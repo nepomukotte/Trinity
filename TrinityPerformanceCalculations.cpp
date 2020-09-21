@@ -7,11 +7,11 @@
 #include <TStyle.h>
 #include <TMath.h>
 #include <TH1D.h>
-
+#include <iostream>
+#include <fstream>
+#include <string>
 #include <TROOT.h>
 #include <TApplication.h>
-
-
 #include <stdio.h>
 
 using namespace std;
@@ -193,49 +193,111 @@ return fabs(i2-i1);
 //follows description in Dutta 2005 in particular equation 28 with
 //parameterization of beta in equation 13 case II
 //energies in GeV distances in km at inptut
-Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu) 
+
+string star ;
+double number;
+int angleNumber;
+vector<double> enerNu,enerTau,prob,angle;
+int rem = 0 ;
+void removeDuplicates()
 {
-
-if(Etau>Enu)
-  return 0;
-
-Double_t sCC = grsCC->Eval(Enu); //crossection in pB
-Double_t sNC = grsNC->Eval(Enu); //crossection in pB
-Double_t rho = 2.65; //density in g/cm3
-Double_t NA = 6.022142e23;
-
-Double_t dInvConvCC = sCC*rho*NA*1e-31; // 1/km 1e-12*1e-28*1e4*1e5
-Double_t dInvConvtotal = (sNC+sCC)*rho*NA*1e-31; // 1/km
-Double_t beta = 1.2e-6 + 0.16e-6 * log(Etau/1e10); //cm2/g Equation 13 case II in Dutta 
-//cout<<"beta "<<beta<<endl;
-Double_t prefactor = Mtau/(DecayTime*c*1e5*beta*rho*Etau); //dimensionless
-//cout<<"Prefactor: "<<prefactor<<endl;
-
-Double_t xDelta = log(Etau/(0.8*Enu))/(beta*rho)*1e-5+D; //where delta function is non zero; 1e-5 convert from cm to km 
-
-if(xDelta<0)
-  return 0;
-
-//cout<<"beta: "<<beta<<" rho: "<<rho<<" Etau: "<<Etau<<endl;
-Double_t Prob = 1.e-5/(beta*rho*Etau); //km/GeV
-//cout<<"Prob: "<<Prob<<endl;
-Double_t Pnu = dInvConvCC*exp(-xDelta*dInvConvtotal);  // 1/km
-//cout<<"Pnu: "<<Pnu<<endl;
-Prob *= Pnu; 
-//cout<<"Prob2: "<<Prob<<endl;
-if(Prob<0)
-  return 0;
-
-if(prefactor<0)
-  return 0;
-  
-Double_t Ptau = exp(-prefactor*(1.0-exp(-beta*rho*(D-xDelta)*1e5))); //1e5 to convert from km to cm 
-//cout<<"Ptau: "<<Ptau<<endl;
-//cout<<1.0-exp(-beta*rho*(D-xDelta)*1e5)<<endl;
-Prob *= Ptau;
-
-return Prob;  
+	while(rem < enerNu.size()-1){
+		if(enerNu[rem]==enerNu[rem+1]){
+			enerNu.erase(enerNu.begin()+rem+1);
+			removeDuplicates();
+		}else if(enerNu[rem+1]==enerNu[rem+2]){
+			rem ++;
+			removeDuplicates();
+		}
+	}
 }
+void readFromTable(){
+	ifstream ifs("table_with_e_05_a_1.txt") ;
+	if(ifs.is_open()){
+	ifs>>star;
+		while(ifs.good()){
+			ifs>>number;
+			enerNu.push_back(number);
+			ifs>>number;
+			angle.push_back(number);
+			for(int i=0;i<100;i++){
+				ifs>>number;
+				enerTau.push_back(number);
+				ifs>>number;
+				prob.push_back(number);
+			}
+			ifs>>number;
+			enerTau.push_back(number);
+			ifs>>star;
+		}
+		cout << "size: " << enerNu.size() << endl;
+		removeDuplicates() ;
+	}
+}
+void findAngleNumber(){
+	for(int i=1;i<enerNu.size();i++){
+		if(angle[0]==angle[i]){
+			angleNumber = i;
+			break;
+		}else{
+			continue ;
+		}
+	}
+}
+double biLinearInterpolation(double a1,double n1,double q11,double a2,double n2,double q22,double x,double y){
+	double q12 = (q11 + q22)/2 ;
+	double q21 = q12 ;
+	double p = (n2-y)/(n2-n1)*( (a2-x)/(a2-a1)*q11 + (x-a1)/(a2-a1)*q21 ) + (y-n1)/(n2-n1)*( (a2-x)/(a2-a1)*q12 + (x-a1)/(a2-a1)*q22 ) ;
+
+return p ;
+}
+Double_t PEtau(Double_t D,Double_t Etau,Double_t Enu)
+{
+	int indexEnu=0;
+	int indexAngle=0;
+	int indexEtau=0;
+	Enu = log10(Enu) + 9.0;
+	Etau = log10(Etau) + 9.0 ;
+	double zenithAngle = 180 - acos(D/2/REarth)/M_PI*180 ;
+	if(zenithAngle >= angle[0] && zenithAngle <= angle[angleNumber-1] && Enu>=enerNu[0] && Enu <=enerNu[enerNu.size()-1]){
+		for(int i=0;i<enerNu.size();i++){
+			if(Enu>=enerNu[i] && Enu<=enerNu[i+1]){
+				indexEnu = i ;
+				break;
+			}else{
+				continue;
+			}
+		}
+		for(int i=0;i<angleNumber;i++){
+			if(zenithAngle>=angle[i] && zenithAngle<=angle[i+1]){
+				indexAngle=i;
+				break;
+			}else{
+				continue;
+			}
+		}
+		for(int i=0;i<100;i++){
+			if(Etau>=enerTau[i] && Etau<=enerTau[i+1]){
+				indexEtau=i;
+				break;
+			}else{
+				continue;
+			}
+		}
+		int indexProb1 = indexEnu*angleNumber*100+indexAngle*100+indexEtau;
+		double p1 = prob[indexProb1] ;
+		int indexProb2 = (indexEnu+1)*angleNumber*100 + (indexAngle+1)*100 + indexEtau ;
+		double p2 = prob[indexProb2] ;
+
+		double Prob = biLinearInterpolation(angle[indexAngle],enerNu[indexEnu],p1,angle[indexAngle+1],enerNu[indexEnu+1],p2,zenithAngle,Enu)/
+						(pow(10,4+(indexEtau+1)*0.07)-pow(10,4+indexEtau*0.07));
+		return Prob ;
+	}else{
+		return 0 ;
+	}
+}
+
+
 
 Double_t PDecayFluorescence(Double_t Etau, Double_t y, Double_t elevation, Double_t azimuth)
 {
@@ -1666,7 +1728,7 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
 
     Double_t dLogEnergyStep = 0.2; //0.2
     Double_t dHalfEnergyBinWidth =1/2.; //in log was 1/2
-    Double_t logEmin = 7; //7
+    Double_t logEmin = 6; //7
     Double_t logEmax = 11; //11
 
     bCombined = kTRUE;
@@ -1679,7 +1741,7 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
     iConfig = 2; //telescope altitude
   
     //exposure
-    Double_t dExposure=3*365*24*3600*0.20; //exposure time 3 years in seconds with 20% duty cycle
+    Double_t dExposure=10*365*24*3600*0.20; //exposure time 3 years in seconds with 20% duty cycle
 
     Double_t dFoV = 2;  //test 0, 1, 2, 10
     tanFoV = tan(dFoV/180.*pi);
@@ -1774,11 +1836,11 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
   hTriggeredAzimuthAngles->Scale(1.0/hTriggeredAzimuthAngles->Integral(),"nosw2");
 
   TString Filename;
-  Filename.Form("SensitivityResults/new4/DifferentialSensitivityTrinity_10TimesNSB_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
+  Filename.Form("SensitivityResults/DifferentialSensitivityTrinity_10TimesNSB_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
   cDiffSensitivity->SaveAs(Filename.Data());
-  Filename.Form("SensitivityResults/new4/AcceptanceTrinity_10TimesNSB_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
+  Filename.Form("SensitivityResults/AcceptanceTrinity_10TimesNSB_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
   cAcceptance->SaveAs(Filename.Data());
-  Filename.Form("SensitivityResults/new4/TriggeredAzimuthTrinity_10TimesNSB_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
+  Filename.Form("SensitivityResults/TriggeredAzimuthTrinity_10TimesNSB_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
   cTriggeredAzimuthAngles->SaveAs(Filename.Data());
 }
 
@@ -1787,7 +1849,8 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
 //
 //////////////////////////////////////////////////////////////////
 int main (int argc, char **argv) {
-
+	readFromTable() ;
+	findAngleNumber() ;
 
   //initiate root
   TROOT root("DisplayEvts","Display Results");
