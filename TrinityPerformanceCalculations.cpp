@@ -281,7 +281,7 @@ int FindLion(double dValue, vector<double> &vData,int iSize)
 return index;
 }
 //Calculates the probability of tau emergence using NuTauSim LUT
-Double_t PEtauNuTauSim(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
+Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 {
 	//Enu = log10(Enu) + 9.0;
 	//Etau = log10(Etau) + 9.0 ;
@@ -318,7 +318,7 @@ Double_t PEtauNuTauSim(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau)
 //Assumes the energy of the tau is 0.8*Enu
 //Double_t PEtauNoTauEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 //Double_t PEtauNoTauEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
-Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
+Double_t PEtauNoEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 {
 
 int n = hTau->FindBin(Etau);
