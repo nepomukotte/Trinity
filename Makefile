@@ -5,7 +5,7 @@ LD = g++        # linker
 
 ARFLAGS = rcs
 
-LDFLAGS += -Wl,--no-as-needed -fPIC -ggdb3 -O3
+LDFLAGS += -Wl,--no-as-needed -fPIC -ggdb3 -O3 -fno-omit-frame-pointer
 LDFLAGS += $(shell root-config --libs)
 
 CXXFLAGS += -c -fPIC  -ggdb3 -O3 
