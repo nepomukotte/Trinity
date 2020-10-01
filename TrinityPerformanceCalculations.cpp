@@ -260,7 +260,7 @@ int FindLion(double dValue, vector<double> &vData,int iSize)
           int iWidth = iSize/2;
           int index = iWidth;
           //cout<<dValue<<": ";
-          while(iWidth>1 && vData[index]!=dValue && index > 0  && index < iSize)
+          while(iWidth>1 && vData[index]!=dValue && index > 0  && index <iSize)
             {
               iWidth = iWidth/2+ iWidth%2;
               index = vData[index]<dValue ? index + iWidth :  index - iWidth;
@@ -294,7 +294,8 @@ Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau)
 	 int indexDistance = FindLion(D,dist,distanceNumber);
 
 	 int indexEtau = FindLion(Etau,enerTau,100);
-		int indexProb1 = indexEnu*distanceNumber*100+indexDistance*100+indexEtau;
+		
+                int indexProb1 = indexEnu*distanceNumber*100+indexDistance*100+indexEtau;
 		double p1 = prob[indexProb1] ;
 		int indexProb2 = (indexEnu+1)*distanceNumber*100 + (indexDistance+1)*100 + indexEtau ;
 		double p2 = prob[indexProb2] ;
@@ -317,7 +318,7 @@ Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau)
 //Assumes the energy of the tau is 0.8*Enu
 //Double_t PEtauNoTauEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 //Double_t PEtauNoTauEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
-Double_t PEtauNoELoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
+Double_t PEtauNoEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 {
 
 int n = hTau->FindBin(Etau);
@@ -353,7 +354,7 @@ return Prob;
 //parameterization of beta in equation 13 case II
 //energies in GeV distances in km at inptut
 //Fails <1e8 GeV because energy loss (Beta) becoms <0
-Double_t PEtauiDutta(Double_t D,Double_t Etau, Double_t Enu,TH1D *hTau) 
+Double_t PEtauDutta(Double_t D,Double_t Etau, Double_t Enu,TH1D *hTau) 
 {
 
 if(Etau>0.8*Enu)
@@ -842,7 +843,7 @@ return ProbTauDecay;
 void PlotEmergenceProbability()
 {
 
-  TH1D *hTau = new TH1D("hTauS","",140,5,12);
+  TH1D *hTau = new TH1D("hTauS","",70,4,11);
   //hTau->SetMaximum(1);
   hTau->GetXaxis()->SetTitle("energy [GeV]");
   hTau->GetYaxis()->SetTitle("F_tau/F_nu");
@@ -1869,7 +1870,7 @@ void CalculateIntegralSensitivity(TH1D *hTau)
 void CalculateDifferentialSensitivity(TH1D *hTau)
 {
 
-    Double_t dLogEnergyStep = 0.2; //0.2
+    Double_t dLogEnergyStep = 1; //0.2
     Double_t dHalfEnergyBinWidth =1/2.; //in log was 1/2
     Double_t logEmin = 6; //7
     Double_t logEmax = 10.5; //11
@@ -1886,7 +1887,7 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
     //exposure
     Double_t dExposure=10*365*24*3600*0.20; //exposure time 10 years in seconds with 20% duty cycle
 
-    Double_t dFoV = 2; //3  //test 0, 1, 2, 10
+    Double_t dFoV = 2;  //test 0, 1, 2, 10
     tanFoV = tan(dFoV/180.*pi);
     //dFoVBelow = asin(REarth/(REarth+DetectorAltitude[iConfig]));
     dFoVBelow =  3/180.*pi; 
