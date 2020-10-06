@@ -1149,7 +1149,8 @@ axis->Delete();
                           dP = dPCherenkov;
                         dDeltaAcceptance+=hTau->GetBinContent(i+1)*dP;
                         //dDeltaAcceptance+=hTau->GetBinContent(i+1); //use above
-                        hTriggeredAzimuthAngles->Fill(azimuth,hTau->GetBinContent(i+1)*dP*dWeightForTriggeredAzimuth);
+                        if(!bMonoNu)
+                          hTriggeredAzimuthAngles->Fill(azimuth,hTau->GetBinContent(i+1)*dP*dWeightForTriggeredAzimuth);
                        }
                      //if(hTau->GetBinContent(i+1)*dP>0 )
                      //cout<<hTau->GetBinCenter(i+1)<<"  "<<hTau->GetBinContent(i+1)<<" y:  "<<y<<"  el: "<<elevation<<" az: "<<azimuth<<" dp: "<<dP<<" dDeltaAccept: "<<dDeltaAcceptance<<" prod: "<<hTau->GetBinContent(i+1)*dP<<endl;
@@ -1870,7 +1871,7 @@ void CalculateIntegralSensitivity(TH1D *hTau)
 void CalculateDifferentialSensitivity(TH1D *hTau)
 {
 
-    Double_t dLogEnergyStep = 1; //0.2
+    Double_t dLogEnergyStep = 0.2; //0.2
     Double_t dHalfEnergyBinWidth =1/2.; //in log was 1/2
     Double_t logEmin = 6; //7
     Double_t logEmax = 10.5; //11
@@ -1898,6 +1899,13 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
     TGraph *grDiffAcceptance = new TGraph();
 
     TGraph *grSensitivity = new TGraph();
+    grSensitivity->SetLineWidth(3);
+    grSensitivity->SetLineColor(kBlue+3);
+
+    TGraph *grSensitivityNuCommunity = new TGraph();
+    grSensitivityNuCommunity->SetLineWidth(3);
+    grSensitivityNuCommunity->SetLineColor(kRed+3);
+
 
 
     TCanvas *cDiffSensitivity = new TCanvas("cDiffSensitivity","Differential Sensitivity",750,500);
@@ -1906,6 +1914,13 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
     cDiffSensitivity->SetLogx();
 
     TGraph *grAcceptance = new TGraph();
+    grAcceptance->SetLineWidth(3);
+    grAcceptance->SetLineColor(kBlue+3);
+
+    TGraph *grAcceptanceMonoEnergy = new TGraph();
+    grAcceptanceMonoEnergy->SetLineWidth(3);
+    grAcceptanceMonoEnergy->SetLineColor(kRed+3);
+
     TCanvas *cAcceptance = new TCanvas("cAcceptance","Acceptance",750,500);
     cAcceptance->Draw();
     cAcceptance->SetLogy();
@@ -1922,25 +1937,35 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
     Int_t n=0;
     while(dLogE<=logEmax)
        {
+          bMonoNu = kFALSE; //calculate the acceptance averaged over Enu bin
           Double_t dAcceptance = CalculateAcceptance(dLogE-dHalfEnergyBinWidth,dLogE+dHalfEnergyBinWidth,grDiffAcceptance,hTau);
-    
-
 
           if(dAcceptance>1)
            {
-              //Double_t dEIndexed = pow(10,-dLogE*nuIndex);
+              grAcceptance->SetPoint(n,pow(10,dLogE),dAcceptance);
 
-              Double_t dnuFnu = 3 * pow(10,dLogE*2) / dAcceptance / dExposure / (pow(10,dLogE+dHalfEnergyBinWidth)- pow(10,dLogE-dHalfEnergyBinWidth));
+              Double_t dnuFnu = 3 * 2.44 * pow(10,dLogE*2) / dAcceptance / dExposure / (pow(10,dLogE+dHalfEnergyBinWidth)- pow(10,dLogE-dHalfEnergyBinWidth));
               cout<<"Energy "<<dLogE-dHalfEnergyBinWidth<<" to "<<dLogE+dHalfEnergyBinWidth<<" acceptance:  "<<dAcceptance<<" nuFnu: "<<dnuFnu<<" for power law with index -"<<nuIndex<<endl;
               grSensitivity->SetPoint(n,pow(10,dLogE),dnuFnu);
               cDiffSensitivity->cd();
               grSensitivity->Draw("alp");
+
+              //Calculate the Sensitivity as done by the Nu Community
+              bMonoNu = kTRUE; //calculate the acceptance at Enu bin center
+              dAcceptance = CalculateAcceptance(dLogE-dHalfEnergyBinWidth,dLogE+dHalfEnergyBinWidth,grDiffAcceptance,hTau);
+              grAcceptanceMonoEnergy->SetPoint(n,pow(10,dLogE),dAcceptance);
+              bMonoNu = kFALSE;
+              dnuFnu = 3 * 2.44 / dAcceptance / dExposure / log(10) / (2*dHalfEnergyBinWidth) * pow(10,dLogE); //2.44 is from Feldman Cousin 90% confidence upper limit
+              cout<<"NuCommunity Definition: "<<dnuFnu<<" acceptance at center energy: "<<dAcceptance<<endl;
+              grSensitivityNuCommunity->SetPoint(n,pow(10,dLogE),dnuFnu);
+              grSensitivityNuCommunity->Draw("lp");
+
               cDiffSensitivity->Modified();
               cDiffSensitivity->Update();
 
-              grAcceptance->SetPoint(n,pow(10,dLogE),dAcceptance);
               cAcceptance->cd();
               grAcceptance->Draw("alp");
+              grAcceptanceMonoEnergy->Draw("lp");
               cAcceptance->Modified();
               cAcceptance->Update();
 
@@ -1953,8 +1978,14 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
           dLogE+=dLogEnergyStep;
        }
 
-  grSensitivity->SetLineWidth(3);
-  grSensitivity->SetLineColor(kBlue+3);
+
+  cDiffSensitivity->cd();
+  TLegend *legend = new TLegend(0.53,0.7,0.75,0.88);
+  TString legstr;
+  legend->AddEntry(grSensitivity,"Integration","l");
+  legend->AddEntry(grSensitivityNuCommunity,"Approximation","l");
+  legend->Draw();
+
   grSensitivity->GetXaxis()->SetTitle("energy [GeV]");
   grSensitivity->GetYaxis()->SetTitle("E^{2} dN/dE [ GeV cm^{-2} s^{-1} sr^{-1} ]");
   grSensitivity->GetYaxis()->SetTitleSize(0.04);
@@ -1962,8 +1993,12 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
   grSensitivity->GetXaxis()->SetTitleSize(0.04);
   grSensitivity->GetXaxis()->SetLabelSize(0.04);
 
-  grAcceptance->SetLineWidth(3);
-  grAcceptance->SetLineColor(kBlue+3);
+  cAcceptance->cd();
+  legend = new TLegend(0.755,0.49,0.84,0.63);
+  legend->AddEntry(grAcceptance,"Averaged","l");
+  legend->AddEntry(grAcceptanceMonoEnergy,"Mono","l");
+  legend->Draw();
+
   grAcceptance->GetXaxis()->SetTitle("energy [GeV]");
   grAcceptance->GetYaxis()->SetTitle("acceptance [ cm^{2} sr ]");
   grAcceptance->GetYaxis()->SetTitleSize(0.04);
@@ -1986,6 +2021,14 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
   cAcceptance->SaveAs(Filename.Data());
   Filename.Form("SensitivityResults/StudyHighestEnergies/TriggeredAzimuthTrinity_NuTauSim_%ikmAboveGround_%0.0fsqrmMirror_%0.1fdegUpperFoV_%0.1fdegLowerFoV_%0.1fdegMinShowerLength.root",iConfig,dMirrorA[iMirrorSize],dFoV,dFoVBelow/pi*180.,dMinLength);
   cTriggeredAzimuthAngles->SaveAs(Filename.Data());
+
+  Double_t *dE = grSensitivity->GetX(); 
+  Double_t *dF = grSensitivity->GetY(); 
+  for(int i=0;i<grSensitivity->GetN();i++)
+     {
+       cout<<dE[i]<<"  "<<dF[i]<<endl;;
+     }
+
 }
 
 ////////////////////////////////////////////////////////////////////
