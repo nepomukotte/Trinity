@@ -1,3 +1,4 @@
+#include <TF1.h>
 #include <TGraph.h>
 #include <TGaxis.h>
 #include <TTimer.h>
@@ -281,7 +282,7 @@ int FindLion(double dValue, vector<double> &vData,int iSize)
 return index;
 }
 //Calculates the probability of tau emergence using NuTauSim LUT
-Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
+Double_t PEtauNTauSim(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 {
 	//Enu = log10(Enu) + 9.0;
 	//Etau = log10(Etau) + 9.0 ;
@@ -318,7 +319,7 @@ Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau)
 //Assumes the energy of the tau is 0.8*Enu
 //Double_t PEtauNoTauEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 //Double_t PEtauNoTauEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
-Double_t PEtauNoEnergyLoss(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
+Double_t PEtau(Double_t D,Double_t Etau, Double_t Enu, TH1D *hTau) 
 {
 
 int n = hTau->FindBin(Etau);
@@ -1873,14 +1874,14 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
 
     Double_t dLogEnergyStep = 0.2; //0.2
     Double_t dHalfEnergyBinWidth =1/2.; //in log was 1/2
-    Double_t logEmin = 6; //7
+    Double_t logEmin = 5; //7
     Double_t logEmax = 10.5; //11
 
     bCombined = kTRUE;
     yMin = 5; //5
     yMax = 500; //500
     yDelta = 5; //5
-    MaxElevation = 20; //elevation angle (determines path through Earth;
+    MaxElevation = 40; //elevation angle (determines path through Earth;
     DeltaAngle = 0.05; //steps in azimuth and elevation 
 
     iConfig = 2; //telescope altitude
@@ -1888,11 +1889,11 @@ void CalculateDifferentialSensitivity(TH1D *hTau)
     //exposure
     Double_t dExposure=10*365*24*3600*0.20; //exposure time 10 years in seconds with 20% duty cycle
 
-    Double_t dFoV = 2;  //test 0, 1, 2, 10
+    Double_t dFoV = 89;  //test 0, 1, 2, 10
     tanFoV = tan(dFoV/180.*pi);
     //dFoVBelow = asin(REarth/(REarth+DetectorAltitude[iConfig]));
-    dFoVBelow =  3/180.*pi; 
-    iMirrorSize = 2;
+    dFoVBelow =  89/180.*pi; 
+    iMirrorSize = 3;
     dMinimumNumberPhotoelectrons = dThreshold[iMirrorSize]/dMirrorA[iMirrorSize]; 
 
     dMinLength = 0.3; //mimnimum length a shower has to have in the camera, in degrees. This is a conservative estimate because it assumes that the shower starts at a distance l from the detector, which is not necessarily tru for showers with shallow elevation angles.
