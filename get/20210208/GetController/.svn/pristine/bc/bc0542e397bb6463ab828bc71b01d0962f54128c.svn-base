@@ -1,0 +1,247 @@
+/**
+ * $Id$
+ * @file EditTestDialog.cpp
+ * @date 20 avr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#include "get/EditTestDialog.h"
+#include "get/WorkspaceManager.h"
+#include "get/ControllerOptions.h"
+#include "CCfg/CConfig.h"
+#include "CCfg/Scalar.h"
+#include "CCfg/Range.h"
+using namespace CCfg;
+#include <QStringList>
+#include <QPushButton>
+#include <QRegExpValidator>
+#include <QFileDialog>
+#include <QMessageBox>
+
+namespace get {
+//_____________________________________________________________________________
+EditTestDialog::EditTestDialog(QWidget* parentWidget)
+	: QDialog(parentWidget)
+{
+	setupUi(this);
+
+	// Set available types of tests
+	QStringList listOfTypes;
+	size_t const typeCount = sizeof(WorkspaceManager::ALLOWED_TEST_TYPES)/sizeof(*WorkspaceManager::ALLOWED_TEST_TYPES);
+	for (size_t i=0; i < typeCount; ++i)
+	{
+		listOfTypes << QString(WorkspaceManager::ALLOWED_TEST_TYPES[i]);
+	}
+	// Check additional types in workspace
+	try
+	{
+		CCfg::CConfig defaultTest = WorkspaceManager::instance().defaultTest();
+		CCfg::Scalar & type = defaultTest("Type").find().toScalar();
+		Range* typeRange = type.getRange();
+		if (typeRange)
+		{
+			QStringList typeList = QString::fromStdString(typeRange->toString()).remove('{').remove('}')
+						.split(", ", QString::SkipEmptyParts);
+			for (int i=0; i < typeList.size(); ++i)
+			{
+				if (not listOfTypes.contains(typeList.at(i)))
+					listOfTypes << typeList.at(i);
+			}
+		}
+	}
+	catch (const CCfg::Exception & e)
+	{}
+	// Ensure no duplicates
+#if QT_VERSION >= 0x040500
+	listOfTypes.removeDuplicates();
+#endif
+	// Add types to combo box
+	testTypeComboBox->addItems(listOfTypes);
+	// Set default type
+	int defaultIndex = testTypeComboBox->findText("Default");
+	if (defaultIndex >=0)
+		testTypeComboBox->setCurrentIndex(defaultIndex);
+	else if ((defaultIndex = testTypeComboBox->findText("BaseLine")) > 0)
+		testTypeComboBox->setCurrentIndex(defaultIndex);
+
+	// Constrain inputs
+	eccIpAddressLineEdit->setText("127.0.0.1");
+#if QT_VERSION >= 0x040700
+	testNameLineEdit->setPlaceholderText(tr("aNewTest"));
+	eccIpAddressLineEdit->setPlaceholderText("255.255.255.255");
+	daqIpAddressLineEdit->setPlaceholderText("255.255.255.255");
+	targetIpAddressLineEdit->setPlaceholderText("255.255.255.255");
+#endif
+	QRegExp ipRegExp("(\\d\\d*)\\.(\\d\\d*)\\.(\\d\\d*)\\.(\\d\\d*)");
+	QRegExpValidator* ipValidator = new QRegExpValidator(ipRegExp, this);
+	eccIpAddressLineEdit->setValidator(ipValidator);
+	daqIpAddressLineEdit->setValidator(ipValidator);
+	targetIpAddressLineEdit->setValidator(ipValidator);
+
+	try
+	{
+		CCfg::CConfig defaultTest = WorkspaceManager::instance().defaultTest();
+		int defaultPort = 46866;
+		defaultPort = defaultTest("Setup", "Network")("IpNode", "ECC")("port").getIntValue();
+		eccPortSpinBox->setValue(defaultPort);
+		defaultPort = defaultTest("Setup", "Network")("IpNode", "DAQ")("port").getIntValue();
+		daqPortSpinBox->setValue(defaultPort);
+		defaultPort = defaultTest("Setup", "Network")("IpNode", "TARGET")("port").getIntValue();
+		targetPortSpinBox->setValue(defaultPort);
+	}
+	catch (const CCfg::Exception & e)
+	{}
+
+	QObject::connect(testNameLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+	QObject::connect(eccIpAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+	QObject::connect(daqIpAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+	QObject::connect(targetIpAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+	QObject::connect(hwConfigPathLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+	QObject::connect(paramConfigPathLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+	QObject::connect(dataPathLineEdit, SIGNAL(editingFinished()), this, SLOT(validate()));
+
+	QObject::connect(hwConfigPushButton, SIGNAL(released()), this, SLOT(selectHwConfig()));
+	QObject::connect(paramConfigPushButton, SIGNAL(released()), this, SLOT(selectParamConfig()));
+	QObject::connect(dataPathPushButton, SIGNAL(released()), this, SLOT(selectDataPath()));
+
+	daqIpAddressLineEdit->setText(QString::fromStdString(ControllerOptions::instance().dataFlowAddress().toString()));
+	daqPortSpinBox->setValue(ControllerOptions::instance().dataFlowEndpoint().port());
+	dataPathLineEdit->setText(".");
+
+	validate();
+}
+//_____________________________________________________________________________
+TestSummary EditTestDialog::getTestSummary() const
+{
+	TestSummary summary;
+	summary.setName(testNameLineEdit->text().toStdString());
+	summary.setType(testTypeComboBox->currentText().toStdString());
+	summary.setHwConfigPath(hwConfigPathLineEdit->text().toStdString());
+	summary.setParamConfigPath(paramConfigPathLineEdit->text().toStdString());
+	summary.setDataPath(dataPathLineEdit->text().toStdString());
+	summary.eccEndpoint().ipAddress().fromString(eccIpAddressLineEdit->text().toStdString(), false);
+	summary.eccEndpoint().port() = eccPortSpinBox->value();
+	summary.targetEndpoint().ipAddress().fromString(targetIpAddressLineEdit->text().toStdString(), false);
+	summary.targetEndpoint().port() = targetPortSpinBox->value();
+	return summary;
+}
+//_____________________________________________________________________________
+void EditTestDialog::setTestSummary(const get::TestSummary & summary)
+{
+
+	testNameLineEdit->setText(QString::fromStdString(summary.name()));
+	QString testType = QString::fromStdString(summary.type());
+	if (testTypeComboBox->findText(testType) < 0)
+		testTypeComboBox->addItem(testType);
+	testTypeComboBox->setCurrentIndex(testTypeComboBox->findText(testType));
+	hwConfigPathLineEdit->setText(QString::fromStdString(summary.hwConfigPath()));
+	paramConfigPathLineEdit->setText(QString::fromStdString(summary.paramConfigPath()));
+	dataPathLineEdit->setText(QString::fromStdString(summary.dataPath()));
+	eccIpAddressLineEdit->setText(QString::fromStdString(summary.eccEndpoint().ipAddress().toString()));
+	eccPortSpinBox->setValue(summary.eccEndpoint().port());
+	targetIpAddressLineEdit->setText(QString::fromStdString(summary.targetEndpoint().ipAddress().toString()));
+	targetPortSpinBox->setValue(summary.targetEndpoint().port());
+
+	validate();
+}
+//_____________________________________________________________________________
+void EditTestDialog::selectHwConfig()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Select a hardware configuration file"),
+			hwConfigPathLineEdit->text(),
+			QString("%1 (*.xml *.xcfg);; %2 (*)").arg(tr("CompoundConfig XML files")).arg(tr("All files")));
+	if (not path.isEmpty())
+	{
+		hwConfigPathLineEdit->setText(path);
+		validate();
+	}
+}
+//_____________________________________________________________________________
+void EditTestDialog::selectParamConfig()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Select a test parameter file"),
+			paramConfigPathLineEdit->text(),
+			QString("%1 (*.xml *.xcfg);; %2 (*)").arg(tr("CompoundConfig XML files")).arg(tr("All files")));
+	if (not path.isEmpty())
+	{
+		paramConfigPathLineEdit->setText(path);
+		validate();
+	}
+}
+//_____________________________________________________________________________
+void EditTestDialog::selectDataPath()
+{
+	QString path = QFileDialog::getExistingDirectory(this, tr("Select a directory for data"),
+			dataPathLineEdit->text(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+	if (not path.isEmpty())
+	{
+		dataPathLineEdit->setText(path);
+		validate();
+	}
+}
+//_____________________________________________________________________________
+void EditTestDialog::accept()
+{
+	// Check configuration file exist
+	if (not QFileInfo(paramConfigPathLineEdit->text()).exists())
+	{
+		QMessageBox::warning(this, tr("Error"),
+				tr("Test parameter file \"%1\" does not exist!")
+				.arg(paramConfigPathLineEdit->text()));
+		return;
+	}
+	if (not QFileInfo(hwConfigPathLineEdit->text()).exists())
+	{
+		QMessageBox::warning(this, tr("Warning"),
+				tr("Hardware configuration file \"%1\" does not exist locally!")
+				.arg(hwConfigPathLineEdit->text()));
+	}
+
+	QDialog::accept();
+}
+//_____________________________________________________________________________
+void EditTestDialog::validate()
+{
+	bool isValid = true;
+	isValid = isValid && not testNameLineEdit->text().isEmpty();
+	isValid = isValid && eccIpAddressLineEdit->hasAcceptableInput ();
+	isValid = isValid && daqIpAddressLineEdit->hasAcceptableInput ();
+	isValid = isValid && targetIpAddressLineEdit->hasAcceptableInput ();
+	isValid = isValid && eccIpAddressLineEdit->hasAcceptableInput ();
+	isValid = isValid && not hwConfigPathLineEdit->text().isEmpty();
+	isValid = isValid && not paramConfigPathLineEdit->text().isEmpty();
+	isValid = isValid && not dataPathLineEdit->text().isEmpty();
+
+	buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isValid);
+}
+//_____________________________________________________________________________
+} /* namespace get */

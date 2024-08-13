@@ -1,0 +1,5 @@
+connect device asad
+# ADC2: 0x240 = straight binary format, all ones
+reg-write ADC2 0x240
+
+

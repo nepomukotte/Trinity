@@ -1,0 +1,9 @@
+<RCC>
+	<qresource prefix="/dbbrowser" >
+		<file alias="connected">../res/images/connect_established.png</file>
+		<file alias="disconnected">../res/images/connect_no.png</file>
+	</qresource>
+  <qresource prefix="/application/dbconfiged">
+    <file alias="logo.svg">../res/images/ccfg-db-logo.svg</file>
+  </qresource>
+</RCC>

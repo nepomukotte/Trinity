@@ -1,0 +1,775 @@
+/**
+\page page_Tutorial Tutorial
+
+\section sec_Tutorial_Content Content
+<ul>
+	<li>\ref sec_Tutorial_Build </li>
+	<li>\ref sec_Tutorial_Integrate </li>
+	<li>\ref sec_Tutorial_Overview <li>
+	<li>\ref sec_Tutorial_HelloWorld </li>
+	<li>\ref sec_Tutorial_Loading </li>
+	<li>\ref sec_Tutorial_UsingConfig </li>
+	<li>\ref sec_Tutorial_PlainModel </li>
+	<ul>
+		<li>\ref subsec_Tutorial_PlainModel_ObjectLookup </li>
+		<li>\ref subsec_Tutorial_PlainModel_Iteration </li>
+		<li>\ref subsec_Tutorial_PlainModel_Alteration </li>
+
+	</ul>
+	<li>\ref sec_Tutorial_ConfigModel </li>
+	<ul>
+		<li>\ref subsec_Tutorial_ConfigModel_Introduction </li>
+		<li>\ref subsec_Tutorial_ConfigModel_StoringViews </li>
+		<li>\ref subsec_Tutorial_ConfigModel_Iteration </li>
+	</ul>
+</ul>
+
+
+
+\section sec_Tutorial_Build Building CompoungConfig
+<p>
+The build system of CompoundConfig is based on the autotools (automake,
+autoconf...). Nevertheless, you do not need to have knowledge of these tools
+(beyond what is explained here) to  build or use the library.</p>
+<p>
+CompoundConfig compilation has been tested both on Linux and Windows (with
+MinGW). Please refer to \ref page_Build "the build instructions page" for the
+detailed procedure.</p>
+
+
+
+\section sec_Tutorial_Integrate Integrating CompoundConfig
+<p>
+This \ref page_Integration "page" explains how to integrate the library into
+your own applications or libraries.</p>
+
+
+
+\section sec_Tutorial_Overview Overview
+The library is divided into 3 modules:
+- the \ref page_MainModule "main module" contains data structures defining
+the memory representation of a configuration, and a few utility classes about
+this representation.
+- the \ref page_ViewModule "view module" contains classes using the semantics
+of configuration attributes to provide a virtual view expanding inherited
+configuration attribute.
+- the \ref page_IoModule "I/O module" contains classes to load and save
+configurations using several formats and storage media.
+
+
+
+\section sec_Tutorial_HelloWorld The "Hello World" program
+<p>
+This program will show you the basics of loading a configuration and
+displaying a configuration value.</p>
+<p>
+For this test to work, you will need to put the following configuration in a
+file named HelloWorld.xml in the directory where the executable will run.</p>
+\verbatim
+<HelloConfig>
+	<Messages>
+		<hello>Hello world !</hello>
+		<bye>Bye Bye !</bye>
+	</Messages>
+	<Numbers>
+		<i>3</i>
+		<pos id="x" unit="m">5.2</pos>
+		<pos id="y" unit="m">-2.1</pos>
+		<pos id="z" unit="m">1.4</pos>
+		<memSize unit="bytes">0x10000</memSize>
+	</Numbers>
+</HelloConfig>
+\endverbatim
+Here is the code of the most simple program.
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc("HelloWorld.xml");	// load the configuration
+	Object& config = *doc.getConfig();	// retrieve the root object
+
+	// display the value of the HelloConfig.Message.hello scalar property.
+	cout << config("Messages")("hello").getStringValue() << endl;
+
+	return 0;
+}
+\endcode
+<p>
+Assuming you named the file containing this code hello_config.cpp, here is how
+to compile and link it in the most simple way (you must have successfully built
+and installed CompoundConfig):</p>
+\verbatim
+g++ -o hello_config hello_config.cpp `pkg-config --libs --cflags CompoundConfig`
+\endverbatim
+Output:
+\verbatim
+Hello world !
+\endverbatim
+
+
+
+\section sec_Tutorial_Loading Loading
+<p>
+The most important class when working with files or databases is the
+CCfg::Io::Document class. It handles all the work behind loading a saving
+a configuration and takes ownership of the loaded configuration.
+The consequence of this ownership is that once the document is destroyed, the
+whole configuration is destroyed, so the scope of the document must encompass
+the scope of configuration usage.</p>
+<p>
+There are several ways to load a file, the most simple being to specify its
+path or URL in the constructor. But it is also possible to default construct a
+document and to call the loadFromFile or loadFromURL methods. Finally, when the
+most control is needed, one can specify Storage and Format objects that he
+creates himself instead of letting them be deduced from the path or the URL.</p>
+
+
+
+\section sec_Tutorial_UsingConfig Using the Configuration
+<p>
+Once the configuration is loaded, it must be retrieved. Either the constructor
+loaded it, in which case CCfg::Io::Document::getConfig must be called, or the
+load method did the job, in which case the method already returns it:</p>
+\code
+Io::Document doc;
+Object& config = doc.loadFromFile("HelloWorld.xml");
+\endcode
+
+<p>There are two ways of accessing configurations:</p>
+- The simplest and most efficient way is to use the native memory
+structures: the classes CCfg::Attribute, CCfg::Object, CCfg::Scalar.
+However, as these memory structures are the mirror of the file content,
+it means objects does not inherits from the values of their default objects.
+- The semantically correct, more powerful, but also slower way, is to pass
+through high level layer which primarily involves the class CCfg::CConfig.
+It implements the default object mechanism, but has a higher overhead and
+has a few subtleties.
+<p>
+Both ways have many functions and operators in common, so that they are not
+very different for most operations. However, some functions are specific
+to the one or the other, and CCfg::CConfig does not have the same
+lifetime and copy semantics as CCfg::Attribute.</p>
+<p>
+Now, we'll make a tour of the ways of using configurations.</p>
+
+
+
+\section sec_Tutorial_PlainModel The Plain Memory Model
+<p>
+The plain memory model is returned by CCfg::Io::Document::getConfig when using
+documents. Although it returns a CCfg::Object, the main class that is useful
+to access a configuration is the base class CCfg::Attribute.
+In fact, CCfg::Attribute acts as a generic configuration entity, having
+virtual methods coming from both CCfg::Object and CCfg::Scalar interfaces.</p>
+<p>
+It means the compile-time typing is light, but there are run time checks that
+will fail if the assumption on the configuration structure proves false.
+Strong compile-time typing wouldn't make sense because we are dealing
+with configurations that are most of the times unknown at compile-time.
+For example, one cannot retrieve the value of an attribute (assumed to be a
+scalar), if actually it is an object.  Typically in such case, the object
+throws an exception (documented in each method).</p>
+
+
+\subsection subsec_Tutorial_PlainModel_ObjectLookup Object Lookups
+<p>
+The most simple way of accessing a configuration is demonstrated in
+\ref sec_Tutorial_HelloWorld "the Hello World program". It just involves
+using the parentheses operator to retrieve sub-attributes like in an
+associative table.</p>
+<p>
+In fact, each call to the parenthese operator returns a CCfg::Attribute
+reference, so it it possible to store intermediate results. It is useful
+both for optimisation purpose (each call to parenthese operator has a
+complexity of O(N), N being the number of children attributes), and for
+conciseness.</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	Object& config = doc.loadFromFile("HelloWorld.xml");
+
+	// keep a reference to the "Numbers" object.
+	Attribute& numbers = config("Numbers");
+
+	// display the values of the pos "array".
+	cout << numbers("pos", "x").getRealValue() << endl
+		<< numbers("pos", "y").getRealValue() << endl
+		<< numbers("pos", "z").getRealValue() << endl;
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+5.2
+-2.1
+1.4
+\endverbatim
+<p>
+Be careful to always use a reference or a pointer to CCfg::Attribute, but never
+make a copy like this:\code Attribute numbers = config("Numbers");\endcode
+Hopefully it wouldn't compile because Attribute is abstract, however you
+could write:</p>
+\code Object numbers = config("Numbers");\endcode
+It would compile, but may yield unexpected result.
+Indeed the copy semantics of CCfg::Object is a "shallow copy" and not a
+"deep copy":
+- the copied attribute is not integrated into the configuration tree (would
+make no sense because the parent would have doublets).
+- the copied object is empty: children are not duplicated recursively.
+<p>
+The only purpose of this copy semantics is to create a clone having the same
+name and index.</p>
+
+
+\subsection subsec_Tutorial_PlainModel_Scalars Using Scalar properties
+<p>
+Scalar properties are represented by the CCfg::Scalar class, but most of its
+methods are also available in CCfg::Attribute interface. There are methods to
+perform type conversions, and operators to use them in a natural way.</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/Object.h"
+#include <iostream>
+#include <math.h>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	Object& config = doc.loadFromFile("HelloWorld.xml");
+
+	// keep a reference to the "Numbers" object.
+	Attribute& numbers = config("Numbers");
+
+	// get configuration values
+	double pos_x = numbers("pos", "x");
+	double pos_y = numbers("pos", "y");
+
+	// set a configuration value.
+	numbers("pos", "z") = sqrt(pos_x*pos_x + pos_y*pos_y);
+
+	// display the values of the pos "array".
+	cout << numbers("pos", "x").getRealValue() << endl
+		<< numbers("pos", "y").getRealValue() << endl
+		<< numbers("pos", "z").getRealValue() << endl;
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+5.2
+-2.1
+5.60803
+\endverbatim
+<p>
+When getting a configuration value, the compiler will select the closest
+conversion operator from the request type (here it will select operator Real()).
+However, the internal type of the scalar property must match exactly this
+selected type, otherwise it will throw the CCfg::Value::UnexpectedType
+exception.</p>
+<p>
+If you prefer to specify the requested type explicitly, there are methods
+equivalent to operator overloading:</p>
+<ul>
+	<li>CCfg::Attribute::getIntValue</li>
+	<li>CCfg::Attribute::getHexValue</li>
+	<li>CCfg::Attribute::getRealValue</li>
+	<li>CCfg::Attribute::getBoolValue</li>
+	<li>CCfg::Attribute::getStringValue</li>
+</ul>
+<p>
+All these methods require perfect type match between the requested type and
+the internal type. If what you want to do is perform a conversion, there are
+methods to do so:</p>
+<ul>
+	<li>CCfg::Attribute::getValueAsInt</li>
+	<li>CCfg::Attribute::getValueAsHex</li>
+	<li>CCfg::Attribute::getValueAsReal</li>
+	<li>CCfg::Attribute::getValueAsBool</li>
+	<li>CCfg::Attribute::getValueAsString</li>
+</ul>
+<p>
+These conversion methods always success from a numeric (including boolean)
+type to any type, but they can fail from a string to a numeric type
+because a string doesn't always represent a numeric type correctly
+(eg: converting the string "hello" to integer is a non-sense, but also
+converting the string "1.5" to integer is erroneous). Its worth to notice that
+the string must also be a complete match (converting "8x" to integer is not
+valid). Every conversion problem will be reported by the exception
+CCfg::Value::BadConversion</p>
+<p>
+There are also setter methods that can substitute to assignment operator:</p>
+<ul>
+	<li>CCfg::Attribute::setIntValue(Int)</li>
+	<li>CCfg::Attribute::setHexValue(Hex)</li>
+	<li>CCfg::Attribute::setRealValue(Real)</li>
+	<li>CCfg::Attribute::setBoolValue(Bool)</li>
+	<li>CCfg::Attribute::setStringValue(const String&)</li>
+</ul>
+<p>
+It is also possible to perform type autodetection from a string with the method
+CCfg::Attribute::setValue(const std::string &). It analyses the string to
+determine what type of data it represents, converts the string to this data type
+and stores it.</p>
+<p>
+If a string is assumed to represent a certain type, there are also overloaded
+methods to use this string while forcing it to be interpreted as the target
+type. Of course, it requires the string to perfectly and completely comply to
+the type format.</p>
+<ul>
+	<li>CCfg::Attribute::setIntValue(const String &)</li>
+	<li>CCfg::Attribute::setHexValue(const String &)</li>
+	<li>CCfg::Attribute::setRealValue(const String &)</li>
+	<li>CCfg::Attribute::setBoolValue(const String &)</li>
+</ul>
+<p>
+Finally, the class CCfg::Value and the methods CCfg::Attribute::getValue and
+CCfg::Attribute::setValue(const Value &) allows to store and manipulate generic
+values without knowing their type.</p>
+
+
+
+\subsection subsec_Tutorial_PlainModel_Iteration Iterating on Attributes
+<p>
+Until now, all examples needed a complete knowledge of the configuration
+structure. But there may be cases where we want to enumerate every attributes
+in order to print them, or to count the number of occurences of some indexed
+property.</p>
+<p>
+The framework provides an STL-like iteration mechanism on <em>objects</em>.</p>
+
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	Object& config = doc.loadFromFile("HelloWorld.xml");
+
+	// keep a reference to the "Numbers" object.
+	Attribute& numbers = config("Numbers");
+
+	// iterate on each attribute of the object HelloConfig.Numbers
+	for(Attribute::const_iterator iAttribute = numbers.begin(); iAttribute != numbers.end(); ++iAttribute)
+	{
+		// print the name, index and value of attributes (all are scalar properties).
+		cout << iAttribute->getName() << '[' << iAttribute->getIndex() << ']'
+			<< '=' << iAttribute->getValueAsString() << endl;
+	}
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+i[]=3
+pos[x]=5.2
+pos[y]=-2.1
+pos[z]=1.4
+memSize[]=0x10000
+\endverbatim
+<p>
+Like in the STL, there is a const and non-const version of the begin/end
+methods, and of the iterator (iterator/const_iterator). The non-const version
+can be used in every situation where the parent object is not const. Otherwise,
+or if you want to enforce a strict const correctness, the const version must be
+used.</p>
+
+
+\subsection subsec_Tutorial_PlainModel_Alteration Altering the Configuration Structure
+<p>
+The previous examples only showed how to read a configuration, but in some
+cases, it is necessary to extend a configuration by adding some objects or
+scalar properties, or remove some of them, or even to create a configuration
+from scratch.</p>
+<p>First, let's see how to create attributes. There are basically 2 ways to
+do it: either call CCfg::Attribute::appendObject and CCfg::Attribute::appendScalar,
+or instanciate a new attribute and insert it using CCfg::Attribute::append,
+CCfg::Attribute::prepend, or CCfg::Attribute::insert.</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	Object& config = doc.loadFromFile("HelloWorld.xml");
+
+	// add a new object
+	Attribute& speed = config.appendObject("Speed", "0");
+
+	// populate it with scalars
+	// as the created scalar is returned, we can assign its value right away.
+	speed.appendScalar("v", "x") = 12.5;
+	speed.appendScalar("v", "y") = -3.2;
+	speed.appendScalar("v", "z") = 1.8;
+
+	// check everything has been added.
+	Attribute& speed2 = config("Speed", "0");
+	for(Attribute::const_iterator iAttribute = speed2.begin(); iAttribute != speed2.end(); ++iAttribute)
+	{
+		cout << iAttribute->getName() << '[' << iAttribute->getIndex() << ']'
+			<< '=' << iAttribute->getValueAsString() << iAttribute->getUnit() << endl;
+	}
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+v[x]=12.5
+v[y]=-3.2
+v[z]=1.8
+\endverbatim
+Here is how to create the same scalars using CCfg::Attribute::append:
+\code
+speed.append(new Scalar("v", "x", Value(12.5)));
+speed.append(new Scalar("v", "y", Value(-3.2)));
+speed.append(new Scalar("v", "z", Value(1.8)));
+\endcode
+<p>
+Beware when using append, prepend, and insert to always give up ownership of
+the pointer, because the parent configuration object always takes ownership of
+its children.</p>
+<p>
+Using CCfg::Attribute::insert requires having a CCfg::Attribute::iterator on
+the attribute before which insertion should be performed. There are several
+ways to obtain an iterator:</p>
+<ul>
+	<li>using the iterator of a loop;</li>
+	<li>calling CCfg::Attribute::begin or CCfg::Attribute::end, but for
+insertion, it is not very useful, because there are already append and prepend
+methods;</li>
+	<li>calling CCfg::Attribute::find or CCfg::Attribute::search when we have a
+reference on the parent and know the name of the attribute;</li>
+	<li>calling CCfg::Attribute::getIterator when we already have a reference on
+the attribute for which we want an interator.</li>
+</ul>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/Object.h"
+#include "CCfg/Scalar.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	Object& config = doc.loadFromFile("HelloWorld.xml");
+
+	Attribute& numbers = config("Numbers");
+
+	// insert a scalar j=5 before pos[x]
+	numbers.insert(numbers.find("pos", "x"),
+		new Scalar("j", "", Value(5)));
+
+	// check everything has been added.
+	Attribute& speed2 = config("Numbers");
+	for(Attribute::const_iterator iAttribute = speed2.begin(); iAttribute != speed2.end(); ++iAttribute)
+	{
+		cout << iAttribute->getName() << '[' << iAttribute->getIndex() << ']'
+			<< '=' << iAttribute->getValueAsString() << iAttribute->getUnit() << endl;
+	}
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+i[]=3
+j[]=5
+pos[x]=5.2m
+pos[y]=-2.1m
+pos[z]=1.4m
+memSize[]=0x10000bytes
+\endverbatim
+
+
+\section sec_Tutorial_ConfigModel The high-level CConfig model
+<p>
+So far, we have only operated on the plain memory structures. Sometimes, it is
+safer and more consistent to do so (eg: when altering the structure), and sometimes
+it is much more simple. Nevertheless in this mode we cannot take advantage of the
+default object mechanism. If you want to take advantage of it, you must
+pass through the CConfig layer.</p>
+
+\subsection subsec_Tutorial_ConfigModel_Introduction Introduction
+<p>
+The purpose of this layer is to provide a class that behaves like the
+CCfg::Attribute class, while automatically taking inherited <em>attributes</em>
+in account in every operations. This class is CCfg::CConfig. Here is an
+example showing how it is similar as using the plain model.</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/CConfig.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	// initializes a CConfig from the configuration root. Notice that instead of
+	// using a reference, we create a CConfig from the CCfg::Object reference.
+	CConfig config(&doc.loadFromFile("CConfigExample.xml"));
+
+	// using the CConfig is like using the plain memory model.
+	cout << config("TransformationMatrix", "TRANSLATION")("Row", 3)("value", 3).getRealValue() << endl;
+	return 0;
+}
+\endcode
+You will need to put the following XML configuration in a file named
+"CConfigExample.xml" to make it work:
+\verbatim
+<ViewExample>
+	<!-- defines the stereotype of a transformation matrix -->
+	<TransformationMatrix id="*">
+		<!-- Declares that each row has 4 values initialized to 0 -->
+		<Row id="*">
+			<value id="0">0.0</value>
+			<value id="1">0.0</value>
+			<value id="2">0.0</value>
+			<value id="3">0.0</value>
+		</Row>
+
+		<!-- Declares the 4 rows of the matrix and initializes the diagonal to 1 -->
+		<Row id="0">
+			<value id="0">1.0</value>
+		</Row>
+		<Row id="1">
+			<value id="1">1.0</value>
+		</Row>
+		<Row id="2">
+			<value id="2">1.0</value>
+		</Row>
+		<Row id="3">
+			<value id="3">1.0</value>
+		</Row>
+	</TransformationMatrix>
+
+	<!-- declares a translation matrix of vector [5.0; -2.5; 3.1]
+		The resulting matrix is:
+		[1.0   0.0   0.0   5.0]
+		[0.0   1.0   0.0  -2.5]
+		[0.0   0.0   1.0   3.1]
+		[0.0   0.0   0.0   1.0]
+	-->
+	<TransformationMatrix id="TRANSLATION">
+		<Row id="0">
+			<value id="3">5.0</value>
+		</Row>
+		<Row id="1">
+			<value id="3">-2.5</value>
+		</Row>
+		<Row id="2">
+			<value id="3">3.1</value>
+		</Row>
+	</TransformationMatrix>
+</ViewExample>
+\endverbatim
+<p>
+Now lets see how it works: when we instanciate a CCfg::CConfig, we
+provide it with a CCfg::Attribute that will be its entry point into
+the configuration. It can be any <em>attribute</em>, it does not need to be the
+root <em>attribute</em>.</p>
+<p>
+A CConfig depends on two things:
+<ul>
+	<li>The base attribute: the entry point in the configuration;</li>
+	<li>The path: which is the path of the virtual attribute that this
+CConfig is referencing.</li>
+</ul>
+<p>The path is the most important information. When you initializes a
+<em>CConfig</em> from an <em>attribute</em>, it usually takes the path of the
+<em>attribute</em>. When you look for a <em>children attribute</em>, the
+searched name and index will be appended to this path, but nothing else will be
+done. Contrarily to CCfg::Attribute::operator() which returns the corresponding
+CCfg::Attribute, the <em>CConfig</em> only returns itself (to enable chained
+calls) and modify its internal path. Therefore, by chaining calls to
+CCfg::CConfig::operator()() you just accumulate data in a path.</p>
+<p>
+However, when you call another operation that requires to do something on
+the <em>concrete attribute</em>, at this moment, the CConfig is
+<strong>resolved</strong>. Resolving a <em>CConfig</em> is an operation that
+searches the <em>concrete attribute</em> matching the path, using inheritance
+ rules defined in the configuration semantics. <strong>But, once a CConfig has
+been resolved, its path is immediately reset to its initialization state
+</strong>. This way, you can start another lookup with the same
+CCfg::CConfig at the same starting point. The following example
+demonstrate this reinitialization:</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/CConfig.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	CConfig config(&doc.loadFromFile("CConfigExample.xml"));
+
+	// uses the CConfig once: the path is accumulated, then the method getRealValue
+	// is called which triggers the resolution, then inner getRealValue is
+	// called on the concrete attribute, and the CConfig path is reset for the next use
+	cout << config("TransformationMatrix", "TRANSLATION")("Row", 3)("value", 3).getRealValue() << endl;
+
+	// the CConfig has been reset, we can use it again like if nothing happened.
+	cout << config("TransformationMatrix", "TRANSLATION")("Row", 2)("value", 3).getRealValue() << endl;
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+1
+3.1
+\endverbatim
+
+\subsection subsec_Tutorial_ConfigModel_StoringViews Storing a CConfig resolution Result
+<p>
+Like with plain <em>attributes</em>, we can create an intermediate CConfig on
+<em>children attributes</em> to avoid re-specifying the full path each time, and
+to improve performance.</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/CConfig.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	CConfig config(&doc.loadFromFile("CConfigExample.xml"));
+
+	// create a CConfig on the virtual object TransformationMatrix[TRANSLATION].Row[0]
+	CConfig row0 = config("TransformationMatrix", "TRANSLATION")("Row", 0);
+
+	// loop on the 4 values
+	for(int i = 0; i < 4; ++i)
+	{
+		// display the value.
+		cout << row0("value", i).getRealValue() << endl;
+
+		// by looking the configuration, you will see that each value displayed
+		// here is defined in a different concrete object:
+		// - TransformationMatrix[*].Row[*]
+		// - TransformationMatrix[*].Row[0]
+		// - TransformationMatrix[TRANSLATION].Row[0]
+		// But the power of the CConfig is to make this completely transparent.
+	}
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+1
+0
+0
+5
+\endverbatim
+
+\subsection subsec_Tutorial_ConfigModel_Iteration Iterating on a CConfig
+<p>
+Iteration on a <em>CConfig</em> is rather different than iterating on an object.
+This difference comes from the fact that an <em>object</em> is a true container
+whereas the <em>CConfig</em> is a virtual container that requires non-trivial
+computations to determine its content.</p>
+<p>
+The <em>object</em> iteration model is using the STL-style lightweight
+iterators, whereas the <em>view</em> iteration model is using the Java-like
+heavy-weight iterators. The first are just small pointer-like objects whereas
+the seconds are big stateful objects. They are most adequate than STL-like
+iterators when it comes to provide access to computation results, because they
+can be stored inside them.</p>
+<p>
+Although the Java-like iterator was the original way of accessing children
+configs, there is another way consisting in directly retrieving the the
+computed list of CConfig and iterating on it. It seems like a more natural and
+concise way of doing it and therefore it is the recommended method. Iterators
+can still be used though, just use the method that you prefer. The following
+example uses both methods to demonstrate each one:</p>
+\code
+#include "CCfg/Io/Document.h"
+#include "CCfg/CConfig.h"
+#include "CCfg/Object.h"
+#include <iostream>
+
+using namespace CCfg;
+using namespace std;
+
+int main()
+{
+	Io::Document doc;
+	CConfig config(&doc.loadFromFile("ViewExample.xml"));
+
+	// create a CConfig on the virtual object TransformationMatrix[TRANSLATION]
+	CConfig matrix = config("TransformationMatrix", "TRANSLATION");
+
+	// first iteration method: using the Java-like iterator.
+	CConfig::Iterator iRow = matrix.iterate();
+
+	// loop on each row
+	while(iRow.hasNext())
+	{
+		// do not forget to call next before accessing the first element.
+		iRow.next();
+		// second iteration method: retrieving the ConfigList
+		ConfigList columns = iRow->getAttributes();
+		// loop on each column
+		for(size_t i = 0; i < columns.size(); ++i)
+		{
+			cout << columns[i].getValueAsString() << '\t';
+		}
+		cout << endl;
+	}
+
+	return 0;
+}
+\endcode
+Output:
+\verbatim
+1.0	0.0	0.0	5.0
+0.0	1.0	0.0	-2.5
+0.0	0.0	1.0	3.1
+0.0	0.0	0.0	1.0
+\endverbatim
+
+*/

@@ -1,0 +1,308 @@
+/**
+ * @file HistogramWidget.cpp
+ * @date Jan 28, 2014
+ * @author sizun
+ * 
+ * @note SVN tag: $Id: HistogramWidget.cpp 1105 2014-01-29 08:47:35Z psizun $
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the ConfigWizard software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "HistogramWidget.h"
+#include "RangeDialog.h"
+
+#include <QApplication>
+#include <QBoxLayout>
+#include <QCheckBox>
+#include <QDialogButtonBox>
+#include <QDoubleSpinBox>
+#include <QDir>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QProgressDialog>
+#include <QPushButton>
+
+// ROOT include
+#ifdef HAVE_QTROOT
+#include <TQtWidget.h>
+#include <TStyle.h>
+#include <TFrame.h>
+#include <TROOT.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TVirtualPad.h>
+#include <TPaletteAxis.h>
+#endif // HAVE_QTROOT
+
+#include <cmath>
+#include <fstream>
+#include <iomanip>
+#include <limits>
+#include <string>
+
+namespace get
+{
+namespace root
+{
+//_________________________________________________________________________________________________
+#ifdef HAVE_QTROOT
+//_________________________________________________________________________________________________
+HistogramWidget::HistogramWidget(QWidget *parentWidget) : QWidget(parentWidget), hist_(0), qtWidget_(0)
+{
+	// Set style of ROOT canvas
+	gROOT->SetStyle("Plain");
+	gStyle->SetCanvasColor(kWhite);
+	gStyle->SetFrameFillColor(kWhite);
+	gStyle->SetTitleBorderSize(0);
+	// Set pad title font and size
+	gStyle->SetTitleSize(0.04, "*");
+	gStyle->SetTitleFont(22, "*");
+	// Set title font and size for all 3 axes
+	gStyle->SetTitleSize(0.04, "XYZ");
+	gStyle->SetTitleFont(22, "XYZ");
+	// Set label font and size for all 3 axes
+	gStyle->SetLabelSize(0.04, "XYZ");
+	gStyle->SetLabelFont(22, "XYZ");
+	gStyle->SetLineWidth(1);
+	gStyle->SetOptStat(0);
+	gStyle->SetOptTitle(1);
+	gStyle->SetPalette(1);
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setSpacing(0);
+	layout->setMargin(0);
+	qtWidget_ = new TQtWidget(this);
+	layout->addWidget(qtWidget_);
+	qtWidget_->setMinimumSize(100, 120);
+	buttonBox_ = new QDialogButtonBox(QDialogButtonBox::Save, Qt::Horizontal, this);
+	QObject::connect(buttonBox_, SIGNAL(clicked(QAbstractButton*)), this, SLOT(on_buttonBox_clicked(QAbstractButton*)));
+	//QObject::connect(buttonBox_, SIGNAL(rejected()), this, SLOT(reject()));
+	logButton = new QCheckBox(tr("&Log"));
+	logButton->setToolTip(tr("Logarithmic scale. Use this feature at your own risk."));
+	QObject::connect(logButton, SIGNAL(clicked(bool)), this, SLOT(setLogMode(bool)));
+	buttonBox_->addButton(logButton, QDialogButtonBox::ActionRole);
+	rangeButton = new QPushButton(tr("&Range"));
+	buttonBox_->addButton(rangeButton, QDialogButtonBox::ActionRole);
+	exportButton = new QPushButton(tr("&Export"));
+	buttonBox_->addButton(exportButton, QDialogButtonBox::ActionRole);
+	layout->addWidget(buttonBox_);
+	setLayout(layout);
+
+	setMinimumSize(50,50);
+	setWindowTitle(tr("Histogram"));
+}
+//_________________________________________________________________________________________________
+HistogramWidget::~HistogramWidget()
+{
+	if (hist_) hist_->Delete();
+	if (qtWidget_) delete qtWidget_;
+}
+//_________________________________________________________________________________________________
+TVirtualPad* HistogramWidget::canvas() const
+{
+	return qtWidget_->GetCanvas();
+}
+//_________________________________________________________________________________________________
+bool HistogramWidget::isTH1F() const
+{
+	return (hist_ and not strcmp(hist_->ClassName(), "TH1F"));
+}
+//_________________________________________________________________________________________________
+bool HistogramWidget::isTH2F() const
+{
+	return (hist_ and not strcmp(hist_->ClassName(), "TH2F"));
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::setHist(TH1* hist, const char* title)
+{
+	if (hist_) hist_->Delete();
+	hist_ = hist;
+	setWindowTitle(title);
+	if (hist)
+	{
+		qtWidget_->GetCanvas()->Modified();
+		qtWidget_->GetCanvas()->Update();
+		update();
+	}
+}
+//_________________________________________________________________________________________________
+TH1* HistogramWidget::hist() const
+{
+	return hist_;
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::setStandardButtons(QDialogButtonBox::StandardButtons buttons)
+{
+	buttonBox_->setStandardButtons(buttons);
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::on_buttonBox_clicked(QAbstractButton* button)
+{
+	// "Save"
+	if (buttonBox_->standardButton(button) == QDialogButtonBox::Save)
+	{
+		saveHist();
+	}
+	// "Range"
+	else if (button == rangeButton)
+	{
+		setHistRange();
+	}
+	// "Export"
+	else if (button == exportButton)
+	{
+		exportHist();
+	}
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::setLogMode(bool enabled)
+{
+	if (not hist_) return;
+
+	TPad* canvas = (TPad*) this->canvas();
+	canvas->cd();
+	if (isTH1F())
+		canvas->SetLogy(enabled?1:0);
+	else
+		canvas->SetLogz(enabled?1:0);
+
+	canvas->Modified();
+	canvas->Update();
+	qtWidget_->Refresh();
+
+	logButton->setChecked(enabled);
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::setHistRange()
+{
+	if (not hist_) return;
+
+	RangeDialog rangeDialog(this);
+	rangeDialog.setRange(
+			hist_->GetMinimum(),
+			hist_->GetMaximum());
+
+	if (rangeDialog.exec())
+	{
+		double minimum, maximum;
+		rangeDialog.getRange(minimum, maximum);
+		setHistRange(minimum, maximum);
+	}
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::setHistRange(double const & minimum, double const & maximum)
+{
+	if (not hist_) return;
+
+	hist_->SetMinimum(minimum);
+	hist_->SetMaximum(maximum);
+
+	qtWidget_->GetCanvas()->Modified();
+	qtWidget_->GetCanvas()->Update();
+	update();
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::exportHist()
+{
+	if (not hist_) return;
+
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Export data as"), QString("%1/%2.dat").arg(QDir::homePath()).arg(canvas()->GetName()),
+			QString("%1 (*.dat);; %2 (*)")
+			.arg(tr("ASCII data file"))
+			.arg(tr("All files")), 0, QFileDialog::DontUseNativeDialog);
+	if (fileName.isEmpty()) return;
+
+	std::ofstream file(fileName.toStdString().c_str(), std::ios::trunc);
+	typedef std::numeric_limits< double > dbl;
+	typedef std::numeric_limits< float > flt;
+	const float PI = std::atan2(0.0f,-1.0f);
+
+	if (isTH2F())
+	{
+		QString xTitle(hist_->GetXaxis()->GetTitle());
+		bool const convertXToRad = xTitle.endsWith("[deg]");
+		if (convertXToRad) xTitle.replace("[deg]", "[rad]");
+
+		QString yTitle(hist_->GetYaxis()->GetTitle());
+		bool const convertYToRad = yTitle.endsWith("[deg]");
+		if (convertYToRad) yTitle.replace("[deg]", "[rad]");
+
+		file << "# " 	<< xTitle.toStdString()
+				<< '\t' << yTitle.toStdString()
+				<< '\t' << hist_->GetZaxis()->GetTitle() << std::endl;
+		for (int binx=1; binx <= hist_->GetXaxis()->GetNbins(); ++binx)
+		{
+			float x =  hist_->GetXaxis()->GetBinCenter(binx);
+			if (convertXToRad) x = x*PI/180.f;
+			for (int biny=1; biny <= hist_->GetYaxis()->GetNbins(); ++biny)
+			{
+				float y =  hist_->GetYaxis()->GetBinCenter(biny);
+				if (convertYToRad) y = y*PI/180.f;
+				double const z = hist_->GetBinContent(binx, biny);
+				file << std::setprecision(flt::digits10 + 1) << x << '\t' << y << '\t' << std::setprecision(dbl::digits10 + 1) << z << std::endl;
+			}
+		}
+	}
+	else if (isTH1F())
+	{
+		QString xTitle(hist_->GetXaxis()->GetTitle());
+		bool const convertXToRad = xTitle.endsWith("[deg]");
+		if (convertXToRad) xTitle.replace("[deg]", "[rad]");
+
+		file << "# " 	<< xTitle.toStdString()
+				<< '\t' << hist_->GetYaxis()->GetTitle() << std::endl;
+		for (int binx=1; binx <= hist_->GetXaxis()->GetNbins(); ++binx)
+		{
+			float x =  hist_->GetXaxis()->GetBinCenter(binx);
+			if (convertXToRad) x = x*PI/180.f;
+			double const y = hist_->GetBinContent(binx);
+			file << std::setprecision(flt::digits10 + 1) << x << '\t' << std::setprecision(dbl::digits10 + 1) << y << std::endl;
+		}
+
+	}
+
+	file.close();
+}
+//_________________________________________________________________________________________________
+void HistogramWidget::saveHist()
+{
+	static QString saveDir = QDir::homePath();
+
+	TVirtualPad* canvas = qtWidget_->GetCanvas();
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save canvas as"), QString("%1/%2.png").arg(saveDir).arg(canvas->GetName()),
+			QString("PNG (*.png);; GIF (*.gif);; PostScript (*.ps);; %1 (*.eps);; PDF (*.pdf);; %2 (*.C);; %3 (*)")
+			.arg(tr("Encapsulated PostScript"))
+			.arg(tr("ROOT macro"))
+			.arg(tr("All files")), 0, QFileDialog::DontUseNativeDialog);
+	if (fileName.isEmpty()) return;
+	// TPad::Print: The physical size of the Postscript page is the one selected in the current style.
+	gStyle->SetPaperSize(TStyle::kA4);
+	canvas->SaveAs(fileName.toStdString().c_str());
+	saveDir = QFileInfo(fileName).canonicalPath();
+}
+#endif // HAVE_QTROOT
+//_________________________________________________________________________________________________
+} /* namespace root */
+} /* namespace get */

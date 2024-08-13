@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+slicedir=@datarootdir@/slice
+
+Name: mdaq-cli
+Description: Mordicus command line interface library
+Requires: Utilities@DEBUG_SUFFIX@ mdaq-utl@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -lmdaq-cli@DEBUG_SUFFIX@
+Cflags: -I${includedir}

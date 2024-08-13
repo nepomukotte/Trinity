@@ -1,0 +1,14 @@
+connect device aget
+writeReg reg1 0x38029059
+writeReg reg2 0x38a1df
+writeReg reg3 0x0
+writeReg reg4 0x0
+writeReg reg6 0
+writeReg reg7 0
+writeReg reg8 0
+writeReg reg8msb 0
+writeReg reg9 0
+writeReg reg9msb 0
+writeReg reg10 0
+writeReg reg11 0
+writeReg reg12 0

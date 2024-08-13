@@ -1,0 +1,77 @@
+// $Id$
+
+#include "get/asad/utl.h"
+#include <boost/test/auto_unit_test.hpp>
+
+namespace get
+{
+namespace asad
+{
+
+BOOST_AUTO_TEST_CASE(FreqToLCM1_Test)
+{
+	// CKW = 100 MHz = WCKn
+	uint64_t expectedValue = UINT64_C(0x48900001020000CF);
+	uint64_t actualValue = utl::buildLcm1RegisterValue(100.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 50 MHz = WCKn
+	expectedValue = UINT64_C(0x91200001020000D7);
+	actualValue = utl::buildLcm1RegisterValue(50.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 25 MHz = WCKn
+	expectedValue = UINT64_C(0x20400001020000C7);
+	actualValue = utl::buildLcm1RegisterValue(25.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 12.5 MHz = WCKn
+	expectedValue = UINT64_C(0x41420001020000C7);
+	actualValue = utl::buildLcm1RegisterValue(12.5);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 6.25 MHz = WCKn
+	expectedValue = UINT64_C(0x81C30001020000C7);
+	actualValue = utl::buildLcm1RegisterValue(6.25);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 100 MHz, WCKn = 1 MHz
+	expectedValue = UINT64_C(0xc8406001020000c7);
+	actualValue = utl::buildLcm1RegisterValue(100., 100.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 50 MHz, WCKn = 1 MHz
+	expectedValue = UINT64_C(0x90406001020000c7);
+	actualValue = utl::buildLcm1RegisterValue(50., 50.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 100 MHz, WCKn = 50 MHz
+	expectedValue = UINT64_C(0xc9200001020000d7);
+	actualValue = utl::buildLcm1RegisterValue(100., 2.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 100 MHz, WCKn = 25 MHz
+	expectedValue = UINT64_C(0xc8400001020000c7);
+	actualValue = utl::buildLcm1RegisterValue(100., 4.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 100 MHz, WCKn = 12.5 MHz
+	expectedValue = UINT64_C(0xc8420001020000c7);
+	actualValue = utl::buildLcm1RegisterValue(100., 8.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 100 MHz, WCKn = 75 MHz -> WCKn = 77,778 MHz
+	expectedValue = UINT64_C(0x89600001020000d7);
+	actualValue = utl::buildLcm1RegisterValue(100., 100./75.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+
+	// CKW = 100 MHz, WCKn = 33,3 MHz
+	expectedValue = UINT64_C(0x28c00001020000c7);
+	actualValue = utl::buildLcm1RegisterValue(100., 3.);
+	BOOST_CHECK_EQUAL(actualValue, expectedValue);
+}
+
+} /* namespace asad */
+} /* namespace get */
+
+

@@ -1,0 +1,45 @@
+if VXWORKS_KERNEL
+BUILT_SOURCES += StateMachineTest_ctdt.c
+CLEANFILES += StateMachineTest_ctdt.c
+
+EXTRA_PROGRAMS = StateMachineTest_partialimage
+
+if MASTER
+nodist_EXTRA_RunControlMaster_SOURCES = RunControlMaster_ctdt.c
+
+BUILT_SOURCES += RunControlMaster_ctdt.c
+CLEANFILES += RunControlMaster_ctdt.c
+
+EXTRA_PROGRAMS += RunControlMaster_partialimage
+RunControlMaster_partialimage_SOURCES = $(RunControlMaster_SOURCES)
+nodist_RunControlMaster_partialimage_SOURCES = $(nodist_RunControlMaster_SOURCES)
+RunControlMaster_partialimage_LDADD = $(RunControlMaster_LDADD)
+
+RunControlMaster_ctdt.c: RunControlMaster_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+endif
+
+nodist_EXTRA_StateMachineTest_SOURCES = StateMachineTest_ctdt.c
+
+StateMachineTest_partialimage_SOURCES = $(StateMachineTest_SOURCES)
+StateMachineTest_partialimage_LDADD = $(StateMachineTest_LDADD)
+
+StateMachineTest_ctdt.c: StateMachineTest_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+
+if SERVANT
+nodist_EXTRA_RunControlServant_SOURCES = RunControlServant_ctdt.c
+
+BUILT_SOURCES += RunControlServant_ctdt.c
+CLEANFILES += RunControlServant_ctdt.c
+
+EXTRA_PROGRAMS += RunControlServant_partialimage
+RunControlServant_partialimage_SOURCES = $(RunControlServant_SOURCES)
+nodist_RunControlServant_partialimage_SOURCES = $(nodist_RunControlServant_SOURCES)
+RunControlServant_partialimage_LDADD = $(RunControlServant_LDADD)
+
+RunControlServant_ctdt.c: RunControlServant_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+endif
+
+endif

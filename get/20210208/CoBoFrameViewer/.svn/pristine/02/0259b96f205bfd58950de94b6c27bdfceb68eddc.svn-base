@@ -1,0 +1,312 @@
+/**
+ * @file CoBoFrameBrowser.cpp
+ * @date Apr 9, 2013
+ * @author sizun
+ * 
+ * @note SVN tag: $Id$
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the CoBoFrameViewer software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "CoBoFrameBrowser.h"
+#include "GDataSample.h"
+#include "GDataChannel.h"
+#include "GDataFrame.h"
+#include "utl/Logging.h"
+
+#include <TF1.h>
+#include <TFile.h>
+#include <TGraph.h>
+#include <TH1F.h>
+#include <TMath.h>
+#include <TMultiGraph.h>
+#include <TTree.h>
+#include <TROOT.h>
+#include <TString.h>
+
+#if ROOT_VERSION_CODE > 393216
+namespace GET {
+const char* nsName = "GET";
+#else
+namespace get {
+const char* nsName = "get";
+#endif
+//__________________________________________________________________________________________________
+CoBoFrameBrowser::CoBoFrameBrowser(const TGWindow *p, UInt_t w, UInt_t h)
+	: fFile(0), fTree(0), fEntries(0), fCurrentId(-1), fFrame(0), isUpToDate(false), drawOption("COLZ")
+{
+	// Create a main frame
+	fMainFrame = new TGMainFrame(p, w, h);
+	fMainFrame->Connect("CloseWindow()", TString::Format("%s::CoBoFrameBrowser", nsName).Data(), this, "CloseWindow()");
+
+	// Create canvas widget
+	CreateCanvas();
+	for (Int_t agetId = 0; agetId < 4; ++agetId) { multiGraph[agetId] = 0; histo[agetId] = 0; }
+
+	// Create a horizontal frame widget with buttons
+	DefineButtons();
+
+	// Set a name to the main frame
+	fMainFrame->SetWindowName("CoBoFrameBrowser");
+
+	// Map all subwindows of main frame
+	fMainFrame->MapSubwindows();
+
+	// Initialize the layout algorithm
+	fMainFrame->Resize(fMainFrame->GetDefaultSize());
+	// Map main frame
+	fMainFrame->MapWindow();
+}
+//_____________________________________________________________________________
+void CoBoFrameBrowser::CloseWindow()
+{
+   // Got close message for this MainFrame. Terminates the application.
+   gApplication->Terminate();
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::CreateCanvas()
+{
+	fEcanvas = new TRootEmbeddedCanvas("Ecanvas", fMainFrame, 900, 600);
+	fMainFrame->AddFrame(fEcanvas,
+			new TGLayoutHints(kLHintsExpandX | kLHintsExpandY, 10, 10, 10, 1));
+
+	fCanvas = fEcanvas->GetCanvas();
+	fCanvas->Clear();
+	fCanvas->Divide(2, 2);
+}
+//_____________________________________________________________________________
+void CoBoFrameBrowser::DefineButtons()
+{
+	TGHorizontalFrame *hframe = new TGHorizontalFrame(fMainFrame, 900, 40);
+
+	fButPrev = new TGTextButton(hframe, "&Prev");
+	fButPrev->Connect("Clicked()", TString::Format("%s::CoBoFrameBrowser", nsName).Data(), this, "DrawPreviousFrame()");
+	hframe->AddFrame(fButPrev, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+
+	fButGoTo = new TGNumberEntry(hframe);
+	fButGoTo->SetLimitValues(-1, -1);
+	fButGoTo->Connect("ValueSet(Long_t)", TString::Format("%s::CoBoFrameBrowser", nsName).Data(), this, "GoToAction(Long_t)");
+	hframe->AddFrame(fButGoTo, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+	//Connect("DrawFrame(Long_t)", "TGNumberEntry", fButGoTo, "SetValue(Long_t)");
+
+	fButNext = new TGTextButton(hframe, "&Next");
+	fButNext->Connect("Clicked()", TString::Format("%s::CoBoFrameBrowser", nsName).Data(), this, "DrawNextFrame()");
+	hframe->AddFrame(fButNext, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+
+	fBut3D = new TGCheckButton(hframe, "&3D");
+	fBut3D->Connect("Toggled(Bool_t)", TString::Format("%s::CoBoFrameBrowser", nsName).Data(), this, "DrawCurrentFrame()");
+	hframe->AddFrame(fBut3D, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+
+	fButExit = new TGTextButton(hframe, "&Exit", "gApplication->Terminate(0)");
+	hframe->AddFrame(fButExit, new TGLayoutHints(kLHintsCenterX, 5, 5, 3, 4));
+
+	fMainFrame->AddFrame(hframe, new TGLayoutHints(kLHintsCenterX, 2, 2, 2, 2));
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::LoadFile(const std::string & filename)
+{
+	// Clean
+	if (fFile) { fFile->Close(); fFile->Delete(); fFile = 0; }
+	fTree = 0;
+	fEntries = 0;
+	fCurrentId = -1;
+	fButGoTo->SetLimitValues(-1, -1);
+
+	// Open file
+	fFile = new TFile(filename.c_str());
+	if (not fFile) return;
+
+	// Get tree
+	fTree = (TTree*) fFile->Get("tree");
+	if (!fTree) return;
+	fEntries = fTree->GetEntries();
+	fButGoTo->SetLimitValues(0, fEntries);
+
+	gROOT->cd(); //Make sure that the new objects are memory resident
+	fTree->SetBranchAddress("GDataFrame", &fFrame);
+
+	// Draw first frame
+	DrawNextFrame();
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::DrawPreviousFrame()
+{
+	DrawFrame(fCurrentId - 1);
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::DrawNextFrame()
+{
+	DrawFrame(fCurrentId + 1);
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::GoToAction(Long_t)
+{
+	Long_t newFrameId = fButGoTo->GetIntNumber();
+	DrawFrame(newFrameId);
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::DrawCurrentFrame()
+{
+	isUpToDate = false;
+	DrawFrame(fCurrentId);
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::DrawFrame(Long_t frameId)
+{
+	if (!fTree or frameId < 0 or frameId >= fEntries) return;
+	if (frameId == fCurrentId and isUpToDate) return;
+
+	std::cout << "Drawing frame #" << frameId << "..." << std::endl;
+
+	int ok = fTree->GetEntry(frameId);
+	if (not ok) return;
+
+	if (fBut3D->IsOn())
+		DrawFrame3D(frameId);
+	else
+		DrawFrame2D(frameId);
+
+	fCurrentId = frameId;
+	fButGoTo->SetIntNumber(fCurrentId);
+	isUpToDate = true;
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::DrawFrame2D(Long_t frameId)
+{
+	fCanvas->Clear();
+	fCanvas->Divide(2, 2);
+	for (Int_t agetId = 0; agetId < 4; ++agetId)
+	{
+		TVirtualPad* pad = fCanvas->cd(1 + agetId);
+		pad->SetTopMargin(1.25);
+		if (multiGraph[agetId]) delete multiGraph[agetId];
+		multiGraph[agetId] = new TMultiGraph(TString::Format("mgAget%d", agetId),
+				TString::Format("AGET #%d", agetId).Data());
+		for (Int_t chanId = 0; chanId < 68; ++chanId)
+		{
+			//LOG_DEBUG() << "Searching for channel " << chanId << " of AGET chip no. " << agetId;
+			GDataChannel* channel = fFrame->SearchChannel(agetId, chanId);
+			//LOG_DEBUG() << "Found " << channel;
+			if (!channel) continue;
+
+			TGraph *graph = new TGraph(channel->fNsamples);
+			graph->SetName(TString::Format("gAget%dChan%d", agetId, chanId).Data());
+			for (Int_t i = 0; i < channel->fNsamples; ++i)
+			{
+				GDataSample* sample = (GDataSample*) channel->fSamples.At(i);
+				graph->SetPoint(i, sample->fBuckIdx, sample->fValue);
+			}
+			/*
+			// Remove pedestals
+			Int_t firstPedestalBucket=1, lastPedestalBucket=20;
+			Double_t pedestalMean = TMath::Mean(graph->GetY()+firstPedestalBucket, graph->GetY()+lastPedestalBucket+1);
+			Double_t* data = graph->GetY();
+			for (Int_t i = 0; i < channel->fNsamples; ++i)
+			{
+			//	data[i] += 250 - pedestalMean;
+			}
+			// Fit peak
+			TF1* fitFcn = new TF1("peakFcn", "[3] + (x>=[1])*(x<512)*[0]*exp(-3*(x-[1])/[2])*sin((x-[1])/[2])*pow((x-[1])/[2], 3)");
+			fitFcn->SetParNames("t0", "")
+			*/
+			Int_t colorIndex = chanId + 1; // 2*chanId+60;
+			graph->SetLineColor(colorIndex);
+			graph->SetMarkerColor(colorIndex);
+			multiGraph[agetId]->Add(graph, "CP");
+		}
+		UInt_t numChannels = 0;
+		if (multiGraph[agetId]->GetListOfGraphs())
+			numChannels = multiGraph[agetId]->GetListOfGraphs()->GetSize();
+		if (numChannels > 0)
+		{
+			LOG_DEBUG() << "Drawing samples from " << numChannels << " channel(s) of AGET chip no. " << agetId;
+			multiGraph[agetId]->Draw("A");
+			multiGraph[agetId]->SetTitle(TString::Format("Frame %ld - AGET %d", frameId, agetId).Data());
+			multiGraph[agetId]->GetHistogram()->GetXaxis()->SetTitle("Time bucket index");
+			multiGraph[agetId]->GetHistogram()->GetYaxis()->SetTitle("Value");
+			multiGraph[agetId]->GetHistogram()->GetXaxis()->CenterTitle();
+			multiGraph[agetId]->GetHistogram()->GetYaxis()->CenterTitle();
+		}
+		gPad->Modified();
+		gPad->Update();
+	}
+	fCanvas->cd();
+	fCanvas->Modified();
+	fCanvas->Update();
+}
+//__________________________________________________________________________________________________
+void CoBoFrameBrowser::DrawFrame3D(Long_t /* frameId */)
+{
+	fCanvas->Clear();
+	fCanvas->Divide(2, 2);
+
+	for (Int_t agetId = 0; agetId < 4; ++agetId)
+	{
+		if (histo[agetId]) delete histo[agetId];
+		TString histName = TString::Format("hAget%d", agetId);
+		histo[agetId] = new TH2F(histName.Data(), "", 512, -0.5, 511.5, 68, -0.5, 67.5);
+	}
+
+	TIter channelIter((TCollection*) fFrame->GetChannels());
+	GDataChannel* channel=0;
+	while ((channel = (GDataChannel*) channelIter.Next()))
+	{
+		TIter sampleIter((TCollection*) &channel->fSamples);
+		GDataSample* sample = 0;
+		while ((sample = (GDataSample*) sampleIter.Next()))
+		{
+			histo[channel->fAgetIdx]->SetBinContent(sample->fBuckIdx, channel->fChanIdx, sample->fValue);
+		}
+	}
+
+	for (Int_t agetId = 0; agetId < 4; ++agetId)
+	{
+		fCanvas->cd(1 + agetId);
+		gPad->SetRightMargin(0.2);
+		histo[agetId]->Draw(drawOption);
+		histo[agetId]->SetTitle(TString::Format("AGET %d", agetId).Data());
+		histo[agetId]->GetXaxis()->SetTitle("Time bucket index");
+		histo[agetId]->GetYaxis()->SetTitle("Channel");
+		histo[agetId]->GetZaxis()->SetTitle("Value");
+		histo[agetId]->GetXaxis()->CenterTitle();
+		histo[agetId]->GetYaxis()->CenterTitle();
+		histo[agetId]->GetZaxis()->CenterTitle();
+		gPad->Modified();
+		gPad->Update();
+	}
+
+	fCanvas->cd();
+	fCanvas->Modified();
+	fCanvas->Update();
+}
+//__________________________________________________________________________________________________
+CoBoFrameBrowser::~CoBoFrameBrowser()
+{
+	// Clean up used widgets: frames, buttons, layout hints
+	fMainFrame->Cleanup();
+	delete fMainFrame;
+}
+//__________________________________________________________________________________________________
+} // namespace get

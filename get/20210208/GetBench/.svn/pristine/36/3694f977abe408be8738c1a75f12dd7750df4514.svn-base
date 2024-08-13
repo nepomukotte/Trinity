@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Setup id="Conditions">
+	<ECC>
+		<!-- Whether to configure CoBo boards (and MuTanT modules) in parallel or sequentially.-->
+		<parallelProcessing>true</parallelProcessing>
+		<!-- Enables the event display (might slow down the acquisition rate). -->
+		<DataMonitor>true</DataMonitor>
+		<!-- Controls the verbosity level. -->
+		<Verbose>false</Verbose>
+	</ECC>
+	<Node id="*">
+		<Instance id="*" />
+	</Node>
+	<Node id="CoBo">
+		<Instance id="*">
+			<!-- Whether the CoBo board is active and should be configured. -->
+			<isActive>true</isActive>
+			<Module>
+				<!-- Defines the number of events to acquire before stopping the acquisition. -->
+				<nbEvent>100</nbEvent>
+				<!-- Deprecated. Specific to 1 AGet firmware. -->
+				<frameType range="{standard, test, threeBytes, zeroSuppression}">standard</frameType>
+				<!--  Value of the 'dataSource' field in the header of the data frames.
+This Data source ID typically refers to the detector or detector type from which the Frame data have been extracted. -->
+				<dataSource range="[0, 255]">0</dataSource>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId range="[0, 255]">0</coboId>
+				<!-- Number of AGET time buckets to read. -->
+				<readoutDepth unit="buckets" range="[0, 512]">512</readoutDepth>
+				<!-- Deprecated. Whether to send a ramp instead of real data. -->
+				<isAcqTestMode>false</isAcqTestMode>
+				<!-- Allows, if set, to modify hit pattern before readout. Modified hit pattern is OR'ed and AND'ed with registers 'readAlways' and ' 'readIfHit' respectively.-->
+				<enableWriteHittedregister>false</enableWriteHittedregister>
+				<!-- Whether to enable the 2p mode. -->
+				<enableMem2pMode>false</enableMem2pMode>
+				<!-- Threshold of the multiplicity trigger mode (total of the 4 AsAd's). -->
+				<multiplicityThreshold>50</multiplicityThreshold>
+				<!-- In 2p mode, multiplicity threshold for the second trigger. -->
+				<multiplicityThreshold_2p>50</multiplicityThreshold_2p>
+				<!-- Number of samples to sum in the multiplicity sliding window for the multiplicity mode. -->
+				<multWindowSize>10</multWindowSize>
+				<!-- When set, a moving average is automatically subtracted from each AGET's raw multiplicity value to shift the baseline down to 0. -->
+				<multSubtractAverage>false</multSubtractAverage>
+				<!-- Twice the number of absolute deviations to subtract from multiplicity signal.  In testing, a value of 4 (2 deviations) worked well to prevent noise from causing triggers. -->
+				<multSubtractDevs range="[0, 7]">0</multSubtractDevs>
+				<!-- Trigger mode: standby (NoTrigger), trigger on external LVCMOS signal using a 2.5 V SMA cable (External), trigger on multiplicity above threshold (onMultiplicity), software trigger (onRequest),
+			  trigger on pulse sent via the AsAd internal pulser (onSlowControl), trigger after specified delay (periodically). In 2p mode: External_2p (2 pulses needed), onMultiplicity_2p (2 different thresholds, one for each half-memory),
+			  onRequest_2p, onSlowControl_2p, periodically_2p. -->
+				<triggerMode range="{external, external_2p, noTrigger, onMultiplicity, onMultiplicity_2p, onRequest, onRequest_2p, onSlowControl, onSlowControl_2p, periodically, periodically_2p}">periodically</triggerMode>
+				<!-- Mode for the secondary trigger (pulses sent on connector J6, pin 4 for external trigger logic). -->
+				<secondaryTriggerMode range="{external, noTrigger, onMultiplicity, onRequest, onSlowControl, periodically}">noTrigger</secondaryTriggerMode>
+				<!-- Delay, in milliseconds, to wait for between trigger events, in periodic mode. Ignored if triggerPeriod_10ns is defined. -->
+				<triggerPeriod unit="ms">1000</triggerPeriod>
+				<!-- Delay (units of 10 ns) between event causing the trigger and actual freeze of the AGET SCA memory. -->
+				<triggerDelay unit="10ns">800</triggerDelay>
+				<!-- Delay (units of 10 ns), in 2p mode, between event causing the second trigger and actual freeze of the AGET SCA  second memory. -->
+				<triggerDelay_2p unit="10ns">800</triggerDelay_2p>
+				<!-- Maximum duration (in units of 10ns), in 2p mode, during which the firmware waits for the second trigger. After this delay, the first trigger is canceled and CoBo begins to wait for another event. -->
+				<triggerTimeOut_2p unit="10ns">800</triggerTimeOut_2p>
+				<!-- Delay (units of 10 ns) after the first trigger after which the second trigger can be issued, in 2p mode.
+			In "multiplicity 2p mode", this deadtime allows to make sure the second half of the SCA memory has enough time to be filled. -->
+				<triggerDeadTime_2p unit="10ns">800</triggerDeadTime_2p>
+				<!-- In periodic 2p mode, delay between the first and second triggers, in units of 10 ns.-->
+				<triggerTime_2p unit="10ns">800</triggerTime_2p>
+				<!-- Frequency of the CoBo SCA writing clock CKW, in MHz. For R-CoBo, it must be of the form 100 MHz/2**N. For M-CoBo, it must be of the form 2000 MHz/N. -->
+				<writingClockFrequency unit="MHz" range="[1.0, 200.0]">100.0</writingClockFrequency>
+				<!-- Frequency of the CoBo SCA reading clock CKR, in MHz. It must be set to 25 MHz. -->
+				<readingClockFrequency unit="MHz" range="{25.0}">25.0</readingClockFrequency>
+				<!-- Manual delay from rising edge of SCR to data availability in CoBo. See calibrateAutoReadDataDelay and enableAutoReadDataDelay. -->
+				<readDataDelay>14</readDataDelay>
+				<!-- Whether to compute automatic read data delay during calibration. -->
+				<calibrateAutoReadDataDelay>true</calibrateAutoReadDataDelay>
+				<!-- Whether to use the automatic (true) or manual (false) read data delay. -->
+				<enableAutoReadDataDelay>true</enableAutoReadDataDelay>
+				<!-- Delay between SCW low and SCR high (units of 10 ns). Also known as scwScrDelay. -->
+				<writeReadDelay unit="10ns">0</writeReadDelay>
+				<!-- Delay, in CKR clock cycle(s), from rising edge of SCW signal to start of multiplicity sliding window. -->
+				<scwMultDelay unit="cycles">50</scwMultDelay>
+				<!-- Whether to reset the timestamp and event counters at the start of each run (false) or not (true). -->
+				<useExternalTimeReset>false</useExternalTimeReset>
+				<!-- Whether to enable zero suppression by CoBo. Threshold for each channel is defined by parameter Aget.channel.zeroSuppressionThreshold. -->
+				<enableZeroSuppression>false</enableZeroSuppression>
+				<!-- Sets the polarity of the zero suppression threshold. -->
+				<zeroSuppressionInverted>false</zeroSuppressionInverted>
+				<!-- Debugging parameter. Set to true to skip the configuration of the CoBo PLL device. -->
+				<skipPLLConfig>false</skipPLLConfig>
+				<!-- Parameters of the CoBo PLL device (see LMK04806 TI datasheet). -->
+				<PLL>
+					<!-- Divide value of the VCO Divider. -->
+					<VCO_DIV range="[0, 7]">1</VCO_DIV>
+					<!-- Device mode (0 = Dual PLL, Internal VCO; 6 = PLL2, Internal VCO). -->
+					<MODE range="[0, 16]">0</MODE>
+					<!-- Enables synchronization circuitry. -->
+					<EN_SYNC>true</EN_SYNC>
+					<!-- Sets the polarity of the SYNC pin when input. -->
+					<SYNC_POL_INV>false</SYNC_POL_INV>
+					<!-- When set, causes a SYNC event to occur when programming register R0 to R5 to adjust digital delay values.-->
+					<SYNC_EN_AUTO>false</SYNC_EN_AUTO>
+					<!-- Sets the IO type of the SYNC pin. -->
+					<SYNC_TYPE range="[0, 6]">0</SYNC_TYPE>
+					<!-- Lock detect mux selection when output (0 = Logic Low; 1 = PLL1 DLD) -->
+					<LD_MUX range="[0, 18]">1</LD_MUX>
+					<!-- LD IO pin type (3 = Output (push-pull); 4 = Output inverted (push-pull)). -->
+					<LD_TYPE range="[0, 6]">3</LD_TYPE>
+					<SYNC_PLL2_DLD>false</SYNC_PLL2_DLD>
+					<SYNC_PLL1_DLD>false</SYNC_PLL1_DLD>
+					<!-- Holdover mux selection (3 = PLL1  PLL2 DLD; 4 = Holdover Status). -->
+					<HOLDOVER_MUX range="[0, 18]">3</HOLDOVER_MUX>
+					<!-- HOLDOVER IO pin type ((3 = Output (push-pull); 4 = Output inverted (push-pull)). -->
+					<HOLDOVER_TYPE range="[0, 6]">3</HOLDOVER_TYPE>
+					<!-- Status_CLKin1 pin MUX selection (1 = CLKin1 LOS). -->
+					<Status_CLKin1_MUX range="[0, 6]">1</Status_CLKin1_MUX>
+					<!-- Status_CLKin0 IO pin type (2 = Input /w pull-down resistor). -->
+					<Status_CLKin0_TYPE range="[0, 6]">2</Status_CLKin0_TYPE>
+					<!-- Status_CLKin0 pin MUX selection (1 = CLKin0 LOS). -->
+					<Status_CLKin0_MUX range="[0, 6]">1</Status_CLKin0_MUX>
+					<!-- Mode to use in determining reference CLKin for PLL1 (0 = CLKin0 Manual; 1 = CLKin1 Manual). -->
+					<CLKin_SELECT_MODE range="[0, 7]">0</CLKin_SELECT_MODE>
+					<EN_CLKin1>false</EN_CLKin1>
+					<EN_CLKin0>true</EN_CLKin0>
+					<!-- Status_CLKin1 IO pin type (0 = Input). -->
+					<Status_CLKin1_TYPE range="[0, 6]">0</Status_CLKin1_TYPE>
+				</PLL>
+			</Module>
+			<LEMO>
+				<L id="*">
+					<!-- Defines function of LEMO connector. -->
+					<function range="{busy_output, external_timestamp_reset_input, external_trigger_input, none, pll_clkin0_input, pll_clkin0_output, pll_clkin1_input, pll_clkin1_output, pll_holdover_output, pll_ld_output, pll_sync_input, pll_sync_output, trigger_pulse_output}">none</function>
+				</L>
+				<!-- Configuration of LEMO connector 0 on the CoBo front panel. -->
+				<L id="0" />
+				<!-- Configuration of LEMO connector 1 on the CoBo front panel. -->
+				<L id="1" />
+				<!-- Configuration of LEMO connector 2 on the CoBo front panel. -->
+				<L id="2" />
+				<!-- Configuration of LEMO connector 3 on the CoBo front panel. -->
+				<L id="3" />
+			</LEMO>
+			<!-- See AsAd Test and Calibration Management.-->
+			<Generator>
+				<!-- Value to (initially) set the output voltage of the generator to, expressed in mV w.r.t Vref= 1102mV.
+	Together with defaultVoltage, it defines the amplitude of the AsAd pulser voltage step. -->
+				<amplitudeStart unit="mV" range="[-1000.0, 1000.0]">-1000.0</amplitudeStart>
+				<!-- Specific to the AGET test bench. Amplitude, in mV, of internal AsAd pulser, at which the run stops when using calibration ramp. -->
+				<amplitudeStop unit="mV">5.0</amplitudeStop>
+				<!-- Specific to the AGET test bench. Step, in mV, between amplitude increments. -->
+				<amplitudeStep unit="mV">200</amplitudeStep>
+				<!-- Whether CoBo should periodically trigger the AsAd pulser. -->
+				<periodicModeEnabled>false</periodicModeEnabled>
+				<!-- Period, in ms, of the periodic triggers of the AsAd pulser. -->
+				<period_ms unit="ms">1000</period_ms>
+				<!-- Whether CoBo should trigger the AsAd pulser twice per period instead of once. -->
+				<doublePulseEnabled>false</doublePulseEnabled>
+				<!-- Amplitude, in mV, of the second pulse when in double pulse mode.-->
+				<secondPulseAmplitude unit="mV" range="[-1000.0, 1000.0]">-300.0</secondPulseAmplitude>
+				<!-- Enables AsAd pulser pseudo-random Poisson mode instead of the strictly periodic mode. -->
+				<poissonModeEnabled>false</poissonModeEnabled>
+				<!-- Default voltage at the output of the generator, expressed in mV w.r.t Vref= 1102mV. -->
+				<defaultVoltage unit="mV" range="[-1000.0, 1000.0]">0.0</defaultVoltage>
+				<!-- Whether voltage steps should be triggered from an AsAd ISP1 external signal rather than from the end of LSB data register loading.-->
+				<externalTriggerMode>false</externalTriggerMode>
+			</Generator>
+			<!-- Parameters of the circular buffers. -->
+			<CircularBuffer>
+				<!-- Memory address of the beginning of the circular buffer of AsAd 0. Unused if this parameter is defined at the AsAd level. -->
+				<startOfMemory>0x8000000</startOfMemory>
+				<!-- Memory address of the end of the circular buffer of AsAd 3. Unused if this parameter is defined at the AsAd level. -->
+				<endOfMemory>0x10000000</endOfMemory>
+				<!-- Number of events per CPU interrupt. -->
+				<interruptRate>0x1</interruptRate>
+				<!-- Threshold (Bytes) indicating the amount of free space below which the firmware stops writing in the circular buffer.
+ Should be greater than the maximum frame size. -->
+				<levelAlmostFullMemory unit="B">0x280000</levelAlmostFullMemory>
+				<!-- Level (Bytes) above which the firmware resumes writing data to the circular buffer.-->
+				<levelAlmostEmptyMemory unit="B">0x280000</levelAlmostEmptyMemory>
+			</CircularBuffer>
+			<Alarms>
+				<!-- Whether to subscribe to alarm notifications from CoBo. -->
+				<subscribe>true</subscribe>
+				<!-- Whether CoBo should check for AsAd alarms periodically. -->
+				<checkAsAd>true</checkAsAd>
+			</Alarms>
+			<AsAd id="*">
+				<Control>
+					<!-- Whether the AsAd board is active and should be configured. -->
+					<isActive>false</isActive>
+					<!-- Whether to check AsAd AL line to ensure AsAd is connected to its power supply and abort configuration if it is not. -->
+					<checkPowerSupply>true</checkPowerSupply>
+					<!-- Which AGET chip to use for serial delay calibration. -->
+					<calibrationAgetId range="[0, 3]">0</calibrationAgetId>
+				</Control>
+				<!-- See AsAd Test and Calibration Management. -->
+				<Generator>
+					<!-- Switches between modes where the pulser signal goes directly to the AGET test input or goes through a calibrated external capacitor emulating a charge. Register TCM0 bit T/C.-->
+					<isCalibMode>false</isCalibMode>
+					<!-- Switches between two external capacitor values (1pF and 11pF). Register TCM0 bit RNG.-->
+					<injectValue range="{11pF, 1pF}">1pF</injectValue>
+					<!-- Output-step triggering delay. Register TCM0 bits DLY.-->
+					<triggerDelay unit="WCK periods" range="[0, 31]">0</triggerDelay>
+				</Generator>
+				<!-- Parameters of the circular buffer. -->
+				<CircularBuffer>
+					<!-- Memory address of the beginning of the circular buffer for this AsAd board. -->
+					<startOfMemory>0x8000000</startOfMemory>
+					<!-- Memory address of the end of the circular buffer for this AsAd board. -->
+					<endOfMemory>0x10000000</endOfMemory>
+				</CircularBuffer>
+				<Clocking>
+					<!-- Ratio between writing clock frequency CKW provided by CoBo and actual sampling frequency WCKn. Overriden in LCM1 debug mode.-->
+					<samplingClockDivider range="[1.0, 200.0]">1.0</samplingClockDivider>
+					<!-- Phase shift, in degrees, between master clock and ADC clock. Used to control the data sampling time. Overriden in LCM2 debug mode.-->
+					<phaseShiftAdcClock unit="degrees" range="{0, 90, 180, 270}">270</phaseShiftAdcClock>
+					<!-- ADC clock delay, in ps, to fine tune the data sampling time. Overriden in LCM2 debug mode.-->
+					<delayAdcClock unit="ps" range="{-5335, -5175, -5015, -4855, -4695, -4535, -4375, -4215, -4055, -3895, -3735, -3575, -3415, -3255, -3095, -2935, -2775, -2615, -2455, -2295, -2135, -1975, -1815, -1655, -1495, -1335, -1175, -1015, -855, -695, -535, 0, 535, 695, 855, 1015, 1175, 1335, 1495, 1655, 1815, 1975, 2135, 2295, 2455, 2615, 2775, 2935, 3095, 3255, 3415, 3575, 3735, 3895, 4055, 4215, 4375, 4535, 4695, 4855, 5015, 5175, 5335}">5335</delayAdcClock>
+					<Debug>
+						<!-- Expert mode configuration of AsAd sampling clock management.-->
+						<LCM1>
+							<!-- If true, LCM1 register is configured in expert mode according to bit-fields below.-->
+							<debugModeEnabled>false</debugModeEnabled>
+							<!-- CKW frequency divider (N) - 1.-->
+							<FINDIV range="[0, 127]">18</FINDIV>
+							<!-- WCKn frequency divider (M) - 1.-->
+							<FBDIV range="[0, 127]">18</FBDIV>
+							<!-- WCKn frequency multiplier (U) - 1.-->
+							<OADIV range="[0, 31]">0</OADIV>
+							<!-- Selects a source signal (phase shift) for the actual sampling clock of AGET, WCKn.-->
+							<OAMUX range="[0, 7]">4</OAMUX>
+							<!-- Whether to add (2) or not (1) a programmable delay (FBDLY) in the PLL feedback loop of LCM1.-->
+							<FBSEL range="[1, 2]">1</FBSEL>
+							<!-- Value of the programmable delay in the PLL feedback loop (see FBSEL), starting from 600 ps, by step of 160ps.-->
+							<FBDLY range="[0, 31]">0</FBDLY>
+							<!-- Add a fixed delay of 2 ns in the PLL feedback loop of LCM1.-->
+							<xDlySel>false</xDlySel>
+							<!-- Adds the set value delay (225 ps, 760 ps , then by step of 160 ps) on WCKn.-->
+							<DlyGLA range="[0, 31]">0</DlyGLA>
+							<!-- VCO working bandwidth.-->
+							<VCOSel range="[0, 3]">2</VCOSel>
+						</LCM1>
+						<!-- Expert mode configuration of AsAd readout clock and ADC clock management.-->
+						<LCM2>
+							<!-- If true, LCM2 register is configured in expert mode according to bit-fields below.-->
+							<debugModeEnabled>false</debugModeEnabled>
+							<!-- CKR frequency divider (N) - 1.-->
+							<FINDIV range="[0, 127]">4</FINDIV>
+							<!-- RCKn and ACK frequencies divider (M) - 1.-->
+							<FBDIV range="[0, 127]">4</FBDIV>
+							<!-- RCKn frequency multiplier (U) - 1.-->
+							<OADIV range="[0, 31]">0</OADIV>
+							<!-- ACK frequency multiplier (V) - 1.-->
+							<OBDIV range="[0, 31]">0</OBDIV>
+							<!-- Selects a source signal (phase shift) for the actual readout clock of AGET, RCKn.-->
+							<OAMUX range="[0, 3]">0</OAMUX>
+							<!-- Selects a source signal (phase shift) for the ADC clock, ACK.-->
+							<OBMUX range="[0, 3]">3</OBMUX>
+							<!-- Whether to add (2) or not (1) a programmable delay (FBDLY) in the PLL feedback loop of LCM2.-->
+							<FBSEL range="[1, 2]">1</FBSEL>
+							<!-- Value of the programmable delay in the PLL feedback loop (see FBSEL), starting from 600 ps, by step of 160ps.-->
+							<FBDLY range="[0, 31]">0</FBDLY>
+							<!-- Add a fixed delay of 2 ns in the PLL feedback loop of LCM2.-->
+							<xDlySel>false</xDlySel>
+							<!-- Adds the set value delay (225 ps, 760 ps , then by step of 160 ps) on RCKn.-->
+							<DlyGLA range="[0, 31]">0</DlyGLA>
+							<!-- Adds the set value delay (225 ps, 760 ps , then by step of 160 ps) on ACK.-->
+							<DlyGLB range="[0, 31]">31</DlyGLB>
+						</LCM2>
+					</Debug>
+				</Clocking>
+				<!-- Not used by GetController. -->
+				<ADC />
+				<!-- Settings for the AsAd inspection manager (see "AsAd External Instruments Interface" and section 2.7 of "AsAd Firmware Description"). -->
+				<InspectionLines>
+					<!-- Name of the device to inspect. -->
+					<deviceToInspect range="{ADC, AGET0, AGET1, AGET2, AGET3, DAC, ID, IM, LCM, MONITOR, Multiplicity, SCA0, SCA1, SCA2, SCA3, TCM}">ADC</deviceToInspect>
+					<!-- Analog to Digital Converter. -->
+					<ADC>
+						<ISP1 range="{CKR, CKS, MOSI, SPI_CS}">SPI_CS</ISP1>
+						<ISP2 range="{ACK, CAS, RCK, SPI_CK}">CAS</ISP2>
+					</ADC>
+					<!-- Digital to Analog Converter. -->
+					<DAC>
+						<ISP1 range="{CKS, MISO, MOSI, SPI_CS}">CKS</ISP1>
+						<ISP2 range="{ACS, CAS, SPI_CK}">ACS</ISP2>
+					</DAC>
+					<!-- Test and Calibration Manager. -->
+					<TCM>
+						<ISP1 range="{CKS, MISO, MOSI, SPI_CS}">CKS</ISP1>
+						<ISP2 range="{ACS, CAS, CKO, SPI_CK}">ACS</ISP2>
+					</TCM>
+					<!-- Monitoring. -->
+					<MONITOR>
+						<ISP1 range="{CKS, MISO, MOSI, SPI_CS}">CKS</ISP1>
+						<ISP2 range="{ACS, CAS, SPI_CK}">ACS</ISP2>
+					</MONITOR>
+					<!-- Identifier. -->
+					<ID>
+						<ISP1 range="{CKS, MISO, MOSI, SPI_CS}">CKS</ISP1>
+						<ISP2 range="{ACS, CAS, SPI_CK}">ACS</ISP2>
+					</ID>
+					<!-- Input Manager. -->
+					<IM>
+						<ISP1 range="{CKS, MISO, MOSI, SPI_CS}">CKS</ISP1>
+						<ISP2 range="{ACS, CAS, SPI_CK}">ACS</ISP2>
+					</IM>
+					<!-- Local Clock Manager 1 and 2. -->
+					<LCM>
+						<ISP1 range="{CKS, MOSI2, SPI_CK1, SPI_CS2}">CKS</ISP1>
+						<ISP2 range="{CAS, MOSI1, SPI_CK2, SPI_CS1}">CAS</ISP2>
+					</LCM>
+					<!-- AGET0 SCA Manager. -->
+					<SCA0>
+						<ISP1 range="{CKR, CKW, SCR_AGET, SCW_AGET}">CKR</ISP1>
+						<ISP2 range="{RCK, SCR, SCW, WCK}">SCR</ISP2>
+					</SCA0>
+					<!-- AGET1 SCA Manager. -->
+					<SCA1>
+						<ISP1 range="{CKR, CKW, SCR_AGET, SCW_AGET}">CKR</ISP1>
+						<ISP2 range="{RCK, SCR, SCW, WCK}">SCR</ISP2>
+					</SCA1>
+					<!-- AGET2 SCA Manager. -->
+					<SCA2>
+						<ISP1 range="{CKR, CKW, SCR_AGET, SCW_AGET}">CKR</ISP1>
+						<ISP2 range="{RCK, SCR, SCW, WCK}">SCR</ISP2>
+					</SCA2>
+					<!-- AGET3 SCA Manager. -->
+					<SCA3>
+						<ISP1 range="{CKR, CKW, SCR_AGET, SCW_AGET}">CKR</ISP1>
+						<ISP2 range="{RCK, SCR, SCW, WCK}">SCR</ISP2>
+					</SCA3>
+					<!-- AGET0 Fast Control. -->
+					<AGET0>
+						<ISP1 range="{CKP, DIN, DOUT, SC_CS}">CKP</ISP1>
+						<ISP2 range="{A0C, CA0, SC_CK}">CA0</ISP2>
+					</AGET0>
+					<!-- AGET1 Fast Control. -->
+					<AGET1>
+						<ISP1 range="{CKP, DIN, DOUT, SC_CS}">CKP</ISP1>
+						<ISP2 range="{A1C, CA1, SC_CK}">CA1</ISP2>
+					</AGET1>
+					<!-- AGET2 Fast Control. -->
+					<AGET2>
+						<ISP1 range="{CKP, DIN, DOUT, SC_CS}">CKP</ISP1>
+						<ISP2 range="{A2C, CA2, SC_CK}">CA2</ISP2>
+					</AGET2>
+					<!-- AGET3 Fast Control. -->
+					<AGET3>
+						<ISP1 range="{CKP, DIN, DOUT, SC_CS}">CKP</ISP1>
+						<ISP2 range="{A3C, CA3, SC_CK}">CA3</ISP2>
+					</AGET3>
+					<!-- To inspect the multiplicity signal from an AGET chip (DISCT0 to DISCT3), you also need to enable to set the bit Global.Reg2.islvdsTriggerOutput. See AGET data sheet §3.2.2.-->
+					<Multiplicity>
+						<ISP1 range="{CKO, TRGint}">TRGint</ISP1>
+						<ISP2 range="{CKO, CKW, DISCT0, DISCT1, DISCT2, DISCT3, SCW, TRGext}">DISCT0</ISP2>
+					</Multiplicity>
+				</InspectionLines>
+				<!-- See AsAd Power Supply and Monitoring document -->
+				<Monitoring>
+					<!-- Enables AsAd alerts. -->
+					<isAlarmSet>true</isAlarmSet>
+					<!-- Whether to disable averaging of 16 measurements for all monitored items.-->
+					<averagingDisabled>false</averagingDisabled>
+					<!-- Whether to use ADC for monitoring in fast conversion mode (22.5 kHz) instead of 1.4 kHz.-->
+					<fastConversionEnabled>false</fastConversionEnabled>
+					<!-- Whether to use single channel mode instead of round-robin mode.-->
+					<singleChannelModeEnabled>false</singleChannelModeEnabled>
+					<!-- Item to monitor when in single channel mode.-->
+					<singleChannelItem range="{IDD, Text, Tint, VDD, VDD1}">VDD1</singleChannelItem>
+					<!-- Defines limits for 'VDD' voltage and whether to trigger alerts when 'VDD' crosses these limits. -->
+					<LimitsVDD>
+						<!-- Lower limit of the AsAd 'VDD' main supply voltage [V]. -->
+						<lowerValue unit="V" range="[0.0, 3.74]">3.0</lowerValue>
+						<!-- Upper limit of the AsAd 'VDD' main supply voltage [V]. -->
+						<upperValue unit="V" range="[0.0, 3.74]">3.5</upperValue>
+						<!-- Whether to disable VDD alerts. -->
+						<disableAlerts>false</disableAlerts>
+					</LimitsVDD>
+					<!-- Defines limits for 'VDD1' voltage. -->
+					<LimitsVDD1>
+						<!-- Lower limit of the AsAd 'VDD1' voltage [V]. -->
+						<lowerValue unit="V" range="[0.06, 7.0]">0.06</lowerValue>
+						<!-- Upper limit of the AsAd 'VDD1' voltage [V]. -->
+						<upperValue unit="V" range="[0.06, 7.0]">7.0</upperValue>
+					</LimitsVDD1>
+					<!-- Defines limits for 'IDD' current and whether to trigger alerts when 'IDD' crosses these limits. -->
+					<LimitsIDD>
+						<!-- Lower limit of the AsAd 'IDD' current sunk through 'VDD' [A]. -->
+						<lowerValue unit="A" range="[0.0, 3.0]">0.0</lowerValue>
+						<!-- Upper limit of the AsAd 'IDD' current sunk through 'VDD' [A]. -->
+						<upperValue unit="A" range="[0.0, 3.0]">2.0</upperValue>
+						<!-- Whether to disable IDD alerts. -->
+						<disableAlerts>false</disableAlerts>
+					</LimitsIDD>
+					<!-- Defines limits for 'Tint' temperature. -->
+					<LimitsTint>
+						<!-- Lower limit of the AsAd on-chip temperature 'Tint' [Celsius]. -->
+						<lowerValue unit="C" range="[0, 255]">0</lowerValue>
+						<!-- Upper limit of the AsAd on-chip temperature 'Tint' [Celsius]. -->
+						<upperValue unit="C" range="[0, 255]">50</upperValue>
+					</LimitsTint>
+					<!-- Defines limits for 'Text' temperature. -->
+					<LimitsText>
+						<!-- Lower limit of the AsAd ADC-chips surroundings temperature 'Text' [Celsius]. -->
+						<lowerValue unit="C" range="[0, 255]">17</lowerValue>
+						<!-- Upper limit of the AsAd ADC-chips surroundings temperature 'Text' [Celsius]. -->
+						<upperValue unit="C" range="[0, 255]">50</upperValue>
+						<!-- Whether to disable alerts for 'Text' too high. -->
+						<disableAlertsTooHigh>false</disableAlertsTooHigh>
+						<!-- Whether to disable alerts for 'Text' too low. -->
+						<disableAlertsTooLow>false</disableAlertsTooLow>
+						<!-- Whether to disable alerts for 'Text' sensor out of order. -->
+						<disableAlertsOutOfOrder>false</disableAlertsOutOfOrder>
+					</LimitsText>
+				</Monitoring>
+				<Aget id="*">
+					<Control>
+						<!-- Whether the AGET chip should be configured. -->
+						<isActive>true</isActive>
+						<!-- Deprecated? -->
+						<isAllChannelSelected>false</isAllChannelSelected>
+						<!-- Deprecated. Use enableAsAdPosition instead. -->
+						<Position range="{All, Four, One, Three, Two}">All</Position>
+						<!-- Whether to enable AsAd ADC channel, readout command and sampling commands for this position. -->
+						<enableAsAdPosition>true</enableAsAdPosition>
+						<!-- Whether VDD (false) or ground (true) should be switched at pins 7778 of ZAP interface. Used to set AsAd 'IM0' register bit 'SWZ'.-->
+						<connectGroundToZAP>false</connectGroundToZAP>
+						<!-- Whether to enable AsAd anti-sparkling protection for this AGET chip. Used to set AsAd 'IM1' register bit 'Dbi'.-->
+						<antiSparklingEnabled>true</antiSparklingEnabled>
+						<!-- Deprecated? -->
+						<isGainAsChannel0>false</isGainAsChannel0>
+						<!-- Whether to systematically check the slow control writing of AGET registers has been successfull. -->
+						<scCheckMode>true</scCheckMode>
+					</Control>
+					<Global>
+						<!-- Time bucket offset to start reading from. See AGET register 12.-->
+						<ReadoutPointerOffset>0</ReadoutPointerOffset>
+						<!-- Whether, in multiplicity trigger mode, the multiplicity of this AGET chip should be ignored (true) or not (false). -->
+						<suppressMultiplicity>false</suppressMultiplicity>
+						<Reg1>
+							<!-- If set, the nominal CSA bias current is multiplied by two. -->
+							<isIcsax2>true</isIcsax2>
+							<!-- Internal test capacitor value. -->
+							<TestModeRange range="{10pF, 120fF, 1pF, 240fF}">120fF</TestModeRange>
+							<!-- Peaking time (ns) of the shaper. Warning: values are either AGET or ASTRE specific! -->
+							<peackingTime unit="ns" range="{68, 70, 116, 117, 180, 225, 232, 280, 334, 343, 383, 442, 502, 541, 568, 632, 641, 721, 739, 760, 831, 836, 870, 943, 976, 1014, 1039, 2034, 3985, 5770, 7700}">1014</peackingTime>
+							<!-- Select the acquisition mode: nothing (physics mode); test; functional; calibration. -->
+							<TestModeSelection range="{calibration, functionality, nothing, test}">nothing</TestModeSelection>
+							<!-- Selects variable (peaking time) or fixed 500 ns mode for the Pole Zero Cancellation circuit. -->
+							<IntegrationMode range="{fixed_500ns, variable}">variable</IntegrationMode>
+							<!-- Defines the time marker of the SCA pointer pass. This marker defines the memory time of the trigger in the hit register. -->
+							<SCA_Pointer range="{anySCAPointer, col_0or128or256or384, col_0or256, column_0}">column_0</SCA_Pointer>
+							<!-- Separates the SCA memory into two SCA of 256 cells (2p mode). -->
+							<SCA_Splitting>false</SCA_Splitting>
+							<!-- Enables use of only 32 AGET channels instead of 64. -->
+							<is32channels>false</is32channels>
+							<!-- Enables full readout mode. -->
+							<isAllChannelRead>true</isAllChannelRead>
+							<!-- Enables the reading of Fixed Pattern Noise channels. -->
+							<isFPNRead>true</isFPNRead>
+							<!-- Selects the input charge polarity (micromegas/GEM vs wire chamber). -->
+							<isPositivePolarity>false</isPositivePolarity>
+							<!-- Selects the input common mode voltage of the analog output buffer. -->
+							<Vicm range="{1.25V, 1.35V, 1.55V, 1.65V}">1.35V</Vicm>
+							<!-- Value of the 3 Most Significant Bits of the DAC threshold (common to all channels). -->
+							<GlobalThresholdValue range="[0, 7]">7</GlobalThresholdValue>
+							<!-- Polarity of the DAC threshold. -->
+							<isThresholdSignedPositive>false</isThresholdSignedPositive>
+							<!-- Specifies the use of the veto on the trigger building. Defines how long after a hit the channel can be read again. -->
+							<TriggerVetoOption range="{4us, HitRegisterWidth, Undefined, none}">none</TriggerVetoOption>
+							<!-- Enables the sampling and synchronization of the output discriminator on the rising edge of the SCA CKW signal. -->
+							<isckwriteSynchro>false</isckwriteSynchro>
+							<!-- Allows to have a trigger signal with the same width as the one of the discriminator output signal (Time Over Threshold). -->
+							<isTOTActive>false</isTOTActive>
+							<!-- Defines the width range of the trigger signal (100ns or 200 ns). -->
+							<isTriggerWidth200ns>true</isTriggerWidth200ns>
+							<!-- Adjusts the value of the trigger according to the process corners (table 15 and 16) and to the value of the Range_trigg_width value. Also controls the value of unity multiplicity signal. -->
+							<TriggerWidthRange range="{width0, width1, width2, width3}">width2</TriggerWidthRange>
+							<!-- Specifies the access point in the external mode. -->
+							<ExternalLink range="{CSAStandby, Gain-2Input, SKFilterInput, none}">none</ExternalLink>
+						</Reg1>
+						<Reg2>
+							<!-- Selects the internal signal multiplexed toward the Out_debug pin to be viewed on an oscilloscope. -->
+							<DebugSelection range="{CR, CSA, Gain-2, NegativeInputDiscri, PositiveInputDiscri, none, standby, trigger}">none</DebugSelection>
+							<!-- If enabled, forces to start the readout from the physical column 0. In the normal mode (false), the readout starts from the column following the last written. -->
+							<isReadFromColumn0>false</isReadFromColumn0>
+							<!-- If enabled, a test pattern is serialized to the output instead of the 9 bit address of the last read column. -->
+							<isDigitalOutputTest>false</isDigitalOutputTest>
+							<!-- Specifies the reset level of the analog output during the reset operation. It must be set to false. -->
+							<isResetLevelUndefined>false</isResetLevelUndefined>
+							<!-- If set, a digital marker (near gnd or vdd levels) is multiplexed to the analog output during the first of the reset states. -->
+							<isMarkerEnable>false</isMarkerEnable>
+							<!-- Sets the level of the digital marker (when isMarkerEnable is set). True means level near gnd; false means level near Vdd. -->
+							<isResetLevelVdd>true</isResetLevelVdd>
+							<!-- If set, the output current of the GAIN-2 amplifier is increased by +20%. -->
+							<isBoostPower>true</isBoostPower>
+							<!-- If set, the Sc_dout output data is resynchronized by a clock edge Sc_ck, selected by isSynchroEdgeFalling. -->
+							<isOutputscCkSynchro>false</isOutputscCkSynchro>
+							<!-- Selects the edge for the synchronizing of the Sc_dout output data. False selects the rising edge, true the falling. -->
+							<isSynchroEdgeFalling>false</isSynchroEdgeFalling>
+							<!-- If set, inhibits the 3rd state functionality of the Slow Control output buffer. -->
+							<isSCoutputBufferInTriState>false</isSCoutputBufferInTriState>
+							<!-- Controls the bias current of the 68 SCA line readout buffers. -->
+							<currentBias range="{current0, current1, current2, current3}">current2</currentBias>
+							<!-- Controls the bias current of the SCA output buffers. -->
+							<bufferCurrent range="{1.503mA, 1.914mA, 2.7mA, 4.870mA}">2.7mA</bufferCurrent>
+							<!-- If set, puts the write section in power down mode. -->
+							<isPWDonWrite>false</isPWDonWrite>
+							<!-- If set, puts the read section in power down mode. -->
+							<isPWDonRead>false</isPWDonRead>
+							<!-- Sets alternatively the read and write sections in power down mode. -->
+							<isAlternatePower>false</isAlternatePower>
+							<!-- Controls the length of the reset level data which is initially sent before the analog data of each SCA column in the SCA readout phase. Must be set to true because the Reduced CoBo does not support the long reset sequence. -->
+							<is1bitShortResetReadSeq>true</is1bitShortResetReadSeq>
+							<!-- Enables (false) or disables (true) the output of the trigger signal. -->
+							<isTriggerOutputDisable>false</isTriggerOutputDisable>
+							<!-- Controls whether the reset of the SCA pointer is done on the write signal with a width equal to the SCAwrite clock (false) or automatically on the rising edge of the write signal (true). -->
+							<isRisingedgeWriteAutoresetBank>true</isRisingedgeWriteAutoresetBank>
+							<!-- This bit permits to disable (false) or enable (true) the output of the trigger signal in LVDS level on the pads 85 and 86. -->
+							<islvdsTriggerOutput>false</islvdsTriggerOutput>
+							<!-- In AGET 2.2, the input dynamic range of the discriminator can be fixed to 5 percent (true) or 17.5 percent (false) of the input dynamic range of the analog channel.-->
+							<inputDynamicRange_5pct>false</inputDynamicRange_5pct>
+							<!-- ASTRE only. Multiplicity level for the LVDS trigger. -->
+							<triggerLvdsThreshold range="{1, 2, 4, 8}">1</triggerLvdsThreshold>
+							<!-- ASTRE only. Unity multiplicity level. -->
+							<multiplicityLevel range="{1, 2, 4, 8}">1</multiplicityLevel>
+						</Reg2>
+					</Global>
+					<channel id="*">
+						<!-- If false, sets isSelectedforTestMode=false, TriggerInhibition=none, LSBThresholdValue=0, Gain=120fC, Reading=never. -->
+						<isActive>true</isActive>
+						<!-- Switch between physics mode and test mode (input capacitor for injection). -->
+						<isSelectedforTestMode>false</isSelectedforTestMode>
+						<!-- Permits to inhibit the contribution of a specific channel to the multiplicity (inhibit_trigger), or to both the multiplicity and the hit register (inhibit_channel). See registers 10 and 11 in AGET Data Sheet.-->
+						<TriggerInhibition range="{inhibit_channel, inhibit_trigger, none}">none</TriggerInhibition>
+						<!-- Value of the individual DAC threshold for the channel (4 least significant bits). -->
+						<LSBThresholdValue range="[0, 15]">15</LSBThresholdValue>
+						<!-- Value of the channel gain (CSA charge capacitor). -->
+						<Gain range="{10pC, 120fC, 1pC, 240fC}">1pC</Gain>
+						<!-- When to read the channel. This parameter only has an effect if 'isAllChannelRead' is false and 'enableWriteHittedregister' is true. -->
+						<Reading range="{always, never, only_if_hit}">only_if_hit</Reading>
+						<!-- Threshold below which to suppress data for this channel. Ignored unless enableZeroSuppression is true. -->
+						<zeroSuppressionThreshold range="[0, 4095]">600</zeroSuppressionThreshold>
+					</channel>
+					<channel id="0" />
+					<channel id="1" />
+					<channel id="2" />
+					<channel id="3" />
+					<channel id="4" />
+					<channel id="5" />
+					<channel id="6" />
+					<channel id="7" />
+					<channel id="8" />
+					<channel id="9" />
+					<channel id="10" />
+					<channel id="11" />
+					<channel id="12" />
+					<channel id="13" />
+					<channel id="14" />
+					<channel id="15" />
+					<channel id="16" />
+					<channel id="17" />
+					<channel id="18" />
+					<channel id="19" />
+					<channel id="20" />
+					<channel id="21" />
+					<channel id="22" />
+					<channel id="23" />
+					<channel id="24" />
+					<channel id="25" />
+					<channel id="26" />
+					<channel id="27" />
+					<channel id="28" />
+					<channel id="29" />
+					<channel id="30" />
+					<channel id="31" />
+					<channel id="32" />
+					<channel id="33" />
+					<channel id="34" />
+					<channel id="35" />
+					<channel id="36" />
+					<channel id="37" />
+					<channel id="38" />
+					<channel id="39" />
+					<channel id="40" />
+					<channel id="41" />
+					<channel id="42" />
+					<channel id="43" />
+					<channel id="44" />
+					<channel id="45" />
+					<channel id="46" />
+					<channel id="47" />
+					<channel id="48" />
+					<channel id="49" />
+					<channel id="50" />
+					<channel id="51" />
+					<channel id="52" />
+					<channel id="53" />
+					<channel id="54" />
+					<channel id="55" />
+					<channel id="56" />
+					<channel id="57" />
+					<channel id="58" />
+					<channel id="59" />
+					<channel id="60" />
+					<channel id="61" />
+					<channel id="62" />
+					<channel id="63" />
+					<channel id="64" />
+					<channel id="65" />
+					<channel id="66" />
+					<channel id="67" />
+				</Aget>
+				<Aget id="0" />
+				<Aget id="1" />
+				<Aget id="2" />
+				<Aget id="3" />
+			</AsAd>
+			<AsAd id="0">
+				<!-- Parameters of the circular buffer. -->
+				<CircularBuffer>
+					<!-- Memory address of the end of the circular buffer for this AsAd board. -->
+					<endOfMemory>0xA000000</endOfMemory>
+				</CircularBuffer>
+				<Control>
+					<isActive>true</isActive>
+				</Control>
+			</AsAd>
+			<AsAd id="1">
+				<!-- Parameters of the circular buffer. -->
+				<CircularBuffer>
+					<!-- Memory address of the end of the circular buffer for this AsAd board. -->
+					<endOfMemory>0xC000000</endOfMemory>
+					<!-- Memory address of the beginning of the circular buffer for this AsAd board. -->
+					<startOfMemory>0xA000000</startOfMemory>
+				</CircularBuffer>
+			</AsAd>
+			<AsAd id="2">
+				<!-- Parameters of the circular buffer. -->
+				<CircularBuffer>
+					<!-- Memory address of the end of the circular buffer for this AsAd board. -->
+					<endOfMemory>0xE000000</endOfMemory>
+					<!-- Memory address of the beginning of the circular buffer for this AsAd board. -->
+					<startOfMemory>0xC000000</startOfMemory>
+				</CircularBuffer>
+			</AsAd>
+			<AsAd id="3">
+				<!-- Parameters of the circular buffer. -->
+				<CircularBuffer>
+					<!-- Memory address of the beginning of the circular buffer for this AsAd board. -->
+					<startOfMemory>0xE000000</startOfMemory>
+				</CircularBuffer>
+			</AsAd>
+		</Instance>
+		<Instance id="0" />
+		<Instance id="1">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>1</coboId>
+			</Module>
+		</Instance>
+		<Instance id="2">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>2</coboId>
+			</Module>
+		</Instance>
+		<Instance id="3">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>3</coboId>
+			</Module>
+		</Instance>
+		<Instance id="4">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>4</coboId>
+			</Module>
+		</Instance>
+		<Instance id="5">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>5</coboId>
+			</Module>
+		</Instance>
+		<Instance id="6">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>6</coboId>
+			</Module>
+		</Instance>
+		<Instance id="7">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>7</coboId>
+			</Module>
+		</Instance>
+		<Instance id="8">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>8</coboId>
+			</Module>
+		</Instance>
+		<Instance id="9">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>9</coboId>
+			</Module>
+		</Instance>
+		<Instance id="10">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>10</coboId>
+			</Module>
+		</Instance>
+		<Instance id="11">
+			<Module>
+				<!-- Value of the CoBo index in the header of the data frames. -->
+				<coboId>11</coboId>
+			</Module>
+		</Instance>
+	</Node>
+	<Node id="Mutant">
+		<Instance id="*">
+			<!-- Whether the Mutant module is a master or a slave module.-->
+			<isSlave>false</isSlave>
+			<!-- Whether to enable Mutant data readout. -->
+			<readoutModeEnabled>true</readoutModeEnabled>
+			<!-- Whether to enable the Mutant test mode. -->
+			<testModeEnabled>false</testModeEnabled>
+			<!-- Whether to enable coupling with CENTRUM, or disable the CS interface, or enable scaler channels. -->
+			<centrumScalerInterface range="{CENTRUM, Disabled, Scalers}">Disabled</centrumScalerInterface>
+			<sourceId range="[0, 255]">0</sourceId>
+			<!-- Type of Mutant data frame (only one type so far).-->
+			<frameType range="[0, 0]">0</frameType>
+			<!-- Whether to preload Universal Clock counter and 2 proton time counter values during configuration. -->
+			<preLoadTimestamp>true</preLoadTimestamp>
+			<!-- Value of the 48-bit timestamp to preload, in units of 10 ns -->
+			<preLoadedTimestamp>
+				<!-- Most signficant 16 bits -->
+				<high range="[0x0, 0xFFFF]">0x0</high>
+				<!-- Bits 16 to 31 -->
+				<mid range="[0x0, 0xFFFF]">0x0</mid>
+				<!-- Least signficant 16 bits -->
+				<low range="[0x0, 0xFFFF]">0x0</low>
+			</preLoadedTimestamp>
+			<!-- Whether to preload event counter value during configuration. -->
+			<preLoadEventNumber>true</preLoadEventNumber>
+			<!-- Value of the event number to preload. -->
+			<preLoadedEventNumber range="[0x0, 0xFFFFFFFF]">0x0</preLoadedEventNumber>
+			<!-- Whether to reset all event counters during configuration and at the start of the run. -->
+			<clearCounters>true</clearCounters>
+			<!-- 8 bit SPI digital potentiometer for tuning the VCXO frequency. -->
+			<vcxoControl range="[0x0, 0xFF]">0x80</vcxoControl>
+			<Master>
+				<enablePortA>true</enablePortA>
+				<enablePortB>true</enablePortB>
+			</Master>
+			<Slave>
+				<!-- Port from which this slave module is connected to master module (A means that connection is between slave port A and master port B). -->
+				<slavePort range="{A, B}">A</slavePort>
+				<!-- Slave number (for now, should be 0 if slave is connected from its port A to master port B, 1 otherwise).-->
+				<slaveId range="{0, 1}">0</slaveId>
+			</Slave>
+			<Scalers>
+				<!-- Whether to reset all scaler counters during configuration and at the start of the run. -->
+				<clearScalers>true</clearScalers>
+				<!-- Whether to enable counting for scaler 1 or not. -->
+				<enableScaler id="1">true</enableScaler>
+				<!-- Whether to enable counting for scaler 2 or not. -->
+				<enableScaler id="2">true</enableScaler>
+				<!-- Whether to enable counting for scaler 3 or not. -->
+				<enableScaler id="3">true</enableScaler>
+				<!-- Whether to enable counting for scaler 4 or not. -->
+				<enableScaler id="4">true</enableScaler>
+				<!-- Whether to enable counting for scaler 5 or not. -->
+				<enableScaler id="5">true</enableScaler>
+			</Scalers>
+			<!-- L0L1: external trigger (L0) starts a coincidence window waiting for a valid L1 event;
+ L1L0: when Level 1 trigger occurs, a coincidence window is opened waiting for a L0 trigger validation. -->
+			<levelPriority range="{L0L1, L1L0}">L0L1</levelPriority>
+			<!-- External trigger parameters -->
+			<Level id="0">
+				<!-- Enables L0 (external) trigger -->
+				<isEnabled>true</isEnabled>
+				<!-- Delay of the Level 0 gate, in microseconds. -->
+				<gateDelay unit="us" range="[0.0, 655.35]">1.0</gateDelay>
+				<!-- Duration of the Level 0 gate, in microseconds. -->
+				<gateDuration unit="us" range="[0.01, 655.35]">655.35</gateDuration>
+			</Level>
+			<!-- Multiplicity trigger parameters -->
+			<Level id="1">
+				<!-- Enables L1 (multiplicity) trigger -->
+				<isEnabled>true</isEnabled>
+				<!-- Condition for a valid L1 trigger: only low threshold, only high threshold, either, or both.-->
+				<selection range="{AND, HIGH, LOW, OR}">OR</selection>
+				<!-- Time added to a valid L1 trigger in order to delay the STOP sampling, in microseconds. -->
+				<postTriggerDelay unit="us" range="[0.0, 655.35]">0.01</postTriggerDelay>
+				<L1A>
+					<lowMultThreshold range="[1, 65535]">1</lowMultThreshold>
+					<highMultThreshold range="[1, 65535]">65535</highMultThreshold>
+					<!-- Number of buckets for Level 1A low trigger. -->
+					<lowNumBuckets unit="buckets" range="[1, 511]">511</lowNumBuckets>
+					<!-- Number of buckets for Level 1A high trigger. -->
+					<highNumBuckets unit="buckets" range="[1, 511]">511</highNumBuckets>
+				</L1A>
+				<L1B>
+					<lowMultThreshold range="[1, 65535]">1</lowMultThreshold>
+					<highMultThreshold range="[1, 65535]">65535</highMultThreshold>
+					<!-- Number of buckets for Level 1B low trigger. -->
+					<lowNumBuckets unit="buckets" range="[1, 511]">511</lowNumBuckets>
+					<!-- Number of buckets for Level 1B high trigger. -->
+					<highNumBuckets unit="buckets" range="[1, 511]">511</highNumBuckets>
+					<!-- Timeout value in case of no L1B trigger, in microseconds. -->
+					<timeout unit="us" range="[0.0, 1677000.0]">2.56</timeout>
+				</L1B>
+			</Level>
+			<!-- Level 2 trigger parameters -->
+			<Level id="2">
+				<!-- Enables L2 trigger -->
+				<isEnabled>true</isEnabled>
+				<!-- Tells the trigger/timestamper state machine that a mask pattern will be provided to CoBos in case of L2 OK. -->
+				<hitPatternModified>true</hitPatternModified>
+			</Level>
+			<TwoProtonDecayMode>
+				<!-- Enables 2p mode. -->
+				<isEnabled>false</isEnabled>
+				<!-- Whether to send half-event after a timeout. -->
+				<halfEventReadout>false</halfEventReadout>
+			</TwoProtonDecayMode>
+			<GlobalMasterClock>
+				<!-- Whether GMC is distributed by the internal VCXO (false) or by one of the front panel sources (true). -->
+				<externalClockEnabled>false</externalClockEnabled>
+				<!-- External GMC source: FireWire 1 (J10), FireWire 2 (J9), VHDCI source from board B or optical transceiver source. -->
+				<externalClockSelection range="{FireWireA, FireWireB, Optical, VHDCI}">VHDCI</externalClockSelection>
+			</GlobalMasterClock>
+			<!-- Selects the internal signals sent to the front panel and rear panel LEMO connectors. -->
+			<Inspection>
+				<!-- Signal sent to front panel LEMO connector LOG INSP1. -->
+				<frontPanelInsp1 range="[0, 255]">0</frontPanelInsp1>
+				<!-- Signal sent to front panel LEMO connector LOG INSP2. -->
+				<frontPanelInsp2 range="[0, 255]">0</frontPanelInsp2>
+				<!-- Signal sent to rear panel LEMO connector TEST1. -->
+				<rearPanelInsp1 range="[0, 255]">0</rearPanelInsp1>
+				<!-- Signal sent to rear panel LEMO connector TEST2. -->
+				<rearPanelInsp2 range="[0, 255]">0</rearPanelInsp2>
+			</Inspection>
+			<!-- ATO bit concerns any AMC (that is not a CoBo) plugged in the current shelf and designed to receive only synchronization information (event number and timestamp).-->
+			<AmcTagOnly>
+				<ATO id="1">false</ATO>
+				<ATO id="2">false</ATO>
+				<ATO id="3">false</ATO>
+				<ATO id="4">false</ATO>
+				<ATO id="5">false</ATO>
+				<ATO id="6">false</ATO>
+				<ATO id="7">false</ATO>
+				<ATO id="8">false</ATO>
+				<ATO id="9">false</ATO>
+				<ATO id="10">false</ATO>
+				<ATO id="11">false</ATO>
+				<ATO id="12">false</ATO>
+			</AmcTagOnly>
+			<!-- Register where any information can be stored. No hardware is attached to these bits. -->
+			<UserRegister range="[0, 65535]">0</UserRegister>
+		</Instance>
+		<Instance id="master" />
+		<Instance id="slave1">
+			<GlobalMasterClock>
+				<externalClockEnabled>true</externalClockEnabled>
+			</GlobalMasterClock>
+			<isSlave>true</isSlave>
+		</Instance>
+		<Instance id="slave2">
+			<GlobalMasterClock>
+				<externalClockEnabled>true</externalClockEnabled>
+			</GlobalMasterClock>
+			<Slave>
+				<!-- Slave number (for now, should be 0 if slave is connected from its port A to master port B, 1 otherwise).-->
+				<slaveId>1</slaveId>
+				<!-- Port from which this slave module is connected to master module (A means that connection is between slave port A and master port B). -->
+				<slavePort>B</slavePort>
+			</Slave>
+			<isSlave>true</isSlave>
+		</Instance>
+	</Node>
+</Setup>

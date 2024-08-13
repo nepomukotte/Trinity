@@ -1,0 +1,3 @@
+Control software requires boost library at version 1.77 or higher to compile without any errors.
+
+The GET software does not get installed properly with boost library 1.77 or higher, so we can only use version 1.77 and not install utilities of GET package.

@@ -1,0 +1,885 @@
+/**
+ * @file utl.cpp
+ * @date Dec 20, 2013
+ * @author sizun
+ * 
+ * @note SVN tag: $Id: utl.cpp 1724 2017-11-14 08:45:16Z psizun $
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the GetBench software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "mdaq/utl/CmdException.h"
+#include "get/asad/utl.h"
+#include "utl/BitFieldHelper.hpp"
+#include "utl/BitFieldRegister.hpp"
+#include <boost/algorithm/string/join.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/lexical_cast.hpp>
+#include <cfloat>
+#include <cmath>
+#include <functional>
+#include <iterator>
+#include <map>
+#include <vector>
+
+namespace get
+{
+namespace asad
+{
+namespace utl
+{
+//__________________________________________________________________________________________________
+typedef std::map<std::string, uint64_t> MapISP;
+struct Module
+{
+	uint64_t id;
+	MapISP mapISP1;
+	MapISP mapISP2;
+};
+typedef std::map<const std::string, struct Module> MapISPM;
+typedef ::utl::BitFieldRegister<volatile uint64_t> BitField_uint64;
+//_________________________________________________________________________________________________
+/**
+ * Stores signals available when inspecting an AsAd device.
+ */
+void declare_ispm_signals(MapISPM & signals, const std::string & deviceName, const uint64_t & deviceId,
+		 const std::string & isp1Signal0, const std::string & isp2Signal0,
+		 const std::string & isp1Signal1, const std::string & isp2Signal1,
+		 const std::string & isp1Signal2, const std::string & isp2Signal2,
+		 const std::string & isp1Signal3, const std::string & isp2Signal3)
+{
+	struct Module descr;
+	descr.id = deviceId;
+	signals.insert(std::make_pair(deviceName, descr));
+	MapISPM::iterator itISPM;
+	itISPM = signals.find(deviceName);
+
+	MapISP& map1 = itISPM->second.mapISP1;
+	map1.insert(std::make_pair(isp1Signal0, 0));
+	map1.insert(std::make_pair(isp1Signal1, 1));
+	map1.insert(std::make_pair(isp1Signal2, 2));
+	map1.insert(std::make_pair(isp1Signal3, 3));
+
+	MapISP& map2 = itISPM->second.mapISP2;
+	map2.insert(std::make_pair(isp2Signal0, 0));
+	map2.insert(std::make_pair(isp2Signal1, 1));
+	map2.insert(std::make_pair(isp2Signal2, 2));
+	map2.insert(std::make_pair(isp2Signal3, 3));
+}
+//_________________________________________________________________________________________________
+/**
+ * Stores signals available when inspecting the multiplicity device.
+ * For multiplicity inspection, signal 1 is coded on 1 bit, signal 2 on 3 bits
+ */
+void declare_ispm_signals(MapISPM & signals, const std::string & deviceName, const uint64_t & deviceId,
+		 const std::string & isp1Signal0, const std::string & isp2Signal0,
+		 const std::string & isp1Signal1, const std::string & isp2Signal1,
+										const std::string & isp2Signal2,
+										const std::string & isp2Signal3,
+										const std::string & isp2Signal4,
+										const std::string & isp2Signal5,
+										const std::string & isp2Signal6,
+										const std::string & isp2Signal7)
+{
+	struct Module descr;
+	descr.id = deviceId;
+	signals.insert(std::make_pair(deviceName, descr));
+	MapISPM::iterator itISPM;
+	itISPM = signals.find(deviceName);
+
+	MapISP& map1 = itISPM->second.mapISP1;
+	map1.insert(std::make_pair(isp1Signal0, 0));
+	map1.insert(std::make_pair(isp1Signal1, 1));
+
+	MapISP& map2 = itISPM->second.mapISP2;
+	map2.insert(std::make_pair(isp2Signal0, 0));
+	map2.insert(std::make_pair(isp2Signal1, 1));
+	map2.insert(std::make_pair(isp2Signal2, 2));
+	map2.insert(std::make_pair(isp2Signal3, 3));
+	map2.insert(std::make_pair(isp2Signal4, 4));
+	map2.insert(std::make_pair(isp2Signal5, 5));
+	map2.insert(std::make_pair(isp2Signal6, 6));
+	map2.insert(std::make_pair(isp2Signal7, 7));
+}
+//_________________________________________________________________________________________________
+/**
+ * Builds register value for ISPM multiplexer to debug the signals on AsAd.
+ * See Fig. 14 and Tables 14-20 page 17 of "AsAd Firmware Description".
+ * See Table 20 of GET-AS-002-0010: "AsAd Slow Control Manager: Protocols and Registers Mapping".
+ * See Tables 4,5,6 of GET-AS-002-0003: "AsAd External Instruments Interface".
+ * See note "Multiplicity: Inspection Manager" by Abdel Rebii, January 19th, 2015.
+ *
+ * Table 6 of GET-AS-002-0003 is right in opposition to Table 20 of GET-AS-002-0010.
+ *
+ * The ISP register is 8-bit long:
+ * <7-4>: Dev<3-0>: device to inspect
+ * <3-2>: ISP1<1-0>: signal ISP1
+ * <1-0>: ISP2<1-0>: signal ISP2
+ *
+ * @param moduleName Name of device.
+ * @param signalNameISP1 Name of ISP1 signal.
+ * @param signalNameISP2 Name of ISP2 signal.
+ * @return 8-bit value of the AsAd ISPM register.
+ */
+uint64_t buildIspmRegisterValue(const std::string & moduleName, const std::string & signalNameISP1, const std::string & signalNameISP2)
+{
+	/**
+	 * BitField structure describing ISPM data
+	 */
+	struct ISPMField_uint64 : public BitField_uint64
+	{
+		DECLARE_FIELD(module, 4, 4)
+		DECLARE_FIELD(isp1  , 2, 2)
+		DECLARE_FIELD(isp2  , 0, 2)
+		DECLARE_FIELD(ispm1 , 3, 1)
+		DECLARE_FIELD(ispm2 , 0, 3)
+	};
+
+	ISPMField_uint64 ispm;
+	MapISPM mapOfIspmSignals;
+	/*                                    device name, device ID */
+	/*                         ISP1,         ISP2   */
+	declare_ispm_signals(mapOfIspmSignals, "ADC", 0,
+			                  "CKS",     "SPI_CK",
+                           "SPI_CS",        "CAS",
+                             "MOSI",        "ACK",
+                              "CKR",        "RCK");
+	declare_ispm_signals(mapOfIspmSignals, "DAC", 1,
+			                  "CKS",     "SPI_CK",
+                           "SPI_CS",        "CAS",
+                             "MOSI",        "ACS",
+                             "MISO", "RESET_FAST");
+	declare_ispm_signals(mapOfIspmSignals, "TCM", 2,
+			                  "CKS",     "SPI_CK",
+                           "SPI_CS",        "CAS",
+                             "MOSI",        "ACS",
+                             "MISO",        "CKO");
+	declare_ispm_signals(mapOfIspmSignals, "MONITOR",  3,
+			                  "CKS",     "SPI_CK",
+                           "SPI_CS",        "CAS",
+                             "MOSI",        "ACS",
+                             "MISO",       "IDLE");
+	declare_ispm_signals(mapOfIspmSignals, "ID", 4,
+			                  "CKS",     "SPI_CK",
+                           "SPI_CS",        "CAS",
+                             "MOSI",        "ACS",
+                             "MISO",       "IDLE");
+	declare_ispm_signals(mapOfIspmSignals, "IM", 5,
+			                  "CKS",     "SPI_CK",
+                           "SPI_CS",        "CAS",
+                             "MOSI",        "ACS",
+                             "MISO",       "IDLE");
+	declare_ispm_signals(mapOfIspmSignals, "LCM", 6,
+			                  "CKS",    "SPI_CK2",
+                          "SPI_CS2",        "CAS",
+                            "MOSI2",    "SPI_CS1",
+                          "SPI_CK1",      "MOSI1");
+	declare_ispm_signals(mapOfIspmSignals, "SCA0", 7,
+			                  "CKW",        "WCK",
+                         "SCW_AGET",        "SCW",
+                              "CKR",        "RCK",
+                         "SCR_AGET",        "SCR");
+	declare_ispm_signals(mapOfIspmSignals, "SCA1", 8,
+			                  "CKW",        "WCK",
+                         "SCW_AGET",        "SCW",
+                              "CKR",        "RCK",
+                         "SCR_AGET",        "SCR");
+	declare_ispm_signals(mapOfIspmSignals, "SCA2", 9,
+			                  "CKW",        "WCK",
+                         "SCW_AGET",        "SCW",
+                              "CKR",        "RCK",
+                         "SCR_AGET",        "SCR");
+	declare_ispm_signals(mapOfIspmSignals, "SCA3", 10,
+			                  "CKW",        "WCK",
+                         "SCW_AGET",        "SCW",
+                              "CKR",        "RCK",
+                         "SCR_AGET",        "SCR");
+	declare_ispm_signals(mapOfIspmSignals, "AGET0", 11,
+			                  "CKP",      "SC_CK",
+                            "SC_CS",        "CA0",
+                              "DIN",        "A0C",
+                             "DOUT",  "LAST_INIT");
+	declare_ispm_signals(mapOfIspmSignals, "AGET1", 12,
+			                  "CKP",      "SC_CK",
+                            "SC_CS",        "CA1",
+                              "DIN",        "A1C",
+                             "DOUT",  "LAST_INIT");
+	declare_ispm_signals(mapOfIspmSignals, "AGET2", 13,
+			                  "CKP",      "SC_CK",
+                            "SC_CS",        "CA2",
+                              "DIN",        "A2C",
+                             "DOUT",  "LAST_INIT");
+	declare_ispm_signals(mapOfIspmSignals, "AGET3", 14,
+			                  "CKP",      "SC_CK",
+                            "SC_CS",        "CA3",
+                              "DIN",        "A3C",
+                             "DOUT",  "LAST_INIT");
+	declare_ispm_signals(mapOfIspmSignals, "Multiplicity", 15,
+							  "TRGint",      "CKO",\
+							  "CKO",         "CKW",\
+											 "SCW",\
+											 "TRGext",\
+											 "DISCT0",\
+											 "DISCT1",\
+											 "DISCT2",\
+											 "DISCT3");
+
+    MapISPM::iterator itISPM = mapOfIspmSignals.find(moduleName);
+
+	if (itISPM == mapOfIspmSignals.end())
+	{
+		throw ::mdaq::utl::CmdException("Could not find ISPM module named '" + moduleName + "'");
+	}
+
+	MapISP::iterator itISP1 = itISPM->second.mapISP1.find(signalNameISP1);
+	if (itISP1 == itISPM->second.mapISP1.end())
+	{
+		throw ::mdaq::utl::CmdException("Could not find ISP1 signal '" + signalNameISP1 + "' for ISPM module '" + moduleName + "'");
+	}
+	MapISP::iterator itISP2 = itISPM->second.mapISP2.find(signalNameISP2);
+	if (itISP2 == itISPM->second.mapISP2.end())
+	{
+		throw ::mdaq::utl::CmdException("Could not find ISP2 signal '" + signalNameISP2 + "' for ISPM module '" + moduleName + "'");
+	}
+
+	ispm.set_module(itISPM->second.id);
+	if (UINT64_C(0xF) == itISPM->second.id) // for multiplicity device, signal 1 is coded on 1 bit, signal 2 on 3 bits
+	{
+		ispm.set_ispm1(itISP1->second);
+		ispm.set_ispm2(itISP2->second);
+	}
+	else // for other devices, both signals are coded on 2 bits
+	{
+		ispm.set_isp1(itISP1->second);
+		ispm.set_isp2(itISP2->second);
+	}
+
+	return ispm.value();
+}
+//_________________________________________________________________________________________________
+struct LCM1_uint64: public BitField_uint64
+{
+	uint64_t reverseBits(uint64_t num, size_t nbOfBits)
+	{
+		uint64_t reverse_num = 0;
+		for (size_t i = 0; i < nbOfBits; i++)
+		{
+			if ((num & (1 << i)))
+				reverse_num |= 1 << ((nbOfBits - 1) - i);
+		}
+		return reverse_num;
+	}
+
+	/*
+	 * Redefinition of DECLARE_FIELD to be able to set a field in the reverse bit order
+	 * (AsAd reshuffling).
+	 */
+#undef DECLARE_FIELD
+#define DECLARE_FIELD(name, pos, width) \
+WordBasicType name() const { return RegField::getField<pos, width>(regValue); } \
+void set_##name(WordType val) { RegField::setField<pos, width>(regValue, val); } \
+void set_reverse_##name(WordType val) { \
+	RegField::setField<pos, width>(regValue, reverseBits(val,width)); \
+}
+
+	//DECLARE_FIELD(name, pos, width)
+	DECLARE_FIELD(byte1, 56, 8)
+	DECLARE_FIELD(byte2, 48, 8)
+	DECLARE_FIELD(byte3, 40, 8)
+	DECLARE_FIELD(byte4, 32, 8)
+	DECLARE_FIELD(byte5, 24, 8)
+	DECLARE_FIELD(byte6, 16, 8)
+	DECLARE_FIELD(byte7, 8, 8)
+	DECLARE_FIELD(byte10, 0, 8)
+	DECLARE_FIELD(FINDIV,57, 7)
+	DECLARE_FIELD(FBDIV, 50, 7)
+	DECLARE_FIELD(OADIV, 45, 5)
+	DECLARE_FIELD(OAMUX, 32, 3)
+	DECLARE_FIELD(FBSEL, 24, 2)
+	DECLARE_FIELD(FBDLY, 19, 5)
+	DECLARE_FIELD(XDLYSEL, 18, 1)
+	DECLARE_FIELD(DLYGLA, 13, 5)
+	DECLARE_FIELD(VCOSEL, 3, 2)
+};
+//_________________________________________________________________________________________________
+/**
+ * Computes value of register LCM1 of AsAd LCM device.
+ *
+ * The LCM1 register is an 80-bit register. Here we construct a 64-bit register value,
+ *  the two missing bytes which are always equal to 0x0001 are added on the fly by the device policy.
+ *
+ * - Byte  1: bits <63-56> : FINDIV<0-6> FBDIV<0>
+ * - Byte  2: bits <55-48> : FBDIV<1-6> OADIV<0-1>
+ * - Byte  3: bits <47-40> : OADIV<2-4> 0 0 0 0 0
+ * - Byte  4: bits <39-32> : 0 0 0 0 0 OAMUX<0-2>
+ * - Byte  5: bits <31-24> : 0 0 0 0 0 0 FBSEL<0-1>
+ * - Byte  6: bits <23-16> : FBDLY<0-4> xDlySel DlyGLA<0-1>
+ * - Byte  7: bits <15-8>  : DlyGLA<2-4> 0 0 0 0 0
+ * - Byte  8: 0x00
+ * - Byte  9: 0x01
+ * - Byte 10: bits <7-0>   : 1 1 0 VCOSEL<1-2> 1 1 1
+ *
+ *
+ * @see GET-AS-002-0006 (especially Table 4 for order of bits)
+ * @see GET-AS-002-0010
+ */
+uint64_t buildLcm1RegisterValue(const uint64_t FINDIV, const uint64_t FBDIV, const uint64_t OADIV, const uint64_t OAMUX, const uint64_t FBSEL, const uint64_t DLYGLA, const uint64_t VCOSEL)
+{
+	LCM1_uint64 lcm1;
+	lcm1.setValue(UINT64_C(0x48900001020000CF)); // default values
+	lcm1.set_reverse_FINDIV(FINDIV);
+	lcm1.set_reverse_FBDIV(FBDIV);
+	lcm1.set_reverse_OADIV(OADIV);
+	lcm1.set_reverse_OAMUX(OAMUX);
+	lcm1.set_reverse_FBSEL(FBSEL);
+	lcm1.set_reverse_VCOSEL(VCOSEL);
+	lcm1.set_reverse_DLYGLA(DLYGLA);
+
+	//LOG_DEBUG() << "FinDiv=" << FINDIV << " FbDiv=" << FBDIV << " OADiv=" << OADIV << " VCOSel=" << VCOSEL;
+	//LOG_DEBUG()	<< "OAMux=" << OAMUX << " FbSel=" << FBSEL << " DlyGLA=" << DLYGLA;
+	// LOG_DEBUG() << "U=" << (1+OADIV) << " M=" << (1+FBDIV) << " N=" << (1+FINDIV) << " VCOSel=" << VCOSEL;
+	// LOG_DEBUG() << "LCM1=0x" << std::hex << lcm1.value();
+	return lcm1.value();
+}
+//_________________________________________________________________________________________________
+/**
+ * Computes value of register LCM1 of AsAd LCM device.
+ * @param freqCKW_MHz CoBo sampling clock frequency CKW [MHz].
+ * @param clockDivider Ratio between CKW and WCKn
+ *
+ * The LCM1 register is an 80-bit register. Here we construct a 64-bit register value,
+ *  the two missing bytes which are always equal to 0x0001 are added on the fly by the device policy.
+ *
+ * - Byte  1: bits <63-56> : FINDIV<0-6> FBDIV<0>
+ * - Byte  2: bits <55-48> : FBDIV<1-6> OADIV<0-1>
+ * - Byte  3: bits <47-40> : OADIV<2-4> 0 0 0 0 0
+ * - Byte  4: bits <39-32> : 0 0 0 0 0 OAMUX<0-2>
+ * - Byte  5: bits <31-24> : 0 0 0 0 0 0 FBSEL<0-1>
+ * - Byte  6: bits <23-16> : FBDLY<0-4> xDlySel DlyGLA<0-1>
+ * - Byte  7: bits <15-8>  : DlyGLA<2-4> 0 0 0 0 0
+ * - Byte  8: 0x00
+ * - Byte  9: 0x01
+ * - Byte 10: bits <7-0>   : 1 1 0 VCOSEL<1-2> 1 1 1
+ *
+ *
+ * @see GET-AS-002-0006 (especially Table 4 for order of bits)
+ * @see GET-AS-002-0010
+ */
+uint64_t buildLcm1GenericRegisterValue(const float & freqCKW_MHz, const float & clockDivider)
+{
+	// N : CKW frequency divider = 1 + FINDIV
+	uint64_t FINDIV = 18;
+	// M : WCKn frequency divider = 1 + FBDIV
+	uint64_t FBDIV = 18;
+	// U : WCKn frequency multiplier = 1 + OADIV
+	uint64_t OADIV = 0;
+	// OAMUX: WCKn source signal (CKW or M / (N x U) x CKW with phase shift)
+	uint64_t OAMUX = 4; // 0 deg shift
+	// FbSel: 01 -> no programmable delay
+	uint64_t FBSEL = 1;
+	// DlyGLA: additional delay for WCKn
+	uint64_t DLYGLA = 0;
+	// VCOSel: VCO working band width
+	uint64_t VCOSEL = 2;
+
+	const float freqWCKn_MHz = freqCKW_MHz/clockDivider;
+	LOG_INFO() << "Searching for value of AsAd LCM1 such that WCKn=" << freqWCKn_MHz << " MHz with CKW=" << freqCKW_MHz << " MHz";
+	if (freqWCKn_MHz < 1 or freqWCKn_MHz > 200) // To comply with the AGET requirements, WCKn frequency must be within the range 1 MHz-200 MHz.
+	{
+		throw mdaq::utl::CmdException(boost::lexical_cast< std::string >(freqCKW_MHz) + " MHz is not a valid writing clock (CKW) frequency.");
+	}
+
+	// Given CKW, we set N, M, U so that WCKn = M / (N x U) x CKW
+	// Find 1 <= U <= 32 such that 24MHz/WCKn <= U <= 350 MHz/WCKn
+	// OADiv is the straight binary conversion of U-1
+	OADIV = std::ceil(24.0/freqWCKn_MHz) - 1;
+	// Find 1 <= M <= 128 such that (U*WCKn)/5.5 MHz <= M <= (U*WCKn)/1.5 MHz
+	// FbDiv is the straight binary conversion of M-1
+	FBDIV = std::ceil((OADIV+1.0)*freqWCKn_MHz/5.5) - 1;
+	// Find 1 <= N <= 128 such that N = (M*CKW)/(U*WCKn)
+	// FinDiv is the straight binary conversion of N-1
+	uint64_t N = std::min(std::max(uint64_t((FBDIV+1)*clockDivider/(OADIV+1)), UINT64_C(1)), UINT64_C(128));
+	FINDIV = N - 1;
+	// The frequency U*fWCKn has to be calculated in order to further define the bandwidth in which the VCO will work.
+	const float freqVCO_MHz = (OADIV+1)*freqWCKn_MHz;
+	static const float vcoBandLimits_Mhz[4] = {40., 80., 150., 200.0};
+	const float* pos = std::find_if(vcoBandLimits_Mhz, vcoBandLimits_Mhz+4, std::bind2nd(std::greater_equal< float >(), freqVCO_MHz));
+	VCOSEL = std::distance(vcoBandLimits_Mhz, pos);
+	// Compute actual sampling frequency
+	const double actualFreqWCKn_MHz = (1+FBDIV) * freqCKW_MHz / ((1+FINDIV)*(1+OADIV));
+
+	LOG_DEBUG() << "U=" << (1+OADIV) << " M=" << (1+FBDIV) << " N=" << (1+FINDIV) << " VCOSel=" << VCOSEL;
+	if (std::fabs(actualFreqWCKn_MHz - freqWCKn_MHz) >= FLT_EPSILON)
+	{
+		LOG_WARN() << "Actual sampling frequency WCKn=" << actualFreqWCKn_MHz << " MHz differs from goal of " << freqWCKn_MHz << " MHz!";
+	}
+
+	return buildLcm1RegisterValue(FINDIV, FBDIV, OADIV, OAMUX, FBSEL, DLYGLA, VCOSEL);
+}
+
+//_________________________________________________________________________________________________
+/**
+ * Computes value of register LCM1 of AsAd LCM device.
+ * @param freqCKW_MHz CoBo sampling clock frequency CKW [MHz].
+ * @param clockDivider Ratio between CKW and WCKn
+ *
+ * The LCM1 register is an 80-bit register. Here we construct a 64-bit register value,
+ *  the two missing bytes which are always equal to 0x0001 are added on the fly by the device policy.
+ *
+ * - Byte  1: bits <63-56> : FINDIV<0-6> FBDIV<0>
+ * - Byte  2: bits <55-48> : FBDIV<1-6> OADIV<0-1>
+ * - Byte  3: bits <47-40> : OADIV<2-4> 0 0 0 0 0
+ * - Byte  4: bits <39-32> : 0 0 0 0 0 OAMUX<0-2>
+ * - Byte  5: bits <31-24> : 0 0 0 0 0 0 FBSEL<0-1>
+ * - Byte  6: bits <23-16> : FBDLY<0-4> xDlySel DlyGLA<0-1>
+ * - Byte  7: bits <15-8>  : DlyGLA<2-4> 0 0 0 0 0
+ * - Byte  8: 0x00
+ * - Byte  9: 0x01
+ * - Byte 10: bits <7-0>   : 1 1 0 VCOSEL<1-2> 1 1 1
+ *
+ *
+ * @see GET-AS-002-0006 (especially Table 4 for order of bits)
+ * @see GET-AS-002-0010
+ */
+uint64_t buildLcm1RegisterValue(const float & freqCKW_MHz, const float & clockDivider)
+{
+	// WCKn = CKW (PLL of LCM1 by-passed) if OAMUX = 0
+	// WCKn = M / (N x U) x CKW otherwise
+
+	// N : CKW frequency divider = 1 + FINDIV
+	uint64_t FINDIV = 18;
+	// M : WCKn frequency divider = 1 + FBDIV
+	uint64_t FBDIV = 18;
+	// U : WCKn frequency multiplier = 1 + OADIV
+	uint64_t OADIV = 0;
+	// OAMUX: WCKn source signal (CKW or M / (N x U) x CKW with phase shift)
+	uint64_t OAMUX = 4; // 0 deg shift
+	// FbSel: 01 -> no programmable delay
+	uint64_t FBSEL = 1;
+	// DlyGLA: additional delay for WCKn
+	uint64_t DLYGLA = 0;
+	// VCOSel: VCO working band width
+	uint64_t VCOSEL = 2;
+
+	const float freqWCKn_MHz = freqCKW_MHz/clockDivider;
+	if (std::fabs(clockDivider - 1.0) < FLT_EPSILON)
+	{
+		if (freqCKW_MHz == 100.0) // LCM1 = 0x48900001020000CF
+		{
+			FINDIV = 18; // N = 19
+			FBDIV = 18;  // M = 19
+			OADIV = 0;   // U = 1
+			VCOSEL = 2;  // 67.5MHz – 175MHz
+		}
+		else if (freqCKW_MHz == 50.0) // LCM1 = 0x91200001020000D7
+		{
+			FINDIV = 9; // N = 10
+			FBDIV = 9;  // M = 10
+			OADIV = 0;  // U = 1
+			VCOSEL = 1; // 33.75 MHz-87.5 MHz
+		}
+		else if (freqCKW_MHz == 25.0) // LCM1 = 0x20400001020000C7
+		{
+			FINDIV = 4; // N = 5
+			FBDIV = 4;  // M = 5
+			OADIV = 0;  // U = 1
+			VCOSEL = 0; // 24 MHz-43.75 MHz
+		}
+		else if (freqCKW_MHz == 12.5) // LCM1 = 0x41420001020000C7
+		{
+			FINDIV = 2; // N = 3
+			FBDIV = 5;  // M = 6
+			OADIV = 1;  // U = 2
+			VCOSEL = 0; // 24 MHz-43.75 MHz
+		}
+		else if (freqCKW_MHz == 6.25) // LCM1 = 0x81C30001020000C7
+		{
+			FINDIV = 1; // N = 2
+			FBDIV = 7;  // M = 8
+			OADIV = 3;  // U = 4
+			VCOSEL = 0; // 24 MHz-43.75 MHz
+		}
+		else if (freqCKW_MHz == 3.125)
+		{
+			FINDIV = 0; // N = 1
+			FBDIV = 7;  // M = 8
+			OADIV = 7;  // U = 8
+			VCOSEL = 0; // 24 MHz-43.75 MHz
+		}
+		else
+		{
+			return buildLcm1GenericRegisterValue(freqCKW_MHz, clockDivider);
+		}
+	}
+	else
+	{
+		// Case where WCKn != CKW
+		if (freqCKW_MHz == 100.0 && freqWCKn_MHz == 1.) // LCM1 =
+		{
+			FINDIV = 19; // N = 20
+			FBDIV = 4;  // M = 5
+			OADIV = 24;   // U = 25
+			VCOSEL = 0; // 24 MHz-43.75 MHz
+		}
+		else if (freqCKW_MHz == 50.0 && freqWCKn_MHz == 1.) // LCM1 =
+		{
+			FINDIV = 9; // N = 10
+			FBDIV = 4;  // M = 5
+			OADIV = 24;   // U = 25
+			VCOSEL = 0; // 24 MHz-43.75 MHz
+		}
+		else
+		{
+			return buildLcm1GenericRegisterValue(freqCKW_MHz, clockDivider);
+		}
+	}
+
+	return buildLcm1RegisterValue(FINDIV, FBDIV, OADIV, OAMUX, FBSEL, DLYGLA, VCOSEL);
+}
+//__________________________________________________________________________________________________
+/**
+ * Parses CCfg configuration of an AsAd board to extract parameters related to LCM1 register expert mode.
+ */
+void parseAsAdLcm1DebugConfig(CCfg::CConfig cfg, asad::utl::Lcm1Config & lcm1)
+{
+	CCfg::CConfig lcm1Cfg(cfg("Clocking")("Debug")("LCM1"));
+	lcm1.findiv = lcm1Cfg("FINDIV").getIntValue();
+	lcm1.fbdiv = lcm1Cfg("FBDIV").getIntValue();
+	lcm1.oadiv = lcm1Cfg("OADIV").getIntValue();
+	lcm1.oamux = lcm1Cfg("OAMUX").getIntValue();
+	lcm1.fbsel = lcm1Cfg("FBSEL").getIntValue();
+	lcm1.fbdly = lcm1Cfg("FBDLY").getIntValue();
+	lcm1.xdlysel = lcm1Cfg("xDlySel").getBoolValue();
+	lcm1.dlygla = lcm1Cfg("DlyGLA").getIntValue();
+	lcm1.vcosel = lcm1Cfg("VCOSel").getIntValue();
+}
+//_________________________________________________________________________________________________
+/*
+ * Patch an already existing LCM1 value with given field values.
+ */
+void patchLcm1RegisterValue(uint64_t & lcm1Value, const Lcm1Config & config)
+{
+	LOG_DEBUG() << "Using debug mode to compute LCM1 register value";
+
+	LCM1_uint64 lcm1;
+	lcm1.setValue(lcm1Value);
+
+	lcm1.set_reverse_FINDIV(config.findiv);
+	lcm1.set_reverse_FBDIV(config.fbdiv);
+	lcm1.set_reverse_OADIV(config.oadiv);
+	lcm1.set_reverse_OAMUX(config.oamux);
+	lcm1.set_reverse_FBSEL(config.fbsel);
+	lcm1.set_reverse_FBDLY(config.fbdly);
+	lcm1.set_reverse_XDLYSEL(config.xdlysel);
+	lcm1.set_reverse_DLYGLA(config.dlygla);
+	lcm1.set_reverse_VCOSEL(config.vcosel);
+
+	lcm1Value = lcm1.value();
+}
+//_________________________________________________________________________________________________
+struct LCM2_uint64: public BitField_uint64
+{
+	uint64_t reverseBits(uint64_t num, size_t nbOfBits)
+	{
+		uint64_t reverse_num = 0;
+		for (size_t i = 0; i < nbOfBits; i++)
+		{
+			if ((num & (1 << i)))
+				reverse_num |= 1 << ((nbOfBits - 1) - i);
+		}
+		return reverse_num;
+	}
+
+	/*
+	 * Redefinition of DECLARE_FIELD to be able to set a field in the reverse bit order
+	 * (AsAd reshuffling).
+	 */
+#undef DECLARE_FIELD
+#define DECLARE_FIELD(name, pos, width) \
+WordBasicType name() const { return RegField::getField<pos, width>(regValue); } \
+void set_##name(WordType val) { RegField::setField<pos, width>(regValue, val); } \
+void set_reverse_##name(WordType val) { \
+	RegField::setField<pos, width>(regValue, reverseBits(val,width)); \
+}
+
+	//DECLARE_FIELD(name, pos, width)
+	DECLARE_FIELD(byte1, 56, 8)
+	DECLARE_FIELD(byte2, 48, 8)
+	DECLARE_FIELD(byte3, 40, 8)
+	DECLARE_FIELD(byte4, 32, 8)
+	DECLARE_FIELD(byte5, 24, 8)
+	DECLARE_FIELD(byte6, 16, 8)
+	DECLARE_FIELD(byte7, 8, 8)
+	DECLARE_FIELD(byte10, 0, 8)
+	DECLARE_FIELD(FINDIV,57, 7)
+	DECLARE_FIELD(FBDIV, 50, 7)
+	DECLARE_FIELD(OADIV, 45, 5)
+	DECLARE_FIELD(OBDIV, 40, 5)
+	DECLARE_FIELD(OAMUX, 33, 2)
+	DECLARE_FIELD(OBMUX, 30, 2)
+	DECLARE_FIELD(FBSEL, 24, 2)
+	DECLARE_FIELD(FBDLY, 19, 5)
+	DECLARE_FIELD(XDLYSEL, 18, 1)
+	DECLARE_FIELD(DLYGLA, 13, 5)
+	DECLARE_FIELD(DLYGLB, 8, 5)
+};
+//_________________________________________________________________________________________________
+/**
+ * Computes value of register LCM2 of AsAd LCM device.
+ *
+ * The LCM2 register is an 80-bit register. Here we construct a 64-bit register value,
+ *  the two missing bytes which are always equal to 0x0001 are added on the fly by the device policy.
+ *
+ * - Byte  1: bits <63-56> : FINDIV<0-6> FBDIV<0>
+ * - Byte  2: bits <55-48> : FBDIV<1-6> OADIV<0-1>
+ * - Byte  3: bits <47-40> : OADIV<2-4> OBDIV<0-4>
+ * - Byte  4: bits <39-32> : 0 0 0 0 0 OAMUX<0-1> 1
+ * - Byte  5: bits <31-24> : OBMUX<0-1> 1 0 0 0 FBSEL<0-1>
+ * - Byte  6: bits <23-16> : FBDLY<0-4> xDlySel DlyGLA<0-1>
+ * - Byte  7: bits <15-8>  : DlyGLA<2-4> DlyGLB<0-4>
+ * - Byte  8: 0x00
+ * - Byte  9: 0x01
+ * - Byte 10: bits <7-0>   : 1 1 VCOSEL<0-2> 1 1 1 (VCOSEL=0)
+ *
+ * Depending on document versions OAMUX and OBMUX are either coded on 3 bits or on 2 bits with the extra (most significant) bit hard-coded to 1.
+ *
+ * @see GET-AS-002-0006 (especially Table 9 for order of bits)
+ * @see GET-AS-002-0010
+ * @see AsAd Slow Control Protocol & Registers Mapping (May 2010)
+ */
+uint64_t buildLcm2RegisterValue(const float & freqCKR_MHz, const int32_t & adcClockPhaseShift, const int32_t & adcClockDelay)
+{
+	// fRCKn = M / (U x N) x fCKR
+	// fACK  = M / (V x N) x fCKR
+
+	// N : CKR frequency divider = 1 + FINDIV
+	uint64_t FINDIV = 4;
+	// M : RCKn and ACK frequencies divider = 1 + FBDIV
+	uint64_t FBDIV = 4;
+	// U : RCKn frequency multiplier = 1 + OADIV
+	uint64_t OADIV = 0;
+	// V : ACK frequency multiplier = 1 + OBDIV
+	uint64_t OBDIV = 0;
+	// OAMUX: RCKn phase shift
+	uint64_t OAMUX = 0; // Value on 3 bits: 4
+	// OBMUX: ACK phase shift
+	uint64_t OBMUX = 2; // Value on 3 bits: 6
+	// DlyGLA: additional delay for RCKn
+	uint64_t DLYGLA = 0;
+	// DlyGLB: additional delay for ACK
+	uint64_t DLYGLB = 0;
+
+	// Given CKR, we set N, M, U, V so that RCKn = ACK = 25 MHz
+	//LOG_DEBUG() << "CKR frequency: " << freqCKR_MHz << " MHz";
+	if (freqCKR_MHz == 25.0)
+	{
+		FINDIV = 4; // N = 5
+		FBDIV = 4;  // M = 5
+		OADIV = 0;  // U = 1
+		OBDIV = 0;  // V = 1
+		//lcm2.setValue(UINT64_C(0x20400001620000C7));
+	}
+	else if (freqCKR_MHz == 12.5)
+	{
+		FINDIV = 2; // N = 3
+		FBDIV = 5;  // M = 6
+		OADIV = 0;  // U = 1
+		OBDIV = 0;  // V = 1
+		//lcm2.setValue(UINT64_C(0x41421001620000C7));
+	}
+	else if (freqCKR_MHz == 6.25)
+	{
+		FINDIV = 1; // N = 2
+		FBDIV = 7;  // M = 8
+		OADIV = 0;  // U = 1
+		OBDIV = 0;  // V = 1
+		//lcm2.setValue(UINT64_C(0x81C31801620000C7));
+	}
+
+	/*
+	 * Phase shift of ADC clock
+	 * What we observe on AsAd is different from the output of the PLL
+	 * a phase shift of 180 of the ADC clock (OBMUX = 2, OAMUX = 0)
+	 * means that the clocks are in phase.
+	 * It is corrected here
+	 */
+	//LOG_DEBUG() << "ADC clock phase shift: " << adcClockPhaseShift << " deg";
+
+	OAMUX = 0; // Phase shift of 0, value on 3 bits: 0
+	switch (adcClockPhaseShift)
+	{
+	case 0:
+		OBMUX = 2; // Value on 3 bits: 6
+		break;
+	case 90:
+		OBMUX = 1; // Value on 3 bits: 5
+		break;
+	case 180:
+		OBMUX = 0; // Value on 3 bits: 4
+		break;
+	case 270:
+		OBMUX = 3; // Value on 3 bits: 7
+		break;
+	default:
+		OBMUX = 2; // Default is a true phase shift of 0; value on 3 bits: 6
+		break;
+	}
+
+	/*
+	 * Delay of ADC clock
+	 * By setting the two delays (DlyGLA, DlyGLB), we set the relative delay between the two clocks
+	 * For each of the delays,
+	 * DLYGLx = 0: delay = 225 ps
+	 * DLYGLx = 1: delay = 760 ps
+	 * DLYGLx > 1: delay = 760 ps + (DLYGLx-1)*160 ps
+	 */
+	//LOG_DEBUG() << "ADC clock delay: " << adcClockDelay << " ps";
+	if (adcClockDelay < -5335)
+	{
+		DLYGLA = 31; // 5560 ps
+		DLYGLB = 0; // 225 ps
+	}
+	else if ((adcClockDelay >= -5335) && (adcClockDelay < -375))
+	{
+		DLYGLA = 1 + (-adcClockDelay - 535) / 160;
+		DLYGLB = 0;
+	}
+	else if ((adcClockDelay >= -375) && (adcClockDelay < 375))
+	{
+		DLYGLA = 0;
+		DLYGLB = 0;
+	}
+	else if ((adcClockDelay >= 375) && (adcClockDelay < 5335))
+	{
+		DLYGLA = 0;
+		DLYGLB = 1 + (adcClockDelay - 535) / 160;
+		// DLYGLB = 1: delay(B) = 760 ps            : delay(B-A) = 535 ps
+		// DLYGLB    : delay(B) = 760 + (DLYGLB-1)*160 ps: delay(B-A) = 535 + (DLYGLB-1)*160 ps
+	}
+	else
+	{
+		DLYGLA = 0;
+		DLYGLB = 31;
+	}
+
+	// Overwrite parameters to use AsAd test bench LCM2 value
+//	OAMUX = 3u; // Value on 3 bits: 7
+//	OBMUX = 2u; // Value on 3 bits: 5
+//	DLYGLA = 0u;
+//	DLYGLB = 13u;
+
+	LCM2_uint64 lcm2;
+	lcm2.setValue(UINT64_C(0x20400001620000C7)); // default values
+	lcm2.set_reverse_FINDIV(FINDIV);
+	lcm2.set_reverse_FBDIV(FBDIV);
+	lcm2.set_reverse_OADIV(OADIV);
+	lcm2.set_reverse_OBDIV(OBDIV);
+	lcm2.set_reverse_OAMUX(OAMUX);
+	lcm2.set_reverse_OBMUX(OBMUX);
+	lcm2.set_reverse_DLYGLA(DLYGLA);
+	lcm2.set_reverse_DLYGLB(DLYGLB);
+
+	//LOG_DEBUG() << "FinDiv=" << FINDIV << " FbDiv=" << FBDIV << " OADiv=" << OADIV << " OBDiv=" << OBDIV;
+	//LOG_DEBUG()	<< " OAMux=" << OAMUX << " OBMux=" << OBMUX << " DlyGLA=" << DLYGLA << " DlyGLB=" << DLYGLB;
+	return lcm2.value();
+}
+//__________________________________________________________________________________________________
+/**
+ * Parses CCfg configuration of an AsAd board to extract parameters related to LCM2 register expert mode.
+ */
+void parseAsAdLcm2DebugConfig(CCfg::CConfig cfg, asad::utl::Lcm2Config & lcm2)
+{
+	CCfg::CConfig lcm2Cfg(cfg("Clocking")("Debug")("LCM2"));
+	lcm2.findiv = lcm2Cfg("FINDIV").getIntValue();
+	lcm2.fbdiv = lcm2Cfg("FBDIV").getIntValue();
+	lcm2.oadiv = lcm2Cfg("OADIV").getIntValue();
+	lcm2.obdiv = lcm2Cfg("OBDIV").getIntValue();
+	lcm2.oamux = lcm2Cfg("OAMUX").getIntValue();
+	lcm2.obmux = lcm2Cfg("OBMUX").getIntValue();
+	lcm2.fbsel = lcm2Cfg("FBSEL").getIntValue();
+	lcm2.fbdly = lcm2Cfg("FBDLY").getIntValue();
+	lcm2.xdlysel = lcm2Cfg("xDlySel").getBoolValue();
+	lcm2.dlygla = lcm2Cfg("DlyGLA").getIntValue();
+	lcm2.dlyglb = lcm2Cfg("DlyGLB").getIntValue();
+}
+//_________________________________________________________________________________________________
+/*
+ * Patch an already existing LCM2 value with given field values.
+ */
+void patchLcm2RegisterValue(uint64_t & lcm2Value, const Lcm2Config & config)
+{
+	LOG_DEBUG() << "Using debug mode to compute LCM2 register value";
+
+	LCM2_uint64 lcm2;
+	lcm2.setValue(lcm2Value);
+
+	lcm2.set_reverse_FINDIV(config.findiv);
+	lcm2.set_reverse_FBDIV(config.fbdiv);
+	lcm2.set_reverse_OADIV(config.oadiv);
+	lcm2.set_reverse_OBDIV(config.obdiv);
+	lcm2.set_reverse_OAMUX(config.oamux);
+	lcm2.set_reverse_OBMUX(config.obmux);
+	lcm2.set_reverse_FBSEL(config.fbsel);
+	lcm2.set_reverse_FBDLY(config.fbdly);
+	lcm2.set_reverse_XDLYSEL(config.xdlysel);
+	lcm2.set_reverse_DLYGLA(config.dlygla);
+	lcm2.set_reverse_DLYGLB(config.dlyglb);
+
+	lcm2Value = lcm2.value();
+}
+//__________________________________________________________________________________________________
+/**
+ * Decodes AsAd monitoring alert status into human-readable message.
+ * @see GET-AS-002-0004 Table 10
+ * 0 Reserved. Should always be 0
+ * 1 Reserved. Should always be 0
+ * 2 1: Measured Text > Text high limit
+ * 3 1: Measured Text ≤ Text low limit
+ * 4 1: Text sensor is out of order
+ * 5 Reserved. Should always be 0
+ * 6 1: Measured VDD ≤ VDD low limit or measured VDD > VDD high limit
+ * 7 1: Measured IDD ≤ IDD low limit or IDD > IDD high limit
+ */
+std::string stringifyMonitoringAlertStatus(const uint8_t alertStatus)
+{
+	if (0 != alertStatus)
+	{
+		typedef ::utl::BitFieldHelper< uint8_t > Helper;
+		std::vector<std::string> tokens;
+		if (Helper::getBit(alertStatus, 2u)) tokens.push_back("high Text");
+		if (Helper::getBit(alertStatus, 3u)) tokens.push_back("low Text");
+		if (Helper::getBit(alertStatus, 4u)) tokens.push_back("Text out of order");
+		if (Helper::getBit(alertStatus, 6u)) tokens.push_back("VDD out of range");
+		if (Helper::getBit(alertStatus, 7u)) tokens.push_back("IDD out of range");
+		return boost::algorithm::join(tokens, ", ");
+	}
+	return "OK";
+}
+//_________________________________________________________________________________________________
+} // namespace utl
+} // namespace asad
+} // namespace get
+
+

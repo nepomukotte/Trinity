@@ -1,0 +1,389 @@
+/* =============================================================================
+ * $Id$
+ * @file StandardHeader.cpp
+ * @author sizun
+ * @date 15 déc. 2011
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * =============================================================================
+ */
+
+#include "mfm/StandardHeader.h"
+#include "mfm/FrameFormat.h"
+#include "mfm/Exception.h"
+#include <utl/Rounding.hpp>
+#include <utl/BinIO.hpp>
+using namespace utl;
+
+#include <sstream>
+
+namespace mfm {
+//______________________________________________________________________
+/**
+ * Default constructor.
+ * Builds an empty "Layered" frame header.
+ * @param _byteOrder Byte order.
+ */
+StandardHeader::StandardHeader(utl::Endianness _byteOrder) :
+	Header(_byteOrder),
+	headerSize_blk_(16u),          // By default, 16 blocks of 1 Byte without reserve.
+    itemSize_B_(0),                // By default, frame is layered
+    itemCount_(0)                  // By default, frame is empty
+{
+    // Corrections to inherited default values:
+    // By default, frame is reduced to 1 Header, its size aligned with blockSize.
+    set_frameSize_blk(headerSize_blk());
+    // A standard header is not part of a blob.
+    set_blobNess(false);
+}
+//______________________________________________________________________
+/**
+ * Copy constructor.
+ */
+StandardHeader::StandardHeader(StandardHeader const & header)
+	: Header(header),
+  	  headerSize_blk_(header.headerSize_blk()),
+      itemSize_B_(header.itemSize_B()),
+      itemCount_(header.itemCount())
+{
+	;
+}
+//______________________________________________________________________
+/**
+ * Creates a standard header, using the provided primary header and initializing the additional parameters to their default values.
+ * @param primaryHeader The PrimaryHeader to copy.
+ */
+StandardHeader::StandardHeader(PrimaryHeader const & primaryHeader)
+    : Header(primaryHeader),
+  	  headerSize_blk_(utl::divide<utl::RoundUp>(uint16_t(16u), primaryHeader.blkSize_B())),  // By default, minimum number of blocks providing at least 16 Bytes.
+      itemSize_B_(0),             // By default, frame is layered
+      itemCount_(0)               // By default, frame is empty
+{
+    // Corrections to inherited default values:
+    // By default, frame is reduced to 1 Header, its size aligned with blockSize.
+	set_dataSize_blk(0);
+    // A standard header is not part of a blob.
+    set_blobNess(false);
+}
+//______________________________________________________________________
+/**
+ * Clones this standard header.
+ * @return Returns the actual clone.
+ */
+StandardHeader* StandardHeader::clone() const
+{
+	return new StandardHeader(*this);
+}
+//______________________________________________________________________
+/**
+ * This constructor fills the primary header components according to the provided primary header,
+ * and the remaining header components according to the serialized
+ * data that comes from the specified input stream. Decoding is based on MFM2.x spec.
+ * @param primaryHeader Primary header.
+ * @param dataIn Input data stream.
+ */
+StandardHeader::StandardHeader(PrimaryHeader const & primaryHeader, std::istream& dataIn)
+	:	Header(primaryHeader),
+	 	headerSize_blk_(utl::divide<utl::RoundUp>(uint16_t(16u), primaryHeader.blkSize_B())),  // By default, minimum number of blocks providing at least 16 Bytes.
+		itemSize_B_(0),     // By default, frame is layered
+		itemCount_(0)       // By default, frame is empty
+{
+	// Corrections to inherited default values:
+	// A standard header is not part of a blob.
+	set_blobNess(false);
+	// Read secondary header from stream
+	decode_secondary_header(dataIn);
+}
+//______________________________________________________________________
+/**
+ * This constructor fills the primary header components according to the provided primary header,
+ * and the remaining header components according to the provided format.
+ * @param primaryHeader Primary header.
+ * @param format Frame format description.
+ */
+StandardHeader::StandardHeader(PrimaryHeader const & primaryHeader, FrameFormat const & format)
+	:	Header(primaryHeader),
+	 	headerSize_blk_(utl::divide<utl::RoundUp>(uint16_t(16u), primaryHeader.blkSize_B())),  // By default, minimum number of blocks providing at least 16 Bytes.
+		itemSize_B_(0),     // By default, frame is layered
+		itemCount_(0)       // By default, frame is empty
+{
+	// Corrections to inherited default values:
+	// A standard header is not part of a blob.
+	set_blobNess(false);
+	// Set secondary header fields
+	set_headerSize_blk(format.headerSize_blk());
+	set_itemSize_B(format.itemSize_B());
+	// Initially, frame size is header size
+	set_frameSize_blk(headerSize_blk());
+}
+//______________________________________________________________________
+/**
+ * Prints the contents of this header to standard output.
+ */
+void StandardHeader::print() const
+{
+	std::cout << "StandardHeader[";
+	Header::print();
+	std::cout << ", headerSize_blk = " << headerSize_blk_
+		      << ", itemSize_B = "     << itemSize_B_
+		      << ", itemCount = "      << itemCount_
+		      << "]";
+}
+//______________________________________________________________________
+/**
+ * Equality comparison operator.
+ * @param rvalue Standard header to compare this header to.
+ * @return Whether both headers are identical.
+ */
+bool StandardHeader::operator==(const StandardHeader& rvalue) const
+{
+    return ( static_cast<const PrimaryHeader&>( *this ) == static_cast<const PrimaryHeader&>( rvalue ) )
+    			and headerSize_blk_ == rvalue.headerSize_blk_
+                and itemSize_B_ == rvalue.itemSize_B_
+                and itemCount_ == rvalue.itemCount_;
+}
+//______________________________________________________________________
+/**
+ * Unequality comparison operator.
+ */
+bool StandardHeader::operator!=(const StandardHeader& rvalue) const
+{
+    return !operator==(rvalue);
+}
+//______________________________________________________________________
+bool StandardHeader::isBasicFrame() const
+{
+    return (itemSize_B() != 0);
+}
+//______________________________________________________________________
+bool StandardHeader::isLayeredFrame() const
+{
+    return (itemSize_B() == 0);
+}
+//______________________________________________________________________
+FrameKind StandardHeader::metaType() const
+{
+    if (isLayeredFrame())
+        return LAYERED;
+    else
+        return BASIC;
+}
+//______________________________________________________________________
+uint16_t StandardHeader::headerSize_blk() const
+{
+    return headerSize_blk_;
+}
+//______________________________________________________________________
+uint32_t StandardHeader::headerSize_B() const
+{
+    return headerSize_blk()*blkSize_B();
+}
+//______________________________________________________________________
+uint32_t StandardHeader::headerReserveSize_B() const
+{
+	return headerSize_B() - PrimaryHeader::SPEC_SIZE_B - StandardHeader::SPEC_SIZE_B;
+}
+//______________________________________________________________________
+uint32_t StandardHeader::dataReserveSize_B() const
+{
+	return frameSize_B() - itemCount()*itemSize_B();
+}
+//______________________________________________________________________
+uint16_t StandardHeader::itemSize_B() const
+{
+    return itemSize_B_;
+}
+//______________________________________________________________________
+uint32_t StandardHeader::itemCount()  const
+{
+    return itemCount_;
+}
+//______________________________________________________________________
+void StandardHeader::set_headerSize_blk(uint16_t _newHeaderSize_blk)
+{
+	// Check new size w.r.t. minimum size
+	uint32_t newHeaderSize_B = _newHeaderSize_blk*PrimaryHeader::blkSize_B();
+	if (newHeaderSize_B < PrimaryHeader::SPEC_SIZE_B + StandardHeader::SPEC_SIZE_B)
+	{
+		std::ostringstream msg;
+		msg << "StandardHeader::set_headerSize_blk(" << _newHeaderSize_blk << " blk): " << newHeaderSize_B << " Bytes is not a valid standard header size!";
+	    throw mfm::Exception(msg.str());
+	}
+	headerSize_blk_ = _newHeaderSize_blk;
+
+	// Changing the size of the header section should not affect the size of the data section.
+	//set_frameSize_B(headerSize_B() + oldDataSize_B);
+}
+//______________________________________________________________________
+void StandardHeader::set_headerSize_B(uint32_t _headerSize_B)
+{
+    uint32_t newHeaderSize_blk = utl::divide<utl::RoundUp>(_headerSize_B, (uint32_t) PrimaryHeader::blkSize_B());
+    set_headerSize_blk(newHeaderSize_blk);
+}
+//______________________________________________________________________
+void StandardHeader::set_dataSize_blk(uint32_t _dataSize_blk)
+{
+	set_frameSize_blk(_dataSize_blk + headerSize_blk());
+}
+//______________________________________________________________________
+void StandardHeader::set_dataSize_B(uint64_t _dataSize_B)
+{
+	uint64_t newDataSize_blk = utl::divide<utl::RoundUp>(_dataSize_B, (uint64_t) PrimaryHeader::blkSize_B());
+	set_dataSize_blk(newDataSize_blk);
+}
+//______________________________________________________________________
+void StandardHeader::set_itemSize_B(uint16_t _itemSize_B)
+{
+    itemSize_B_ = _itemSize_B;
+}
+//______________________________________________________________________
+void StandardHeader::setMetaType(FrameKind kind)
+{
+	if (BLOB == kind)
+		throw Exception("Operation StandardHeader::setMetaType does not support BLOB kind of frame!");
+	if (LAYERED == kind)
+		set_itemSize_B(0);
+}
+//______________________________________________________________________
+void StandardHeader::set_itemCount(uint32_t _itemCount)
+{
+    itemCount_ = _itemCount;
+}
+//______________________________________________________________________
+void StandardHeader::set_blkSize_B(uint16_t _blkSize_B)
+{
+	uint32_t const oldHeaderSize_B = headerSize_B();
+	uint64_t const oldDataSize_B = frameSize_B() - oldHeaderSize_B;
+
+    PrimaryHeader::set_blkSize_B(_blkSize_B);
+    set_headerSize_B(oldHeaderSize_B);
+    set_frameSize_B(oldDataSize_B + headerSize_B());
+}
+//______________________________________________________________________
+/**
+ * Decodes header fields specific to standard headers according to serialized data
+ * from the provided input stream.
+ * @param dataIn Binary input stream.
+ */
+void StandardHeader::decode_secondary_header(std::istream& dataIn)
+{
+    if (isBigEndian())
+    {
+        // Next 2 bytes corresponding to application header size (See MFM2.x)
+        uint16_t _headerSize_blk;
+        BinIO::decode<BigEndian, uint16_t>(_headerSize_blk, dataIn);
+        set_headerSize_blk(_headerSize_blk);
+        // Next 2 bytes corresponding to item size (See MFM2.x)
+        BinIO::decode<BigEndian, uint16_t>(itemSize_B_, dataIn);
+        // Next 2 bytes corresponding to number of items in frame (See MFM2.x)
+        BinIO::decode<BigEndian, uint32_t>(itemCount_, dataIn);
+    }
+    else
+    {
+        // Next 2 bytes corresponding to application header size (See MFM2.x)
+        uint16_t _headerSize_blk;
+        BinIO::decode<LittleEndian, uint16_t>(_headerSize_blk, dataIn);
+        set_headerSize_blk(_headerSize_blk);
+        // Next 2 bytes corresponding to item size (See MFM2.x)
+        BinIO::decode<LittleEndian, uint16_t>(itemSize_B_, dataIn);
+        // Next 2 bytes corresponding to number of items in frame (See MFM2.x)
+        BinIO::decode<LittleEndian, uint32_t>(itemCount_, dataIn);
+    }
+}
+//______________________________________________________________________
+void StandardHeader::decode(std::istream& dataIn)
+{
+    // First decode inherited structure
+    PrimaryHeader::decode(dataIn);
+
+    // Then decode fields specific to standard header
+    decode_secondary_header(dataIn);
+}
+//______________________________________________________________________
+/**
+ * Encodes Header elements into serialized data stream according to MFM2.x spec.
+ * @param dataOut Output data stream.
+ * @return true if data was byte swapped during encoding, false otherwise.
+ */
+void StandardHeader::encode(std::ostream& dataOut) const
+{
+    // First encode inherited structure
+    PrimaryHeader::encode(dataOut);
+
+    // Then encode fields specific to standard header
+    if (isBigEndian())
+    {
+        // Next 2 bytes corresponding to application header size (See MFM2.x)
+        BinIO::encode<BigEndian, uint16_t>(headerSize_blk(), dataOut);
+        // Next 2 bytes corresponding to item size (See MFM2.x)
+        BinIO::encode<BigEndian, uint16_t>(itemSize_B_, dataOut);
+        // Next 2 bytes corresponding to number of items in frame (See MFM2.x)
+        BinIO::encode<BigEndian, uint32_t>(itemCount_, dataOut);
+    }
+    else
+    {
+        // Next 2 bytes corresponding to application header size (See MFM2.x)
+        BinIO::encode<LittleEndian, uint16_t>(headerSize_blk(), dataOut);
+        // Next 2 bytes corresponding to item size (See MFM2.x)
+        BinIO::encode<LittleEndian, uint16_t>(itemSize_B_, dataOut);
+        // Next 2 bytes corresponding to number of items in frame (See MFM2.x)
+        BinIO::encode<LittleEndian, uint32_t>(itemCount_, dataOut);
+    }
+}
+//______________________________________________________________________
+void StandardHeader::addItem()
+{
+	addItems(1);
+}
+//______________________________________________________________________
+/**
+ * Adds n items.
+ * @param n Number of items to add.
+ */
+void StandardHeader::addItems(size_t const & n)
+{
+	if (isLayeredFrame()) Header::addItem(); // Throw exception
+
+	// Allocate memory for new item
+	const size_t newItemCount = itemCount() + n;
+	set_itemCount(newItemCount);
+	set_dataSize_B(newItemCount*itemSize_B());
+}
+//______________________________________________________________________
+void StandardHeader::addItem(uint64_t const itemSize)
+{
+	if (isBasicFrame()) Header::addItem();
+
+	// Allocate memory for new item of type 'Embedded frame'
+	uint64_t oldDataSize_B = dataSize_B();
+	set_itemCount(itemCount()+1);
+	set_dataSize_B(oldDataSize_B + itemSize);
+}
+//______________________________________________________________________
+} /* namespace mfm */

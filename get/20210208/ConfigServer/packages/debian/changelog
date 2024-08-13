@@ -1,0 +1,5 @@
+configserver (1.0.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Hervé Loïc <lherve@cea.fr>  Thu, 01 Oct 2009 14:31:53 +0200

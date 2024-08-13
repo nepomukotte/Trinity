@@ -1,0 +1,31 @@
+# This file shall be included at the beginning of each Makefile.am to enable cppcheck execution
+# with a "make cppcheck" command from the root makefile.
+#
+# Normally, it must be included in every Makefile.am of the project, otherwise errors will occur.
+# Alternatively, if you do not want analysis in some specific makefile, you should not include
+# this file but provide an empty "cppcheck:" rule.
+#
+# Preprocessor flags (-I -D) shall be added to AM_CPPFLAGS, CPPFLAGS or INCLUDES. Other flags will be ignored.
+#
+# The CPPCHECK_JOBS environment variable may be defined with an integer value in order to
+# specify the number of parallel threads to run.
+#
+# Author: Frederic Chateau
+#
+
+cppcheck-recursive:
+	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	(cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) cppcheck); \
+	done
+
+cppcheck: cppcheck-recursive
+	@(if [ -n "$(DIST_SOURCES)" ]; \
+	then \
+	cd $(srcdir); \
+	chk_includes=`$(CXX) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -E -x c++ -v - < /dev/null 2>&1 | sed -n -r "/#include <...> search starts here:/,/End of search list/{s| (/.+)|-I\1|p}"`; \
+	chk_defines=`$(CXX) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -E -dD - < /dev/null 2>&1 | sed -n -r 's/^#define\s+(\w+)\s*$$/-D\1/;s/^#define\s+(\w+)\s+(.+)\s*$$/-D\1=\2/;s/ /\\\\ /g;s/\(/\\\(/g;s/\)/\\\)/g;/-D/!d;p'`; \
+	echo "Compiler context used for cppcheck:"; \
+	echo "$$chk_includes $$chk_defines"; \
+	echo "End cppcheck context"; \
+	eval cppcheck $$chk_defines $$chk_includes -j $${CPPCHECK_JOBS:=1} --enable=all --xml $(DIST_SOURCES) 2> $(abs_builddir)/cppcheck-result.xml; \
+	fi)

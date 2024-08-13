@@ -1,0 +1,30 @@
+# Initializing the SIAB Process and Sleeping for 2 seconds
+100300000000000000
+2
+# Initializing the TRGB Process and Sleeping for 2 seconds
+100400000000000000
+2
+# Initializing the COBO Process and Sleeping for 2 seconds
+100500000000000000
+2
+# Initializing the PDU Process and Sleeping for 2 seconds
+100700000000000000
+2
+# Setting up CAN Bus and Sleeping for 2 seconds
+600100000000000000
+2
+# Turning on LVPS at ch9 and Sleeping for 10 seconds
+600209000000000000
+10
+# Checking the status of the LVPS power and Sleeping for 2 seconds
+600409000000000000
+2
+# Turning on Pump at ch8 and Sleeping for 5 seconds
+600208000000000000
+5
+# Checking the status of the Pump power and Sleeping for 2 seconds
+600408000000000000
+2
+# Initializing the LVPS Process and Sleeping for 5 seconds
+100600000000000000
+5

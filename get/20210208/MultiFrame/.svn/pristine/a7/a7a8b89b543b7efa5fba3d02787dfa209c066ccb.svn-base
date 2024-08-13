@@ -1,0 +1,249 @@
+/*
+ * $Id$
+ * @file FrameSerializer.cpp
+ * @created 9 févr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#include "mfm/Serializer.h"
+using namespace utl;
+
+#include "mfm/Frame.h"
+#include "mfm/Exception.h"
+#include <iostream>
+#include <stdexcept>
+#include <cstring>
+#include <algorithm>
+
+namespace mfm
+{
+//______________________________________________________________________
+/**
+ * Default constructor.
+ * Constructs a serializer with its own allocated buffer.
+ * @param _size_B Capacity and size [Bytes] of the new allocated buffer.
+ */
+Serializer::Serializer(size_t _size_B)
+	: offset_B_(0), size_B_(_size_B)
+{
+	// boost::make_shared was only introduced in Boost version 1.36; yet it is safer and faster...
+	SharedBufferPtr p(new mfm::Buffer(size_B_));
+	buffer_ = p;
+}
+//______________________________________________________________________
+/**
+ * Constructs a serializer sharing its buffer with an existing serializer.
+ * @param serializer Existing serializer with which buffer ownership is to be shared.
+ * @param _size_B Size [Bytes] of the data of interest for the new serializer.
+ * @param _offset_B Offset [Bytes] of the data of interest, in addition to the offset of the copied serializer.
+ */
+Serializer::Serializer(Serializer const & serializer, const size_t &  _size_B, const size_t &  _offset_B)
+	: buffer_(serializer.bufferPtr()), offset_B_(serializer.offset_B() + _offset_B), size_B_(_size_B)
+{
+	;
+}
+//______________________________________________________________________
+/**
+ * Copy constructor.
+ * The copy shares its buffer with the original, this is a somewhat shallow copy.
+ * @param r Serializer to copy.
+ */
+Serializer::Serializer(Serializer const & r)
+	: buffer_(r.bufferPtr()), offset_B_(r.offset_B()), size_B_(r.size_B())
+{
+	;
+}
+//______________________________________________________________________
+/**
+ * Assignment operator.
+ * The copy shares its buffer with the original.
+ * @param r Serializer to copy.
+ * @return Returns the actual copy.
+ */
+Serializer& Serializer::operator=(const Serializer & r)
+{
+	buffer_ = r.bufferPtr();
+	offset_B_ = r.offset_B();
+	size_B_ = r.size_B();
+	return *this;
+}
+//______________________________________________________________________
+/**
+ * Destructor.
+ *
+ * The buffer is not de-allocated until the its last co-owner is destroyed.
+ */
+Serializer::~Serializer()
+{
+	;
+}
+//______________________________________________________________________
+/**
+ * Creates a clone of this serializer by performing a deep copy.
+ * @return Returns a deep copy of this instance.
+ *
+ * Contrary to the copy constructor, the clone does not share its buffer with the original instance.
+ */
+Serializer* Serializer::clone() const
+{
+	// Create new instance
+	Serializer* c = new Serializer(capacity());
+
+	// Copy full buffer, not just "region of interest"
+	ByteArray const & source = this->array();
+	ByteArray & dest = c->array();
+	std::copy(source.begin(), source.end(), dest.begin());
+
+	return c;
+}
+//______________________________________________________________________
+/**
+ * Resets the capacity of the underlying shared buffer.
+ *
+ * @param capacity_B New capacity  [Bytes]
+ */
+void Serializer::setCapacity(size_t capacity_B)
+{
+	buffer_->resize(capacity_B);
+}
+//______________________________________________________________________
+/**
+ * Returns a stream to be used to read from the buffer's region of interest.
+ * @param pos_B Additional offset [Bytes].
+ * @return Returns a reference to the internal input stream.
+ */
+std::istream & Serializer::inputStream(size_t const pos_B) const
+{
+	std::istream & is = buffer_->inputStream();
+	is.seekg(offset_B() + pos_B);
+	return is;
+}
+//______________________________________________________________________
+/**
+ * Returns a stream to be used to write to the buffer's region of interest.
+ * @param pos_B Additional offset [Bytes].
+ * @return Returns a reference to the internal output stream.
+ */
+std::ostream & Serializer::outputStream(size_t const pos_B)
+{
+	std::ostream & os = buffer_->outputStream();
+	os.seekp(offset_B() + pos_B);
+	return os;
+}
+//______________________________________________________________________
+/**
+ * Copies data from an input stream into the region of interest of the buffer, with an optional additional offset.
+ *
+ *  @param dataIn Input stream to read from.
+ *  @param n Number of Bytes to copy.
+ *  @param pos Offset, in Bytes, in addition to the Seralizer's own offset, from which to start writing copied data.
+ */
+void Serializer::read(std::istream & dataIn, size_t const & n, size_t const & pos)
+{
+	dataIn.read(begin() + pos, n);
+}
+//______________________________________________________________________
+/**
+ * Copies n bytes from the object pointed to by src into the region of interest of the buffer, with an optional additional offset.
+ *
+ *  @param src Pointer to the memory location to copy from.
+ *  @param n Number of Bytes to copy.
+ *  @param pos Offset, in Bytes, in addition to the Seralizer's own offset, from which to start writing copied data.
+ */
+void Serializer::read(size_t const & n, const void* src, size_t const & pos)
+{
+	const Byte* data = reinterpret_cast< const Byte* >(src);
+	std::copy(data, data + n, begin() + pos);
+	//std::memcpy(&((*buffer_)[pos]), src, n);
+	/*for (size_t i=0; i < n; ++i)
+	{
+		(*buffer_).at(pos+i) = data[i];
+	}*/
+}
+//______________________________________________________________________
+/**
+ * Copies all buffer contents to an output stream.
+ * Only the region of interest of the buffer is copied to the stream.
+ *
+ * @param dataOut Output stream to which the data shall be copied.
+ */
+void Serializer::write(std::ostream & dataOut) const
+{
+	write(dataOut, size_B(), 0);
+}
+//______________________________________________________________________
+/**
+ * Copies part of the buffer contents to an output stream.
+ * Only a subset of the data of interest of the buffer is copied to the stream.
+ *
+ * @param dataOut Output stream to which the data shall be copied.
+ * @param n Number of Bytes to copy.
+ * @param pos Offset, in Bytes, in addition to the Seralizer's own offset, from which to start copying data.
+ */
+void Serializer::write(std::ostream & dataOut, size_t const & n, size_t const & pos) const
+{
+	dataOut.write(begin()+pos, n);
+}
+//______________________________________________________________________
+/**
+ * Returns pointer to the beginning of the serializer buffer (const version).
+ */
+const Byte* Serializer::begin() const
+{
+	return & array()[offset_B_];
+}
+//______________________________________________________________________
+/**
+ * Returns pointer to the beginning of the serializer buffer.
+ */
+Byte* Serializer::begin()
+{
+	return & array()[offset_B_];
+}
+//______________________________________________________________________
+/**
+ * Returns pointer to the end of the serializer buffer (const version).
+ */
+const Byte* Serializer::end() const
+{
+	return begin() + size_B_;
+}
+//______________________________________________________________________
+/**
+ * Returns pointer to the end of the serializer buffer.
+ */
+Byte* Serializer::end()
+{
+	return begin() + size_B_;
+}
+//______________________________________________________________________
+} /* namespace mfm */

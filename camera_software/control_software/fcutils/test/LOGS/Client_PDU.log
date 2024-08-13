@@ -1,0 +1,198 @@
+Staring PDU at: 31-01-2023 14-44-40
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 31-01-2023 15-17-25
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 13-13-36
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 13-15-58
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 13-48-55
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 14-35-43
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 16-01-21
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 17-12-37
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON
+Staring PDU at: 01-02-2023 17-26-16
+Creating and opening the POSIX message queue: /writetoPDU for listening to commands ...
+Creating and opening the POSIX message queue: /writetoRC for responding to master ...
+ Queue: /writetoPDU, message received: 0100000000000000, of size: 16
+message: 0100000000000000
+response: 6060
+ Queue: /writetoPDU, message received: 0209000000000000, of size: 16
+message: 0209000000000000
+response: 6060
+ch9 OK
+ Queue: /writetoPDU, message received: 0409000000000000, of size: 16
+message: 0409000000000000
+response: 6060
+ch9 is ON
+ Queue: /writetoPDU, message received: 0208000000000000, of size: 16
+message: 0208000000000000
+response: 6060
+ch8 OK
+ Queue: /writetoPDU, message received: 0408000000000000, of size: 16
+message: 0408000000000000
+response: 6060
+ch8 is ON

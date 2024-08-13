@@ -1,0 +1,13 @@
+connect device ctrl
+write pipeCtrl firmwareEnable 0
+daqStop
+write agetController reset 1
+write agetController reset 0
+write aget_sc_configuration SC_En 0x0000
+write aget_sc_configuration pulseEnable 0x000F
+write agetController hitRegister 0
+write agetController calibration 0
+writeReg aget_sc_rw 1
+write aget_sc_configuration SC_En 0x000F
+write aget_sc_configuration pulseEnable 0x0000
+sleep 1

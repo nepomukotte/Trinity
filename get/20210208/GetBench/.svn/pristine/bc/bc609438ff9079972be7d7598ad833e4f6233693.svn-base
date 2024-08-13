@@ -1,0 +1,60 @@
+// $Id$
+/**
+@mainpage Documentation of the GET software
+
+
+@section sec_Contents Contents
+	- @subpage page_Installation
+		- @ref sec_components
+		- @ref sec_requirements
+		  - @subpage page_Debian
+		  - @subpage page_Redhat
+		    - @ref sec_yum
+		    - @ref sec_urpmi
+		  - @subpage page_MacOSX
+		    - @ref sec_macports
+		    - @ref sec_brew
+		- @ref sec_download
+		- @ref sec_build
+		  - @ref sec_BuildPlatformSpecific
+		- @ref sec_SetupEnvironment
+	- @subpage page_Concepts
+		- @ref page_Formats
+			- @ref sec_CompoundConfigFormat
+			- @ref sec_DataFormats
+		- @ref page_Tools
+		  - @ref sec_tools_getHwServer
+		  - @ref sec_tools_cconfiged
+		  - @ref sec_tools_getEccServer
+		    - @ref subsec_ConfigRepository
+		  - @ref sec_tools_getEccClient
+		  - @ref sec_tools_dataRouter
+		  - @ref sec_tools_GetController
+		  - @ref sec_tools_CoBoFrameViewer
+		  - @ref sec_tools_CoBoFrameMerge
+		  - @ref sec_tools_CoBoFrameGraw2Root
+		  - @ref sec_tools_CoBoFrameRoot2Disp
+		- @ref page_Interfaces
+	  		- @ref sec_DataFlowInterface
+	  		- @ref sec_EccRccInterface
+	  		- @ref sec_CoBoFirmwareSoftwareInterfaces
+	- @subpage page_Usage
+		- @ref sec_SetupRCoBo
+		- @ref sec_setup_uCoBo
+		- @ref sec_GetController
+		- @ref sec_MUTanT
+		- @ref sec_cmdLineUsage
+		- @ref sec_RCC
+		- @ref sec_CoBoFrameViewer
+	- @subpage page_RunConfigParameters
+	    - @ref sec_config_howto
+	    - @ref sec_config_parameters_list
+	- @subpage page_Troubleshooting
+	- @subpage page_References
+
+@see http://listserv.in2p3.fr/cgi-bin/wa?A0=GET-INFOS-L
+@see http://listserv.in2p3.fr/cgi-bin/wa?A0=GET-USERS-L
+@see https://dsm-trac.cea.fr/get
+@see https://dsm-trac.cea.fr/mordicus
+$LastChangedDate$
+*/

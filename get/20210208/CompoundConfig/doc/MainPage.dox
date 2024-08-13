@@ -1,0 +1,59 @@
+/**
+\mainpage The CompoundConfig library
+\section sec_Intro Introduction
+<p>
+The CompoundConfig library defines API to manipulate tree-like configurations.
+Here is an example of a typical configuration:
+\verbatim
+Trigger_Config {
+   Farm {
+      Controller {
+         <farmController.cfg>
+      }
+      TriggerNode[*] {
+         timeSlice = 100.0 ms
+         nTracks = 4
+         ipAddr = 127.0.0.1
+         ipPort = 3000
+      }
+      TriggerNode[0] {
+         ipAddr = 192.168.0.1
+      }
+      TriggerNode[1] {
+         ipAddr = 192.168.0.1
+         ipPort = 3001
+      }
+      TriggerNode[2] {
+         ipAddr = 192.168.0.2
+      }
+      TriggerNode[3] {
+         ipAddr = 192.168.0.2
+         ipPort = 3001
+      }
+   }
+}
+\endverbatim
+
+<p>
+First, it is recommended you familiarize with \ref page_Concepts "the concepts"
+to learn the semantics and terminology of configurations.
+Then you may follow \ref page_Tutorial "the tutorial" about how to install 
+CompoundConfig and to achieve the most common operations.
+<p>
+Here are the page that may be useful for a novice user:
+<ul>
+	<li>\subpage page_Concepts</li>
+	<li>\subpage page_Build</li>
+	<li>\subpage page_Integration</li>
+	<li>\subpage page_Tutorial</li>
+</ul>
+<p>
+For a more in-depth documentation, you can visit the pages dedicated to each
+module:
+<ul>
+	<li>\subpage page_MainModule "Main module"</li>
+	<li>\subpage page_ViewModule "View module"</li>
+	<li>\subpage page_IoModule "I/O module"</li>
+</ul>
+
+ */

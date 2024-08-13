@@ -1,0 +1,8 @@
+2010-09-29  Patrick Sizun  <patrick.sizun@cea.fr>
+	* Added SQLite3 backend.
+
+2010-09-24  Patrick Sizun  <patrick.sizun@cea.fr>
+	* Added PostgreSql backend.
+
+2010-09-21  Patrick Sizun  <patrick.sizun@cea.fr>
+	* Added menu for management of runs.

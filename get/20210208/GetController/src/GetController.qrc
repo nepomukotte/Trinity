@@ -1,0 +1,40 @@
+<RCC>
+    <qresource prefix="/get">
+    	<file alias="oldlogo.png">../res/icons/logo_get.png</file>
+    	<file alias="logo.svg">../res/icons/GET-Logo-v3-whiteback-square.svg</file>
+    	<file alias="logo-highres.png">../res/icons/GET-Logo-v3-whiteback-square-1151x1151.png</file>
+    	<file alias="logo.png">../res/icons/GET-Logo-v3-whiteback-square-192x192.png</file>
+    </qresource>
+    <qresource prefix="icons/oxygen">
+    	<file alias="index.theme">../res/icons/oxygen/index.theme</file>
+    	<file alias="16x16/actions/application-exit.png">../res/icons/oxygen/16x16/actions/application-exit.png</file>
+    	<file alias="16x16/actions/document-open.png">../res/icons/oxygen/16x16/actions/document-open.png</file>
+    	<file alias="16x16/actions/document-preview.png">../res/icons/oxygen/16x16/actions/document-preview.png</file>
+    	<file alias="16x16/actions/document-save.png">../res/icons/oxygen/16x16/actions/document-save.png</file>
+    	<file alias="16x16/actions/document-edit.png">../res/icons/oxygen/16x16/actions/document-edit.png</file>
+    	<file alias="16x16/actions/document-properties.png">../res/icons/oxygen/16x16/actions/document-properties.png</file>
+    	<file alias="16x16/actions/document-close.png">../res/icons/oxygen/16x16/actions/document-close.png</file>
+    	<file alias="16x16/actions/document-save-all.png">../res/icons/oxygen/16x16/actions/document-save-all.png</file>
+       	<file alias="16x16/actions/document-new.png">../res/icons/oxygen/16x16/actions/document-new.png</file>
+    	<file alias="16x16/actions/document-save-as.png">../res/icons/oxygen/16x16/actions/document-save-as.png</file>
+    	<file alias="16x16/actions/document-print.png">../res/icons/oxygen/16x16/actions/document-print.png</file>
+    	<file alias="16x16/actions/document-revert.png">../res/icons/oxygen/16x16/actions/document-revert.png</file>
+    	<file alias="16x16/actions/edit-paste.png">../res/icons/oxygen/16x16/actions/edit-paste.png</file>
+    	<file alias="16x16/actions/edit-copy.png">../res/icons/oxygen/16x16/actions/edit-copy.png</file>
+    	<file alias="16x16/actions/edit-cut.png">../res/icons/oxygen/16x16/actions/edit-cut.png</file>
+    	<file alias="16x16/actions/edit-undo.png">../res/icons/oxygen/16x16/actions/edit-undo.png</file>
+    	<file alias="16x16/actions/edit-delete.png">../res/icons/oxygen/16x16/actions/edit-delete.png</file>
+    	<file alias="16x16/actions/edit-redo.png">../res/icons/oxygen/16x16/actions/edit-redo.png</file>
+    	<file alias="16x16/actions/edit-select-all.png">../res/icons/oxygen/16x16/actions/edit-select-all.png</file>
+    	<file alias="16x16/actions/edit-find.png">../res/icons/oxygen/16x16/actions/edit-find.png</file>
+    	<file alias="16x16/actions/go-next.png">../res/icons/oxygen/16x16/actions/go-next.png</file>
+    	<file alias="16x16/actions/go-previous.png">../res/icons/oxygen/16x16/actions/go-previous.png</file>
+    	<file alias="16x16/actions/go-jump.png">../res/icons/oxygen/16x16/actions/go-jump.png</file>
+    	<file alias="16x16/actions/zoom-select.png">../res/icons/oxygen/16x16/actions/zoom-select.png</file>
+    	<file alias="16x16/actions/zoom-in.png">../res/icons/oxygen/16x16/actions/zoom-in.png</file>
+    	<file alias="16x16/actions/zoom-out.png">../res/icons/oxygen/16x16/actions/zoom-out.png</file>
+    	<file alias="16x16/actions/zoom-original.png">../res/icons/oxygen/16x16/actions/zoom-original.png</file>
+    	<file alias="16x16/actions/media-playback-start.png">../res/icons/oxygen/16x16/actions/media-playback-start.png</file>
+    	<file alias="16x16/actions/media-playback-stop.png">../res/icons/oxygen/16x16/actions/media-playback-stop.png</file>
+    </qresource>
+</RCC>

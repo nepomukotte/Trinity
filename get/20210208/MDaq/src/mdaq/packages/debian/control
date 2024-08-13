@@ -1,0 +1,12 @@
+Source: mdaq
+Section: unknown
+Priority: extra
+Maintainer: Joël Chavas <joel.chavas@cea.fr>
+Build-Depends: debhelper (>= 7), autotools-dev, libc6-dev, libstdc++6-4.3-dev, linux-libc-dev, libboost-dev(>= 1.33.1), libncurses5-dev, libglib2.0-0, libgl1-mesa-glx, mime-support, libmagic1, locales, file, libc6-i386, libasound2, lib32asound2, pkg-config, libpcre3, libzeroc-ice33-dev, gawk
+Standards-Version: 3.8.0
+Homepage: <https://dsm-trac.cea.fr/mordicus>
+
+Package: mdaq
+Architecture: any
+Depends: tinyxml(>= 2.5.2), compoundconfig(>=2.1.0), utilities(>=1.0.0)
+Description: The mdaq library defines API to perform remote data acquisition and slow control.

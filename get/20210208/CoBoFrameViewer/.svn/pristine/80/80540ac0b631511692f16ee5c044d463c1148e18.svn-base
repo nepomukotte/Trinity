@@ -1,0 +1,96 @@
+/*
+ * $Id$
+ * @file PlotCurve.cpp
+ * @created 13 juil. 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors: patrick.sizun@cea.fr
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#include "get/PlotCurve.h"
+#include <qwt_legend.h>
+#include <qwt_global.h>
+#if QWT_VERSION < 0x060100
+#include <qwt_legend_item.h>
+#else
+#include <qwt_legend_label.h>
+#include <qwt_plot.h>
+#endif
+
+namespace get {
+//_________________________________________________________________________________________________
+PlotCurve::PlotCurve(const QString & title) : QwtPlotCurve(title)
+{
+	// Legend attributes
+#if QWT_VERSION >= 0x060000
+	setLegendAttribute(QwtPlotCurve::LegendShowLine, true);
+	setLegendAttribute(QwtPlotCurve::LegendShowSymbol, true);
+#endif
+}
+//_________________________________________________________________________________________________
+#if QWT_VERSION >= 0x060100
+void PlotCurve::initializeLegend()
+{
+	QwtPlot* plot = QwtPlotCurve::plot();
+	if (plot)
+	{
+		QwtLegend* legend = qobject_cast< QwtLegend* > (plot->legend());
+		QVariant itemInfo = plot->itemToInfo(this);
+		QwtLegendLabel* label = qobject_cast< QwtLegendLabel* > (legend->legendWidget(itemInfo));
+		if (label)
+		{
+			label->setChecked(true);
+		}
+	}
+}
+#else
+void PlotCurve::initializeLegend()
+{
+	;
+}
+#endif
+//_________________________________________________________________________________________________
+#if QWT_VERSION < 0x060100
+void PlotCurve::updateLegend(QwtLegend* legend) const
+{
+	QwtPlotCurve::updateLegend(legend);
+	QwtLegendItem *lgdItem = qobject_cast< QwtLegendItem* >(legend->find(this));
+	if (lgdItem)
+	{
+#if QWT_VERSION >= 0x060000
+		lgdItem->setIdentifierSize(QSize(30, 8));
+#endif
+		lgdItem->setChecked(isVisible());
+	}
+}
+#else
+void PlotCurve::updateLegend(QwtLegend* /* legend */) const
+{
+	;
+}
+#endif
+//_________________________________________________________________________________________________
+} /* namespace get */

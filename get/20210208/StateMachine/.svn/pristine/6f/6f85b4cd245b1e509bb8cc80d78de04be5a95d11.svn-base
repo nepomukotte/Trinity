@@ -1,0 +1,118 @@
+START: (SmRunControl)
+INIT: (SmRunControl)/(SmRunControl)
+TRANS: [#__INIT__#:(__OFF__)->(Off)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Off)]}
+EXEC: {[*]:[onEntr(Off)]}
+EXEC: {}
+Turned off
+STEP BEGIN: EvTurnOn on (SmRunControl)
+TRANS: [#EvTurnOn#:(Off)->(On)]
+EXEC: {[*]:[onExit(Off)]}
+EXEC: {[*]:[#EvTurnOn#:(Off)->(On)]}
+EXEC: {[*]:[onEntr(On)]}
+EXEC: {}
+Turned on
+INIT: (SmRunControl)/(SmOn)
+TRANS: [#__INIT__#:(__OFF__)->(Idle)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Idle)]}
+EXEC: {[*]:[onEntr(Idle)]}
+EXEC: {}
+Idling
+STEP END: EvTurnOn result: 0
+STEP BEGIN: EvStart on (SmRunControl)
+TRANS: [#EvStart#:(Idle)->(Active)]
+EXEC: {[*]:[onExit(Idle)]}
+EXEC: {[*]:[#EvStart#:(Idle)->(Active)]}
+EXEC: {[*]:[onEntr(Active)]}
+EXEC: {}
+Activated
+INIT: (SmRunControl)/(SmActive)
+TRANS: [#__INIT__#:(__OFF__)->(Running)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Running)]}
+EXEC: {[*]:[onEntr(Running)]}
+EXEC: {}
+Running
+STEP END: EvStart result: 0
+STEP BEGIN: EvPause on (SmRunControl)
+TRANS: [#EvPause#:(Running)->(Paused)]
+EXEC: {[*]:[onExit(Running)]}
+EXEC: {[*]:[#EvPause#:(Running)->(Paused)]}
+EXEC: {[*]:[onEntr(Paused)]}
+EXEC: {}
+Paused
+STEP END: EvPause result: 0
+STEP BEGIN: EvResume on (SmRunControl)
+TRANS: [#EvResume#:(Paused)->(Running)]
+EXEC: {[*]:[onExit(Paused)]}
+EXEC: {[*]:[#EvResume#:(Paused)->(Running)]}
+EXEC: {[*]:[onEntr(Running)]}
+EXEC: {}
+Running
+STEP END: EvResume result: 0
+STEP BEGIN: EvStop on (SmRunControl)
+TRANS: [#EvStop#:(Active)->(Idle)]
+RESET: (SmRunControl)/(SmActive)
+EXEC: {[*]:[onExit(Running)]}
+EXEC: {[*]:[onReset(SmActive)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(Active)]}
+EXEC: {[*]:[#EvStop#:(Active)->(Idle)]}
+EXEC: {[*]:[onEntr(Idle)]}
+EXEC: {}
+Idling
+STEP END: EvStop result: 0
+STEP BEGIN: EvStart on (SmRunControl)
+TRANS: [#EvStart#:(Idle)->(Active)]
+EXEC: {[*]:[onExit(Idle)]}
+EXEC: {[*]:[#EvStart#:(Idle)->(Active)]}
+EXEC: {[*]:[onEntr(Active)]}
+EXEC: {}
+Activated
+INIT: (SmRunControl)/(SmActive)
+TRANS: [#__INIT__#:(__OFF__)->(Running)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Running)]}
+EXEC: {[*]:[onEntr(Running)]}
+EXEC: {}
+Running
+STEP END: EvStart result: 0
+STEP BEGIN: EvPause on (SmRunControl)
+TRANS: [#EvPause#:(Running)->(Paused)]
+EXEC: {[*]:[onExit(Running)]}
+EXEC: {[*]:[#EvPause#:(Running)->(Paused)]}
+EXEC: {[*]:[onEntr(Paused)]}
+EXEC: {}
+Paused
+STEP END: EvPause result: 0
+STEP BEGIN: EvStop on (SmRunControl)
+TRANS: [#EvStop#:(Active)->(Idle)]
+RESET: (SmRunControl)/(SmActive)
+EXEC: {[*]:[onExit(Paused)]}
+EXEC: {[*]:[onReset(SmActive)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(Active)]}
+EXEC: {[*]:[#EvStop#:(Active)->(Idle)]}
+EXEC: {[*]:[onEntr(Idle)]}
+EXEC: {}
+Idling
+STEP END: EvStop result: 0
+STEP BEGIN: EvTurnOff on (SmRunControl)
+TRANS: [#EvTurnOff#:(On)->(Off)]
+RESET: (SmRunControl)/(SmOn)
+EXEC: {[*]:[onExit(Idle)]}
+EXEC: {[*]:[onReset(SmOn)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(On)]}
+EXEC: {[*]:[#EvTurnOff#:(On)->(Off)]}
+EXEC: {[*]:[onEntr(Off)]}
+EXEC: {}
+Turned off
+STEP END: EvTurnOff result: 0
+Shutting down
+RESET: (SmRunControl)/(SmRunControl)
+EXEC: {[*]:[onExit(Off)]}
+EXEC: {[*]:[onReset(SmRunControl)]}
+EXEC: {[*]:[onEntr(__OFF__)]}

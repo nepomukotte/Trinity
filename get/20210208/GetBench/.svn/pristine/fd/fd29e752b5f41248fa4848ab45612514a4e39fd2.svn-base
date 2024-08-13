@@ -1,0 +1,306 @@
+/*
+ * $Id$
+ * @file getEccSoapClient.cpp
+ * @created 25 juin 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors: patrick.sizun@cea.fr
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+#include "ecceccProxy.h" // get the gSOAP-generated proxy
+#include "ecc.nsmap"	 // get service namespace bindings
+#include "utl/Logging.h"
+#include "mdaq/utl/ConsoleLoggingBackend.h"
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <iostream>
+#include <cstddef>
+#include <sstream>
+#include <vector>
+
+struct Namespace namespaces[] =
+{   // {"ns-prefix", "ns-name"}
+   {"SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", NULL, NULL}, // MUST be first
+   {"SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", NULL, NULL}, // MUST be second
+   {"xsi", "http://www.w3.org/2001/XMLSchema-instance", NULL, NULL}, // MUST be third
+   {"xsd", "http://www.w3.org/2001/XMLSchema", NULL, NULL}, // Required for XML Schema types
+   {"ecc", "urn:http://localhost:8083/", NULL, NULL}, // The namespace URI of the service operations
+   {NULL, NULL, NULL, NULL} // end of table
+};
+
+void usage(const char* clientPath)
+{
+	std::cerr << "Usage: " << clientPath << " [--port=PORT] [--host=HOST] CMD [PARAMETERS...]\n"
+			<<  "Available commands: exit config-list describe prepare undo configure start stop pause resume breakup status special"<< std::endl;
+}
+
+template< typename T >
+bool getOptionValue(std::vector<std::string> & args, const std::string & optionName, T & optionValue)
+{
+	std::vector<std::string>::iterator arg;
+	for (arg = args.begin(); arg != args.end(); arg++)
+	{
+		if (boost::starts_with(*arg, optionName + "="))
+		{
+			std::istringstream iss(arg->substr(optionName.size()+1));
+			iss >> optionValue;
+			args.erase(arg);
+			return not iss.fail();
+		}
+	}
+	return false;
+}
+
+std::ostream & operator<< (std::ostream & stream, const ecc__Response & r)
+{
+	if (r.ErrorCode != 0)
+	{
+		stream << "Error (code " << r.ErrorCode << "): " << r.ErrorMessage;
+	}
+	else
+	{
+		stream << "OK";
+	}
+	return stream;
+}
+
+std::ostream & operator<< (std::ostream & stream, const ecc__ResponseText & r)
+{
+	if (not r.Text.empty())
+	{
+		stream << "Result:\n" << r.Text << std::endl;
+	}
+
+	if (r.ErrorCode != 0)
+	{
+		stream << "Error (code " << r.ErrorCode << "): " << r.ErrorMessage;
+	}
+	else
+	{
+		stream << "OK";
+	}
+	return stream;
+}
+
+std::ostream & operator<< (std::ostream & stream, const ecc__ResponseState & r)
+{
+	if (r.ErrorCode != 0)
+	{
+		stream << "Error: " << r.ErrorMessage;
+	}
+	else
+	{
+		stream << "SM state=" << r.State << " transition=" << r.Transition;
+	}
+	return stream;
+}
+
+#define EXEC_SOAP_TRANS(cmd, configId, options) 		\
+	ecc__ResponseText r;								\
+	if (client.cmd(configId, options, r) == SOAP_OK)	\
+	{													\
+		std::cout << r << std::endl;					\
+	}													\
+	else												\
+	{													\
+		soap_print_fault(client.soap, stderr);			\
+	}
+
+int main(int argc, char* argv[])
+{
+	// Default parameters
+	int port=8083;
+	std::string host = "localhost";
+	ecc client;
+	ecc__Response response;
+
+	// Setup logging backend
+	::utl::BackendLogger::setBackend(::utl::LoggingBackendPtr(new ::mdaq::utl::ConsoleLoggingBackend));
+
+	// Parse parameters
+	std::vector<std::string> args(argv+1, argv+argc);
+	if (std::find(args.begin(), args.end(), "-h") != args.end() or std::find(args.begin(), args.end(), "--help") != args.end())
+	{
+		usage(argv[0]);
+		return EXIT_SUCCESS;
+	}
+	// Customize port
+	if (not getOptionValue(args, std::string("--port"), port))
+	{
+		char* env_port = getenv("ECC_PORT");
+		if (env_port != NULL)
+		{
+			port = atoi(env_port);
+		}
+	}
+	// Customize host
+	if (not getOptionValue(args, std::string("--host"), host))
+	{
+		char* env_host = getenv("ECC_HOST");
+		if (env_host != NULL)
+		{
+			host = std::string(env_host);
+		}
+	}
+	std::ostringstream oss;
+	oss << "http://" << host << ':' << port;
+	std::string endpoint = oss.str();
+	client.endpoint = endpoint.c_str();
+
+	if (args.size() < 1)
+	{
+		usage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	std::string cmdName = args[0];
+	std::cout << "Executing command '" << cmdName << "'..." << std::endl;
+	if ("exit" == cmdName)
+	{
+		if (client.ecc__ServerExit(response) == SOAP_OK)
+		{
+			std::cout << response << std::endl;
+		}
+		else
+		{
+			soap_print_fault(client.soap, stderr);
+		}
+	}
+	else if ("config-list" == cmdName)
+	{
+		ecc__ResponseText responseText;
+		if (client.ecc__GetConfigIDs(responseText) == SOAP_OK)
+		{
+			std::cout << responseText << std::endl;
+		}
+		else
+		{
+			soap_print_fault(client.soap, stderr);
+		}
+	}
+	else if ("describe" == cmdName)
+	{
+		std::string configId, options;
+		if (args.size() < 2)
+		{
+			std::cerr << "Missing parameter 'ConfigId'" << std::endl;
+			return EXIT_FAILURE;
+		}
+		configId = args[1];
+		if (args.size() >= 3)
+		{
+			options = args[2];
+		}
+		EXEC_SOAP_TRANS(ecc__Describe, configId, options)
+	}
+	else if ("configure" == cmdName)
+	{
+		std::string configId, options;
+		if (args.size() < 2)
+		{
+			std::cerr << "Missing parameter 'ConfigIdTriplet'" << std::endl;
+			return EXIT_FAILURE;
+		}
+		configId = args[1];
+		if (args.size() >= 3)
+		{
+			options = args[2];
+		}
+		EXEC_SOAP_TRANS(ecc__Configure, configId, options)
+	}
+	else if ("prepare" == cmdName)
+	{
+		std::string configId, options;
+		if (args.size() < 2)
+		{
+			std::cerr << "Missing parameter 'ConfigIdTriplet'" << std::endl;
+			return EXIT_FAILURE;
+		}
+		configId = args[1];
+		if (args.size() >= 3)
+		{
+			options = args[2];
+		}
+		EXEC_SOAP_TRANS(ecc__Prepare, configId, options)
+	}
+	else if ("reset" == cmdName or "undo" == cmdName)
+	{
+		EXEC_SOAP_TRANS(ecc__Undo, "", "")
+	}
+	else if ("start" == cmdName)
+	{
+		EXEC_SOAP_TRANS(ecc__Start, "", "")
+	}
+	else if ("stop" == cmdName)
+	{
+		EXEC_SOAP_TRANS(ecc__Stop, "", "")
+	}
+	else if ("pause" == cmdName)
+	{
+		EXEC_SOAP_TRANS(ecc__Pause, "", "")
+	}
+	else if ("resume" == cmdName)
+	{
+		EXEC_SOAP_TRANS(ecc__Resume, "", "")
+	}
+	else if ("breakup" == cmdName)
+	{
+		EXEC_SOAP_TRANS(ecc__Breakup, "", "")
+	}
+	else if ("status" == cmdName)
+	{
+		ecc__ResponseState r;
+		if (client.ecc__GetState(r) == SOAP_OK)
+		{
+			std::cout << r << std::endl;
+		}
+		else
+		{
+			soap_print_fault(client.soap, stderr);
+		}
+	}
+	else if ("special" == cmdName)
+	{
+		// Get special command and its arguments
+		args.erase(args.begin(), args.begin()+1);
+		std::string specialCmdLine = boost::algorithm::join(args, " ");
+		// Run special command
+		LOG_DEBUG() << "Executing special command \"" << specialCmdLine << "\"";
+		EXEC_SOAP_TRANS(ecc__Special, specialCmdLine, "")
+	}
+	else
+	{
+		std::cerr << "Unknown command '" << cmdName << "'." << std::endl;
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+}
+
+
+

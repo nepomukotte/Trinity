@@ -1,0 +1,41 @@
+digraph {
+node [shape=box, style=rounded];
+subgraph clusterMain {
+"CoBoFrameViewer" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/CoBoFrameViewer/"];
+"CompoundConfig" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/CompoundConfig/"];
+"ConfigDatabase" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/ConfigDatabase/"];
+"ConfigWidgets" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/ConfigWidgets/"];
+"ConfigWizard" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/ConfigWizard/"];
+"DatabaseWidgets" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/DatabaseWidgets/"];
+"GetBench" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/GetBench/"];
+"GetController" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/GetController/"];
+"MDaq" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/MDaq/"];
+"MultiFrame" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/MultiFrame/"];
+"StateMachine" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/StateMachine/"];
+"TinyXml" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/TinyXml/"];
+"Utilities" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/Utilities/"];
+"soci" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/soci/"];
+color=invis;}
+subgraph clusterStandalone {
+color=invis;}
+"ConfigWidgets" -> "CoBoFrameViewer" [ color=black  ] ;
+"MultiFrame" -> "CoBoFrameViewer" [ color=black  ] ;
+"TinyXml" -> "CompoundConfig" [ color=black  ] ;
+"CompoundConfig" -> "ConfigDatabase" [ color=black  ] ;
+"soci" -> "ConfigDatabase" [ color=black  ] ;
+"CompoundConfig" -> "ConfigWidgets" [ color=black  ] ;
+"Utilities" -> "ConfigWidgets" [ color=black  ] ;
+"ConfigDatabase" -> "DatabaseWidgets" [ color=black  ] ;
+"ConfigWidgets" -> "DatabaseWidgets" [ color=black  ] ;
+"ConfigWidgets" -> "ConfigWizard" [ color=black  ] ;
+"MDaq" -> "GetBench" [ color=black  ] ;
+"MultiFrame" -> "GetBench" [ color=black  ] ;
+"StateMachine" -> "GetBench" [ color=black  ] ;
+"ConfigWidgets" -> "GetController" [ color=black  ] ;
+"GetBench" -> "GetController" [ color=black  ] ;
+"CompoundConfig" -> "MDaq" [ color=black  ] ;
+"Utilities" -> "MDaq" [ color=black  ] ;
+"CompoundConfig" -> "MultiFrame" [ color=black  ] ;
+"Utilities" -> "MultiFrame" [ color=black  ] ;
+"Utilities" -> "StateMachine" [ color=black  ] ;
+}

@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1735527933/MORDICUS_INSTALL/delimiter=\:
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1735527933/MORDICUS_INSTALL/operation=append
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1735527933/MORDICUS_INSTALL/value=${MORDICUS_INSTALL_ROOT}/${ConfigName}
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1735527933/append=true
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1735527933/appendContributed=true

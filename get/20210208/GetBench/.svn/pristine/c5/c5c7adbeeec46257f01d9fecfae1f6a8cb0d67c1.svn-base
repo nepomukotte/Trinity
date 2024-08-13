@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurations>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value=""/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--enable-debug --disable-shared --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.976762804">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value=""/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--enable-database-support=no --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.2037352962">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value="i586-mingw32msvc"/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value=" --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.1395113032">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value="i586-mingw32msvc"/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--enable-debug --disable-shared --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.880034254">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value="ppc-wrs-vxworks"/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--enable-build-spec=PPC440sfgnu --with-icee-bin=/usr/bin --with-icee=${MORDICUS_INSTALL}  --with-boost=${VX_BOOST_ROOT}  --disable-ecc --enable-cobo --enable-threadsafe-logging=yes --with-bsp-drv-xsrc=/home/sizun/local_sw/GET/cobo/microtca/workspace/vxworks6_3_bsp_CoBo02_NPI_20131209_20131217/ppc440_0/bsp_ppc440_0/ppc440_0_drv_csp/xsrc"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.476426496">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value="ppc-wrs-vxworks"/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--enable-build-spec=PPC440sfgnu --enable-debug --disable-shared --with-boost=${WIND_BASE}/target --with-icee-bin=/usr/bin --with-icee=${MORDICUS_INSTALL} --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.976762804.2133441038">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value=""/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--with-ice=/opt/local --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.17518094.976762804.1793311747">
+<option id="configure" value="configure"/>
+<option id="configdir" value=""/>
+<option id="cache-file" value=""/>
+<option id="help" value="false"/>
+<option id="no-create" value="false"/>
+<option id="quiet" value="false"/>
+<option id="version" value="false"/>
+<option id="host" value="arm-xilinx-linux-gnueabi"/>
+<option id="build" value=""/>
+<option id="target" value=""/>
+<option id="prefix" value="${MORDICUS_INSTALL}"/>
+<option id="exec-prefix" value=""/>
+<option id="libdir" value=""/>
+<option id="bindir" value=""/>
+<option id="sbindir" value=""/>
+<option id="includedir" value=""/>
+<option id="datadir" value=""/>
+<option id="sysconfdir" value=""/>
+<option id="infodir" value=""/>
+<option id="mandir" value=""/>
+<option id="srcdir" value=""/>
+<option id="localstatedir" value=""/>
+<option id="sharedstatedir" value=""/>
+<option id="libexecdir" value=""/>
+<option id="oldincludedir" value=""/>
+<option id="program-prefix" value=""/>
+<option id="program-suffix" value=""/>
+<option id="program-transform-name" value=""/>
+<option id="env_vars" value=""/>
+<option id="enable-maintainer-mode" value="false"/>
+<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
+<flagvalue id="cflags-debug" value="false"/>
+<flagvalue id="cflags-gprof" value="false"/>
+<flagvalue id="cflags-gcov" value="false"/>
+</flag>
+<option id="user" value="--with-icee=${MORDICUS_INSTALL} --with-icee-bin=/usr/bin --enable-database-support=no --disable-ecc --enable-cobo --with-boost-libdir=/mnt/ZedBoard/arm-xilinx-linux-gnueabi/lib --enable-threadsafe-logging=yes"/>
+<option id="autogen" value="autogen.sh"/>
+<option id="autogenOpts" value=""/>
+</configuration>
+</configurations>

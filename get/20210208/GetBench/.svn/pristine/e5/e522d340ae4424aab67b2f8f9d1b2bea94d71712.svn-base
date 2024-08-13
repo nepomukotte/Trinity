@@ -1,0 +1,237 @@
+// $Id: build_details.dox 1108 2014-01-29 15:24:48Z psizun $ 
+/**
+@page page_BuildDetails Detailed build instructions
+
+@tableofcontents
+
+@section sec_BuildDetails Step by step instructions
+We will assume you have set the <em>PREFIX</em> and <em>PKG_CONFIG_PATH</em> environment variables according to the installation directory of your choice, <em>e.g.</em>:
+@verbatim
+PREFIX=<PREFIX>
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:${PREFIX}/lib/pkgconfig
+@endverbatim
+In order for the instructions below to be as platform-agnostic as possible, we also assume the <em>ConfigName</em> variable is set; for example:
+@verbatim
+# Build configuration for Linux in release mode
+ConfigName=pentium-linux-release
+# Build configuration for Mac OS X in debug mode
+ConfigName=apple-darwin-debug
+# Build configuration for a release mode cross-compilation for a PowerPC 440 running VxWorks
+ConfigName=ppc440-vxworks-release
+@endverbatim
+
+@subsection subsec_build_TinyXml TinyXml
+@verbatim
+cd TinyXml && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_CompoundConfig CompoundConfig
+@verbatim
+cd CompoundConfig && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_ConfigWidgets ConfigWidgets
+@verbatim
+cd ConfigWidgets && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_soci soci
+@verbatim
+cd soci  && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} --enable-backend-mysql --enable-backend-postgresql --enable-backend-sqlite3 --enable-backend-oracle --with-oracle-lib=/usr/lib/oracle/11.2/client64/lib --with-oracle-include=/usr/include/oracle/11.2/client64 && \
+make -j 4 && \
+make install && \
+cd ../../..
+@endverbatim
+@note The above instructions enable all the SOCI database backends, which requires the corresponding API libraries to have been installed.
+You may disable the backends you do not need by omitting the <em>--enable-backend-BACKEND</em> configure options.
+@note For Mac OS X, the location of the Oracle OCI library differs from Linux, and it might be necessary to also specify the location of the MySql configuration utility:
+@verbatim
+../../configure --prefix=${PREFIX} --enable-backend-mysql --enable-backend-postgresql --enable-backend-sqlite3 --enable-backend-oracle --with-oracle-include=/opt/local/lib/oracle/sdk/inc
+lude --with-oracle-lib=/opt/local/lib/oracle --with-mysql=/opt/local/bin/mysql_config5
+@endverbatim 
+
+@subsection subsec_build_ConfigDatabase ConfigDatabase
+@verbatim
+cd ConfigDatabase && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} --with-soci=${PREFIX} --enable-postgresql --enable-sqlite3 --enable-oracle --with-oracle-lib=/usr/lib/oracle/11.2/client64/lib --with-oracle-include=/usr/include/oracle/11.2/client64 && \
+make -j 4  && \
+make install && \
+cd ../..
+@endverbatim
+@note Note the use of the <em>--with-soci</em> option (needed because the <em>soci</em> package does not support the <em>pkg-config</em> paradigm).
+@warning Each database backend enabled in <em>ConfigDatabase</em> must also have been enabled when building <em>soci</em>.
+The MySql backend is mandatory.
+
+@subsection subsec_build_DatabaseWidgets DatabaseWidgets
+@verbatim
+cd DatabaseWidgets && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_Utilities Utilities
+@verbatim
+cd Utilities && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_StateMachine StateMachine
+@verbatim
+cd StateMachine && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} --with-ice=yes --enable-distributed-sm-libs=all && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_MultiFrame MultiFrame
+@verbatim
+cd MultiFrame && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_MDaq MDaq
+@verbatim
+cd MDaq && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_GetBench GetBench
+@verbatim
+cd GetBench && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_GetController GetController
+@verbatim
+cd GetController && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_CoBoFrameViewer CoBoFrameViewer
+@verbatim
+cd CoBoFrameViewer && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@subsection subsec_build_ConfigWizard ConfigWizard
+@verbatim
+cd ConfigWizard && \
+./autogen.sh && \
+mkdir -p build/${ConfigName} && \
+cd build/${ConfigName} && \
+../../configure --prefix=${PREFIX} && \
+make -j 4  && \
+make install && \
+cd ../../..
+@endverbatim
+
+@section sec_BuildDebug Debug mode
+Add <em>--enable-debug --disable-shared</em> to the options of the <em>configure</em> script.
+
+@section sec_BuildPlatformSpecific Platform specific issues
+	@subsection subsec_BuildMacOSX Mac OS X
+@subsubsection subsubsec_MacIce ICE
+For packages using ICE (<em>MDaq</em>, <em>GetBench</em>, <em>GetController</em>), the location of the library needs to be given to the <em>configure</em> script using the <em>--with-ice=/opt/local</em> option.
+@subsubsection subsubsec_MacQwt Qwt
+Similarly, for packages using Qwt (<em>GetController</em>, <em>CoBoFrameViewer</em>), use the <em>--with-qwt5=/opt/local</em> option of the <em>configure</em> script.
+
+	@subsection subsec_BuildVxWorks VxWorks
+Detailed instructions are available <a href="https://dsm-trac.cea.fr/mordicus/wiki/VxWorksAutotools">here</a> on how to configure your environment to cross-compile the packages for VxWorks.
+The additional <em>configure</em> options common to all packages are <em>--host</em> and <em>--enable-build-spec</em>; e.g., to configure the cross-compilation build for a PpowerPC 440 architecture running VxWorks:
+@verbatim
+../../configure --prefix=${PREFIX} --host=ppc-wrs-vxworks --enable-build-spec=PPC440gnu
+@endverbatim
+@subsubsection subsubsec_VxWorksIce Ice/IceE
+An additional package, <em>IceE</em>, needs to be built and installed, using the <em>--with-icee=no --with-icee-bin=/usr/bin</em> options.
+Then, the <em>MDaq</em> and <em>GetBench</em> packages need <em>--with-icee=${PREFIX} --with-icee-bin=/usr/bin</em>.
+@subsubsection subsubsec_VxWorksBoost Boost
+Use the <em>--with-boost</em> option. Example: <em>--with-boost=/mnt/vxWorks63/vxworks-6.3/target</em>.
+
+	@subsection subsec_BuildPPC440Linux Embedded Linux
+@htmlonly
+<div align="center">
+<embed src="get_embedded_linux_software_packages.svg" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" />
+</div>
+<div align="center" class="caption">Dependencies between the GET software packages for embedded Linux.</div>
+@endhtmlonly
+Run <em>configure --help</em> to see the available configure options to help the build system find the location of the required headers and libraries.
+
+@subsubsection subsubsec_LinuxEIce Ice/IceE
+An additional package, <em>IceE</em>, needs to be built and installed, using the <em>--with-icee=no --with-icee-bin=/usr/bin</em> options.
+Then, the <em>MDaq</em> package needs <em>--with-icee=${PREFIX} --with-icee-bin=/usr/bin</em>.
+
+$LastChangedDate$
+*/

@@ -1,0 +1,15 @@
+connect device ctrl
+write asadController reset 1
+write asadController reset 0
+write asadController manualCal 0x0
+write asadController calibration 0x1
+writeReg asad_sc_start 0x1
+sleep 1
+readReg asadReadDelay
+readReg asadControllerStatus
+write asadController calibration 0
+connect device asad
+readReg VDD
+connect device ctrl
+readReg asadController
+readReg asadControllerStatus

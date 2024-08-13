@@ -1,0 +1,112 @@
+/**
+ * $Id: GetControllerException.cpp 390 2012-09-26 09:14:02Z psizun $
+ * @file GetControllerException.cpp
+ * @date 20 avr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#include "get/GetControllerException.h"
+
+namespace get {
+//______________________________________________________________________
+/**
+ * Default constructor: initializes an exception with no message.
+ */
+GetControllerException::GetControllerException()
+{
+}
+
+/**
+ * Implicit constructor: initializes an exception with the specified message.
+ * @param message the initial message.
+ */
+GetControllerException::GetControllerException(const std::string& message) :
+	message(message)
+{
+}
+
+/**
+ * Copy constructor.
+ * @param value the exception to copy
+ */
+GetControllerException::GetControllerException(const GetControllerException& value) :
+	std::exception(value), message(value.message)
+{
+}
+
+/**
+ * Assignment operator.
+ * @param value The exception to copy.
+ * @return Returns a reference to this.
+ */
+GetControllerException& GetControllerException::operator =(const GetControllerException& value)
+{
+	message = value.message;
+	return *this;
+}
+
+/**
+ * Destructor.
+ */
+GetControllerException::~GetControllerException() throw()
+{
+}
+
+/**
+ * Returns an error message describing the exception.
+ * @return Returns the error message.
+ */
+const char* GetControllerException::what() const throw()
+{
+	return getMessage().c_str();
+}
+
+/**
+ * Getter of the property "message".
+ * Lazily initializes the message attribute with function formatMessage.
+ * @return Returns an error message describing the cause of the exception.
+ */
+const std::string& GetControllerException::getMessage() const
+{
+	if(message.empty())
+	{
+		message = formatMessage();
+	}
+	return message;
+}
+
+std::string GetControllerException::formatMessage() const
+{
+	return message;
+}
+//______________________________________________________________________
+} /* namespace get */

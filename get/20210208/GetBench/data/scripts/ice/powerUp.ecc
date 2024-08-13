@@ -1,0 +1,9 @@
+exec pipe.ecc
+exec asad.ecc
+exec aget.ecc
+exec lcm_phase0.ecc
+exec adcCal.ecc
+exec adc.ecc
+exec sequencer.ecc
+exec agetBaseLine.ecc
+exec data.ecc

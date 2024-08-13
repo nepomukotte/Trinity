@@ -1,0 +1,15 @@
+connect device ctrl
+write asadEnable powerON 0
+sleep 1
+write asadEnable powerON 1
+sleep 1
+connect device asad
+writeReg resetFast 0
+exec asadCal.ecc
+connect device asad
+writeReg resetFast 0
+writeReg TCM0 0
+writeReg TCM2 0xFF
+writeReg TCM1 0x1F
+writeReg IM1 0xFF
+writeReg DAC0 0x81

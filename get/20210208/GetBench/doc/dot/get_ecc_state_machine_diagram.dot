@@ -1,0 +1,47 @@
+digraph ecc_state_machine {
+  rankdir="TB";
+  compound=true;
+  node [shape=box, style="rounded,filled", fontsize=8, fixedsize=true, width=0.9, fillcolor=yellow, fontcolor="red"];
+  edge [fontsize=8, weight="0.5", color="gray"];
+
+subgraph clusterStateMachine
+{
+  label="ECC State Machine";
+  style="rounded,filled";
+  fillcolor="cornsilk";
+
+subgraph clusterInactive {
+  label = "";
+  color = "invis";
+  EntryPoint [label="", shape="circle", style="filled", width=0.3, fillcolor="black"];
+  Idle;
+  Described;
+  Prepared;
+}
+
+subgraph clusterActive {
+  label = "Active";
+  ActiveEntryPoint [label="", shape="circle", style="filled", width=0.3, fillcolor="black"];
+  Ready;
+  Running;
+  Paused;
+}
+
+  EntryPoint -> Idle [ splines="line" ];
+  Idle -> Described [label = "describe"];
+  Described -> Prepared [label = "prepare"];
+  Prepared -> Paused [label="configure", lhead=clusterActive, weight="1.0"];
+  ActiveEntryPoint -> Ready [ splines="line" ];
+  Ready -> Running [label = "start"];
+  Running -> Paused [label = "pause"];
+
+  Described -> Idle [label = "reset"];
+  Prepared -> Described [label = "reset"];
+  Paused -> Prepared [label="breakup", ltail="clusterActive", weight="1.0"];
+  Running -> Ready [label = "stop"];
+  Paused -> Running [label = "resume"];
+  Paused -> Ready [label = "stop"];
+
+//  Idle -> ActiveEntryPoint [ style="invis" ];
+}
+}

@@ -1,0 +1,7 @@
+# Support for silent build rules
+slice2cpp_verbose_0 = @echo "  SLICE    $@";
+
+.ice.cpp:
+	$(slice2cpp_verbose)$(SLICE2CPP) $(SXXFLAGS) $(SPPFLAGS) --output-dir `dirname $@` --include-dir `dirname $@ | sed 's,^[^/]*/,,'` $<
+.ice.h:
+	$(slice2cpp_verbose)$(SLICE2CPP) $(SXXFLAGS) $(SPPFLAGS) --output-dir `dirname $@` --include-dir `dirname $@ | sed 's,^[^/]*/,,'` $<

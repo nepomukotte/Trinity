@@ -1,0 +1,311 @@
+/**
+ * @file CtrlNodeI.cpp
+ * @date Dec 20, 2013
+ * @author sizun
+ * 
+ * @note SVN tag: $Id$
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the GetBench software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "CtrlNodeI.h"
+#include "get/cobo/AsAdPulserMgrI.h"
+#include "mdaq/hw/server/DeviceImpl.h"
+#include "utl/Logging.h"
+
+namespace get
+{
+namespace cobo
+{
+//__________________________________________________________________________________________________
+CtrlNodeI::CtrlNodeI() : asadPulserMgr(*this), ledMgr_(*this), asadAlarmWatcher_(0)
+{
+}
+//__________________________________________________________________________________________________
+CtrlNodeI::~CtrlNodeI()
+{
+	stopPeriodicPulser();
+}
+//__________________________________________________________________________________________________
+/**
+ * Performs actions needed after an interrupt from the CoBo firmware.
+ * Current identified action is a reset of the AsAd voltage generator's external mode.
+ */
+void CtrlNodeI::onCoBoInterrupt()
+{
+	try
+	{
+		asadPulserMgr.resetExternalPulser();
+	}
+	catch (const mdaq::utl::CmdException & e)
+	{
+		LOG_ERROR() << e.reason;
+	}
+	catch (const std::exception & e)
+	{
+		LOG_ERROR() << e.what();
+	}
+}
+//__________________________________________________________________________________________________
+/**
+ * Sets AsAd voltage generator default output voltage.
+ * @param defaultVoltage_mV Difference between default voltage and reference voltage [mV].
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::setDefaultPulserVoltage(Ice::Long defaultVoltage_mV, const Ice::Current & /* c */)
+{
+	asadPulserMgr.setDefaultVoltage(defaultVoltage_mV);
+}
+//__________________________________________________________________________________________________
+/**
+ * Triggers a voltage step in the AsAd voltage generator.
+ * @param voltage_mV Difference between output voltage and reference voltage [mV].
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::triggerPulser(::Ice::Long voltage_mV, const ::Ice::Current & /* c */)
+{
+	asadPulserMgr.triggerPulser(voltage_mV);
+}
+//__________________________________________________________________________________________________
+/**
+ * Prepares CoBo to reset the AsAd voltage generator after each external signal.
+ * @param enabled Whether the AsAd voltage generator is in its external triggering mode.
+ * @param voltage_mV Difference between output voltage and reference voltage [mV].
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::configureExternalPulser(bool enabled, Ice::Long voltage_mV, const Ice::Current &)
+{
+	asadPulserMgr.configureExternalPulser(enabled, voltage_mV);
+}
+//__________________________________________________________________________________________________
+/**
+ * Configures period and amplitude of AsAd generator periodic pulses.
+ * @param voltage_mV Difference between output voltage and reference voltage [mV].
+ * @param period_ms Period [ms] of pulses.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::configurePeriodicPulser(::Ice::Long voltage_mV, ::Ice::Long period_ms, const ::Ice::Current & /* c */)
+{
+	asadPulserMgr.configurePeriodicPulser(voltage_mV, period_ms);
+}
+//__________________________________________________________________________________________________
+/**
+ * Sets amplitude of second impulsion. If this amplitude is zero, there will be no second impulsion.
+ * @param voltage_mV  Difference between output voltage and reference voltage [mV].
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::configureDoublePulserMode(::Ice::Long voltage_mV, const ::Ice::Current & /* c */)
+{
+	asadPulserMgr.configureDoublePulserMode(voltage_mV);
+}
+//__________________________________________________________________________________________________
+/**
+ * Starts (already configured) timer for periodic AsAd generator pulses.
+ */
+void CtrlNodeI::startPeriodicPulser(const ::Ice::Current &)
+{
+	asadPulserMgr.startPeriodicPulser();
+}
+//__________________________________________________________________________________________________
+/**
+ * Stops AsAd generator periodic pulses.
+ */
+void CtrlNodeI::stopPeriodicPulser(const ::Ice::Current &)
+{
+	asadPulserMgr.stopPeriodicPulser();
+}
+//__________________________________________________________________________________________________
+/**
+ * Enables or disables random Poisson mode.
+ * @param enabled Whether to enable Poisson process instead of the periodic process.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::setRandomPulserEnabled(bool enabled, const Ice::Current & /* c */)
+{
+	asadPulserMgr.setRandomPulserEnabled(enabled);
+}
+//__________________________________________________________________________________________________
+/**
+ * Returns a proxy to the alarm service.
+ * @return Proxy to the alarm service.
+ */
+mt::AlarmServicePrx CtrlNodeI::getAlarmService(const Ice::Current & c)
+{
+	Ice::Identity id = c.adapter->getCommunicator()->stringToIdentity("AlarmService");
+	Ice::ObjectPtr svc = c.adapter->find(id);
+	mt::AlarmServicePrx alarmSvc = 0;
+	if (svc)
+	{
+		alarmSvc = mt::AlarmServicePrx::checkedCast(c.adapter->createProxy(id));
+	}
+	return alarmSvc;
+}
+//__________________________________________________________________________________________________
+/**
+ * Starts or stops the periodic check of the AsAd alarm bits.
+ * @param enabled Boolean flags indicating whether to start or stop.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::setAsAdAlarmMonitoringEnabled(bool enabled, const Ice::Current & c)
+{
+	LOG_DEBUG() << (enabled?"Enabling":"Disabling") << " monitoring of AsAd alarms";
+	if (enabled)
+	{
+		try
+		{
+			mdaq::hw::DevicePrx ctrl = findDevice("ctrl");
+
+			mt::AlarmServicePrx alarmSvc = getAlarmService(c);
+
+			asadAlarmWatcher_ = new AsAdAlarmWatcher(name(c), ctrl, alarmSvc, 30000);
+			return;
+		}
+		catch (const mdaq::utl::CmdException & e)
+		{
+			asadAlarmWatcher_ = 0;
+			throw;
+		}
+
+	}
+	asadAlarmWatcher_ = 0;
+}
+//__________________________________________________________________________________________________
+LedManagerI & CtrlNodeI::ledManager() { return ledMgr_; }
+//__________________________________________________________________________________________________
+/**
+ * Switches the given LED on or off.
+ * @param enabled State to set the LED in.
+ * @param ledId Identifier (bit) or the LED.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::setLED(int ledId, bool enabled, const Ice::Current &)
+{
+	ledMgr_.setLedEnabled(ledId, enabled);
+}
+//__________________________________________________________________________________________________
+/**
+ * Switches all LEDs on or off.
+ * @param enabled State to set the LEDs in.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::setLEDs(bool enabled, const Ice::Current &)
+{
+	ledMgr_.setAllLedsEnabled(enabled);
+}
+//__________________________________________________________________________________________________
+/**
+ * Blinks each LED once successively.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::blinkLEDs(const Ice::Current &)
+{
+	ledMgr_.blinkAllLeds();
+}
+//__________________________________________________________________________________________________
+/**
+ * Switches state of the LED with given identifier.
+ * @param ledId Identifier (bit) or the LED.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::flipLED(int ledId, const Ice::Current &)
+{
+	ledMgr_.flipLed(ledId);
+}
+//__________________________________________________________________________________________________
+/**
+ * Switches state of all the LEDs.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::flipLEDs(const Ice::Current &)
+{
+	ledMgr_.flipAllLeds();
+}
+//__________________________________________________________________________________________________
+/**
+ * Starts pulsing the given LED at the given period (or stops if period is not greater than zero).
+ * @param ledId Identifier (bit) or the LED.
+ * @param period_ms Period of the pulses, in ms.
+ * @param c Information about the current method invocation.
+ */
+void CtrlNodeI::pulseLED(int ledId, int period_ms, const Ice::Current &)
+{
+	ledMgr_.pulseLed(ledId, period_ms);
+}
+//__________________________________________________________________________________________________
+/**
+ *
+ */
+void CtrlNodeI::modifyLED(get::cobo::LedType ledType, Ice::Int asadId, get::cobo::LedState newState, const Ice::Current &)
+{
+	ledMgr_.modifyLED(ledType, asadId, newState);
+}
+//__________________________________________________________________________________________________
+/**
+ * Checks whether CoBo is configured for the two proton mode.
+ * @return True if the 2p mode is enabled.
+ */
+bool CtrlNodeI::is2pModeEnabled()
+{
+	bool enabled = false;
+	try
+	{
+		enabled = findLocalDevice("ctrl").readField("pipeCtrl", "modeEnable_2p");
+	}
+	catch (const mdaq::utl::CmdException &) { ; }
+	return enabled;
+}
+//__________________________________________________________________________________________________
+/**
+ * Checks index given to CoBo board.
+ * @return Value of COBO_index register.
+ */
+uint8_t CtrlNodeI::coboIdx()
+{
+	uint8_t idx = 0;
+	try
+	{
+		idx = findLocalDevice("ctrl").readRegister("COBO_index");
+	}
+	catch (const mdaq::utl::CmdException &) { ; }
+	return idx;
+}
+//__________________________________________________________________________________________________
+/**
+ * Checks data source index.
+ * @return Value of dataSource register.
+ */
+uint8_t CtrlNodeI::dataSource()
+{
+	uint8_t idx = 0;
+	try
+	{
+		idx = findLocalDevice("ctrl").readRegister("dataSource");
+	}
+	catch (const mdaq::utl::CmdException &) { ; }
+	return idx;
+}
+//__________________________________________________________________________________________________
+} /* namespace cobo */
+} /* namespace get */

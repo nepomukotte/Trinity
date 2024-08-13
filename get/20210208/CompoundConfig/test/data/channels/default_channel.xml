@@ -1,0 +1,13 @@
+<Channel id="*">
+	<isActive>true</isActive>
+	<!--Data flow parameters for each type of data-->
+	<Flow id="SPE">
+		<eventRate unit="kHz" range="{2, 100}">100</eventRate>
+		<eventSize unit="Bytes" range="{6, 250}">6</eventSize>
+		<!--Single Photo Electron-->
+	</Flow>
+	<Flow id="WFA">
+		<eventRate>2</eventRate>
+		<eventSize>250</eventSize>
+	</Flow>
+</Channel>

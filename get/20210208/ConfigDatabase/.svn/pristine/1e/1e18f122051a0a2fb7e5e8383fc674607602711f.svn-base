@@ -1,0 +1,236 @@
+/**
+ * @file PostgreSqlConfigDao.cpp
+ * @author sizun
+ * $Id$
+ */
+#include "PostgreSqlConfigDao.h"
+#include "Transaction.h"
+#include "PostgreSqlTableBuilder.h"
+#include "ObjRelMapping.hpp"
+#include <postgresql/soci-postgresql.h>
+#include <soci.h>
+#include <sstream>
+
+namespace CCfg
+{
+namespace Io
+{
+namespace Db
+{
+using namespace SOCI;
+
+////////////////////////////////////////////////////////////////////////////////
+// CCfg::Io::Db::PostgreSqlConfigDao class methods body
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Default constructor.
+ */
+PostgreSqlConfigDao::PostgreSqlConfigDao() : ConfigDao()
+{
+}
+
+/**
+ * Destructor.
+ */
+PostgreSqlConfigDao::~PostgreSqlConfigDao()
+{
+}
+
+/*
+ * (see inherited doc)
+ */
+void PostgreSqlConfigDao::connect(const std::string& connectionString)
+{
+	session.reset(new Session(postgresql, connectionString));
+	eIndicator ind;
+	session->once << "SELECT current_schema() AS currentDb", into(dbName, ind);
+	session->once << "SET client_min_messages = WARNING";
+}
+
+/**
+ * Connects to a PostgreSQL database (using RDMS specific parameters).
+ */
+void PostgreSqlConfigDao::connect(const std::string& host, const std::string& port,
+		const std::string& db, const std::string& user, const std::string& pwd)
+{
+	std::ostringstream connectionString;
+	connectionString << "host=" << host;
+	if(not port.empty())
+	{
+		connectionString << " port=" << port;
+	}
+	connectionString << " user=" << user
+		<< " password=" << pwd;
+	if(not db.empty())
+	{
+		connectionString << " dbname=" << db;
+	}
+	connect(connectionString.str());
+}
+
+/*
+ * (see inherited doc)
+ */
+ConfigDatabasePtr PostgreSqlConfigDao::searchDatabase(const std::string& dbName)
+{
+	Statement stmt = (session->prepare <<
+		"SELECT TEXT(nspname) "
+		"FROM pg_namespace "
+		"WHERE nspname NOT LIKE \'pg_%\' "
+		"AND nspname=:name",
+		use(const_cast<std::string&>(dbName)));
+	return loadDatabase(stmt);
+}
+
+/*
+ * (see inherited doc)
+ */
+ConfigDatabasePtr PostgreSqlConfigDao::getCurrentDatabase()
+{
+	ConfigDatabasePtr dbObj(new ConfigDatabase);
+	dbObj->setDAO(this);
+	session->once << "SELECT current_schema() AS currentDb", into(dbObj->name);
+	return dbObj;
+}
+
+/*
+ * (see inherited doc)
+ */
+ConfigDatabasePtrSetPtr PostgreSqlConfigDao::getDatabases()
+{
+	ConfigDatabasePtrSetPtr databases(new ConfigDatabasePtrSet);
+	Rowset<ConfigDatabasePtr> rowset =
+		(session->prepare <<
+				"SELECT TEXT(nspname) AS schema_name FROM pg_namespace "
+				"WHERE nspname NOT LIKE \'pg_%\' "
+				"AND nspname != \'information_schema\';");
+	for(Rowset<ConfigDatabasePtr>::iterator it = rowset.begin(); it != rowset.end(); ++it)
+	{
+		(*it)->setDAO(this);
+		databases->insert(*it);
+	}
+	return databases;
+}
+
+/*
+ * (see inherited doc)
+ */
+std::vector<std::string> PostgreSqlConfigDao::getUserNames()
+{
+	std::vector<std::string> users;
+	Rowset<std::string> rowset = (session->prepare <<
+			"SELECT usename FROM pg_user");
+	for(Rowset<std::string>::iterator it = rowset.begin(); it != rowset.end(); ++it)
+	{
+		users.push_back(*it);
+	}
+	return users;
+}
+
+/*
+ * (see inherited doc)
+ */
+void PostgreSqlConfigDao::createDatabaseAndUser(const std::string& name, const std::string& pwd)
+{
+	session->once << "CREATE DATABASE " << name;
+	session->once << "CREATE USER " << name << " PASSWORD :pwd ", use(const_cast<std::string&>(pwd));
+	session->once << "GRANT ALL PRIVILEGES ON " << name << ".* TO " << name << " WITH GRANT OPTION";
+}
+
+/*
+ * (see inherited doc)
+ */
+void PostgreSqlConfigDao::removeDatabaseAndUser(const std::string& name)
+{
+	session->once << "DROP DATABASE " << name;
+	session->once << "DROP USER " << name;
+}
+
+/*
+ * (see inherited doc)
+ */
+void PostgreSqlConfigDao::changeUserPassword(const std::string& userName, const std::string& newPassword)
+{
+	session->once <<
+		"ALTER USER " << userName << " WITH PASSWORD ':pwd'",
+		use(const_cast<std::string&>(newPassword));
+}
+
+/*
+ * (see inherited doc)
+ */
+int PostgreSqlConfigDao::getPrivileges(const std::string& userName, const std::string& tableName)
+{
+	eIndicator ind;
+	int privileges = 0;
+	session->once <<
+		"SELECT (\n"
+		"  INT4(has_table_privilege(':user',':schema.:table','select')<>TRUE)       |\n"
+		" (INT4(has_table_privilege(':user',':schema.:table','insert')<>TRUE) << 1) |\n"
+		" (INT4(has_table_privilege(':user',':schema.:table','update')<>TRUE) << 2) |\n"
+		" (INT4(has_table_privilege(':user',':schema.:table','delete')<>TRUE) << 3)\n"
+		");",
+		use(const_cast<std::string&>(tableName), "table"),
+		use(const_cast<std::string&>(dbName), "schema"),
+		use(const_cast<std::string&>(userName), "user"),
+		into(privileges, ind);
+	return privileges;
+}
+
+/*
+ * (see inherited doc)
+ */
+void PostgreSqlConfigDao::revokePrivileges(const std::string& userName)
+{
+	for(size_t i = 0; i < TableCount+1; ++i)
+	{
+		session->once <<
+			"REVOKE ALL PRIVILEGES, GRANT OPTION "
+			"ON " << dbName << '.' << TABLES[i] << " "
+			"FROM " << userName;
+	}
+}
+
+/*
+ * (see inherited doc)
+ */
+bool PostgreSqlConfigDao::isSchemaAdmin(const std::string& userName)
+{
+	eIndicator ind;
+	int isAdmin = 0;
+	session->once <<
+		"SELECT INT4(has_schema_privilege(':user',':schema','usage'))",
+		use(const_cast<std::string&>(dbName),"schema"),
+		use(const_cast<std::string&>(userName), "user"),
+		into(isAdmin, ind);
+	return isAdmin != 0;
+}
+
+/*
+ * (see inherited doc)
+ */
+bool PostgreSqlConfigDao::checkTableExist(const char* tableName)
+{
+	int exist = -1;
+	std::string name(tableName);
+	session->once << "SELECT COUNT(*) AS tableExists "
+		"FROM information_schema.tables "
+		"WHERE table_schema=:schema AND table_name=lower(:name)",
+		use(dbName),
+		use(name),
+		into(exist);
+	return exist == 1;
+}
+
+/*
+ * (see inherited doc)
+ */
+std::auto_ptr<TableBuilder> PostgreSqlConfigDao::createTableBuilder()
+{
+	return std::auto_ptr<TableBuilder>(new PostgreSqlTableBuilder);
+}
+
+}
+}
+}

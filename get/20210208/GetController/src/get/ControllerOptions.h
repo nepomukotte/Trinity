@@ -1,0 +1,86 @@
+/**
+ * $Id: ControllerOptions.h 1153 2014-02-17 13:00:49Z psizun $
+ * @file ControllerOptions.h
+ * @date 6 juin 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors:
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#ifndef get_ControllerOptions_h_INCLUDED
+#define get_ControllerOptions_h_INCLUDED
+
+#include "utl/net/IpAddress.h"
+#include "utl/net/SocketAddress.h"
+
+namespace get {
+//__________________________________________________________________________________________________
+class ControllerOptions
+{
+private:
+	/// Constructor is private (this is a singleton class).
+	ControllerOptions();
+	virtual ~ControllerOptions();
+	/// Copy constructor.
+	ControllerOptions(const ControllerOptions &);             // intentionally undefined
+	/// Assignment operator.
+	ControllerOptions & operator=(const ControllerOptions &); // intentionally undefined
+	void loadSettings();
+	void saveSettings();
+public:
+	static ControllerOptions & instance();
+	bool isDataDisplayEnabled() const;
+	void setDataDisplayEnabled(bool);
+	bool isHeaderDisplayEnabled() const;
+	void setHeaderDisplayEnabled(bool);
+	bool isSaveRawFrameEnabled() const;
+	void setSaveRawFrameEnabled(bool);
+	::utl::net::SocketAddress dataFlowEndpoint() const;
+	::utl::net::IpAddress dataFlowAddress() const;
+	void setDataFlowAddress(const ::utl::net::IpAddress &);
+	uint16_t dataFlowPort() const;
+	void setDataFlowPort(const uint16_t &);
+	std::string dataFlowType() const;
+	void setDataFlowType(const std::string & flowType);
+	::utl::net::SocketAddress dataCtrlEndpoint() const;
+	void setDataCtrlEndpoint(const ::utl::net::SocketAddress & endpoint);
+	::utl::net::SocketAddress alarmLoggerEndpoint() const;
+	void setAlarmLoggerEndpoint(const ::utl::net::SocketAddress &);
+	bool isDataRouterExternal() const;
+	void setDataRouterExternal(bool);
+private:
+	bool dataDisplayEnabled_;
+	bool headerDisplayEnabled_;
+	bool saveRawDataEnabled_;
+	bool isDataRouterExternal_;
+	std::string dataFlowType_;
+	::utl::net::SocketAddress dataFlowEndpoint_;
+	::utl::net::SocketAddress dataCtrlEndpoint_;
+	::utl::net::SocketAddress alarmLoggerEndpoint_;
+};
+//__________________________________________________________________________________________________
+} /* namespace get */
+#endif /* get_ControllerOptions_h_INCLUDED */

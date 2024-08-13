@@ -1,0 +1,117 @@
+/*
+ * $Id: Serializer.h 1478 2014-01-08 14:25:32Z psizun $
+ * @file Serializer.h
+ * @created 9 févr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#ifndef mfm_Serializer_h_INCLUDED
+#define mfm_Serializer_h_INCLUDED
+
+#include <mfm/Common.h>
+#include <mfm/Buffer.h>
+#include <utl/BinIO.hpp>
+
+#include <boost/shared_ptr.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/array.hpp>
+namespace io = boost::iostreams;
+#include <cstddef>
+#include <istream>
+#include <ostream>
+#include <memory>
+
+namespace mfm
+{
+// Forward declarations
+class Frame;
+//___________________________________________________
+/** The Serializer class is a utility class used internally by the MFM library.
+ * It provides an encapsulation of a binary data buffer,
+ * with shared ownership of the buffer between instances.
+ *
+ * Apart from the shared buffer, characterized by its capacity, each instance distinguishes itself by its region of interest within the buffer,
+ *  denoted by an offset and a size (in Bytes).
+ *
+ */
+class Serializer
+{
+public:
+	/** Typedef for a shared pointer to an STL vector of bytes. */
+	typedef boost::shared_ptr< mfm::Buffer > SharedBufferPtr;
+
+	Serializer(size_t _size_B = 0);
+	Serializer(Serializer const & serializer, const size_t & _size_B, const size_t & _offset_B = 0);
+	Serializer(Serializer const & r);
+	virtual ~Serializer();
+	Serializer& operator=(const Serializer & r);
+    virtual Serializer* clone() const;
+
+    /** @name Getters
+     * See corresponding attribute description.
+     */
+	///@{
+    const size_t & offset_B() const { return offset_B_; }
+    size_t capacity() const { return array().size(); }
+    const size_t & size_B() const { return size_B_; }
+    SharedBufferPtr const & bufferPtr() const { return buffer_; }
+    ByteArray const & array() const { return buffer_->array(); }
+    ByteArray & array() { return buffer_->array(); }
+    const Byte* begin() const;
+    Byte* begin();
+    const Byte* end() const;
+    Byte* end();
+    ///@}
+
+    /** @name Setters
+     * See corresponding attribute description.
+     */
+    ///@{
+    void setCapacity(size_t capacity_B);
+    void set_size_B(size_t _size_B) { size_B_ = _size_B; }
+    ///@}
+
+    void read(std::istream & dataIn, size_t const & n, size_t const & pos = 0);
+    void read(size_t const & n, const void* src, size_t const & pos = 0);
+    void write(std::ostream & dataOut) const;
+    void write(std::ostream & dataOut, size_t const & n, size_t const & pos = 0) const;
+
+	std::istream & inputStream(size_t const pos_B = 0) const;
+	std::ostream & outputStream(size_t const pos_B = 0);
+private:
+	SharedBufferPtr buffer_; 		///< Shared data buffer.
+	size_t offset_B_;               ///< Offset [Bytes] of the data of interest in the buffer.
+	size_t size_B_;                 ///< Length [Bytes] of the data of interest in the buffer.
+};
+//___________________________________________________
+} /* namespace mfm */
+#endif /* mfm_Serializer_h_INCLUDED */

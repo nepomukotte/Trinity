@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Daq>
+	<!--The data acquistion duration for a frame-->
+	<frameDuration unit="ms">100
+		<!--10 per second-->
+	</frameDuration>
+	<readOutFreq unit="Mb/s" range="[10, 80]">25</readOutFreq>
+	<Channel id="*">
+		<isActive>true</isActive>
+		<!--Data flow parameters for each type of data-->
+		<Flow id="SPE">
+			<eventRate unit="kHz" range="{2, 100}">100</eventRate>
+			<eventSize unit="Bytes" range="{6, 250}">6</eventSize>
+			<!--Single Photo Electron-->
+		</Flow>
+		<Flow id="WFA">
+			<eventRate>2</eventRate>
+			<eventSize>250</eventSize>
+		</Flow>
+	</Channel>
+	<Channel id="0" />
+	<Channel id="1">
+		<isActive>false</isActive>
+	</Channel>
+	<Channel id="2" />
+</Daq>

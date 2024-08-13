@@ -1,0 +1,47 @@
+RunControlServant:default -p 10001 -t 3000
+RunControlServant:default -p 10002 -t 3000
+RunControlServant:default -p 10003 -t 3000
+RunControlServant:default -p 10004 -t 3000
+RunControlServant:default -p 10005 -t 3000
+RunControlServant:default -p 10006 -t 3000
+RunControlServant:default -p 10007 -t 3000
+RunControlServant:default -p 10008 -t 3000
+RunControlServant:default -p 10009 -t 3000
+RunControlServant:default -p 10010 -t 3000
+START: (SmRunControl)
+INIT: (SmRunControl)/(SmRunControl)
+TRANS: [#__INIT__#:(__OFF__)->(Off)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Off)]}
+EXEC: {[*]:[onEntr(Off)]}
+EXEC: {}
+Turned off
+BCST: #EvTurnOn#
+---> Popped: EvTurnOn
+STEP BEGIN: EvTurnOn on (SmRunControl)
+TRANS: [#EvTurnOn#:(Off)->(On)]
+EXEC: {[*]:[onExit(Off)]}
+EXEC: {[*]:[#EvTurnOn#:(Off)->(On)]}
+EXEC: {[*]:[onEntr(On)]}
+EXEC: {}
+Turned on
+INIT: (SmRunControl)/(SmOn)
+TRANS: [#__INIT__#:(__OFF__)->(Idle)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Idle)]}
+EXEC: {[*]:[onEntr(Idle)]}
+EXEC: {}
+Idling
+STEP END: EvTurnOn result: 0
+BCST: #EvStart#
+---> Popped: EvStart
+STEP BEGIN: EvStart on (SmRunControl)
+Too many servants have been lost.
+RESET: (SmRunControl)/(SmRunControl)
+RESET: (SmRunControl)/(SmOn)
+EXEC: {[*]:[onExit(Idle)]}
+EXEC: {[*]:[onReset(SmOn)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(On)]}
+EXEC: {[*]:[onReset(SmRunControl)]}
+EXEC: {[*]:[onEntr(__OFF__)]}

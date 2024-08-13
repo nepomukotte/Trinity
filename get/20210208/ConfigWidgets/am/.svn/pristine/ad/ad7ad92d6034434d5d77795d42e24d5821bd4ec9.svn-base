@@ -1,0 +1,24 @@
+# ======================================================================================================================
+# Doxygen extended rules for installation and correct cleanup 
+# ----------------------------------------------------------------------------------------------------------------------
+
+include $(top_srcdir)/am/doxygen.am
+
+# Generation Rules
+html-local: doxygen-doc
+
+# Clean Rules
+clean-local:
+	rm -rf "$(DX_DOCDIR)/"
+
+# Install Rules
+install-html-local:
+	if test -e $(DX_DOCDIR)/html/index.html ; then \
+		$(INSTALL) -d "$(DESTDIR)$(htmldir)/html"; \
+		$(INSTALL_DATA) "$(DX_DOCDIR)/$(PACKAGE_NAME).tag" "$(DESTDIR)$(htmldir)"; \
+		$(INSTALL_DATA) -t "$(DESTDIR)$(htmldir)/html" $(DX_DOCDIR)/html/*; \
+	fi
+
+# Uninstall Rules
+uninstall-local:
+	rm -rf "$(DESTDIR)$(htmldir)"

@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+slicedir=@datarootdir@/slice
+
+Name: getbench-eccserver
+Description: GetBench Electronic Control Core server: a C++ class library to build
+	a server interacting with hardware nodes specific to the GET project.
+Requires: getbench-eccclient@DEBUG_SUFFIX@ mdaq-eccserver@DEBUG_SUFFIX@ CompoundConfig@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -lgetbench-eccserver@DEBUG_SUFFIX@
+Cflags: -I${includedir}

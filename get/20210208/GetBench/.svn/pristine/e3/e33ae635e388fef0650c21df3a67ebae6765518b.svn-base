@@ -1,0 +1,60 @@
+// $Id: references.dox 1537 2016-03-08 08:31:57Z psizun $
+/**
+ @page page_Troubleshooting Troubleshooting
+A few common issues are progressively added to <a href="https://dsm-trac.cea.fr/get/wiki/TroubleShooting">this page</a>.
+
+ @page page_References References
+
+@section sec_ref_CoBo CoBo
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/ML507setup.pdf">Reduced CoBo: ML507 Initial Setup</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/ReducedCoBoSetupGuide.pdf">Reduced CoBo Setup Guide</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/ReducedCoBoMultiplicitySetupGuide.pdf">Reduced CoBo Multiplicity Setup Guide</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/4AGET-150714.xlsx">R-CoBo v2.0 adapter board connector assignments</a>
+- <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=cobo">MSU/NSCL Wiki</a>
+  - <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=cobo_pcb">CoBo Hardware</a>
+<!--- <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=daq_setup">Getting started with CoBo</a>-->
+  - <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=cobo_clocking">Configuration of the CoBo PLL</a>@anchor ref_cobo_pll
+    - Texas Instruments LMK0480x PLL device <a href="http://www.ti.com/lit/ds/symlink/lmk04803.pdf">datasheet</a>
+  - <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=microtca_development">Configuration of the MCH</a>@anchor ref_cobo_mch
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/CoBoDataFormat-3.3.pdf">GET CoBo Data Format 3.3</a>@anchor ref_cobo_data_format
+
+@section sec_ref_Mutant MUTanT
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/Getting_Started_Guide_for_MUTANT_V1.1.pdf">Getting Started Guide for MUTanT v1.1</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/MUTANT_SPECIF_V1_3.pdf">MUTanT Specifications v1.3</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/MUTANT_register_mapping_V1.5.pdf">MUTanT Slow Control Registers v1.5</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/MUTanT_data_readout_V1.3.pdf">MUTanT Data Readout v1.3</a>
+- <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/MUTANT_CoBo_com_protocol_V1_2_2.pdf">MUTanT Communication protocol with the CoBo boards v1.2.2</a>
+ 
+@section sec_ref_AsAd AsAd
+- GET-AS-002-0001: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_CoBo_interface_rev1.pdf">AsAd - CoBo Interface</a>
+- GET-AS-002-0002: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_V2.0_QuickStartV0.0.pdf">AsAd v2.0 Quick Start Guide</a>@anchor ref_asad_quick_start
+- GET-AS-002-0003: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_Ext.Instruments_Interface.pdf|AsAd">AsAd External Instruments Interface</a>
+- GET-AS-002-0004: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_PowerSupply%26Monitoring1-1.pdf">AsAd Power Supply and Monitoring</a>
+- GET-AS-002-0005: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_test%26calmanager_version1-1.pdf">AsAd Test and Calibration Management</a>
+- GET-AS-002-0006: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_SCA">AsAd Switched Capacitor Arrays Management</a>
+- GET-AS-002-0007: <i>Analogue to Digital Conversions on AsAd</i>
+  - Texas Instruments ADS6422 ADC <a href="http://www.ti.com/lit/ds/symlink/ads6422.pdf">datasheet</a>
+- GET-AS-002-0008: <i>AsAd Identity Manager</i>
+- GET-AS-002-0009: <i>AsAd physical data</i>
+- GET-AS-002-0010: <i>AsAd Slow Control Manager: Protocol & registers mapping</i>
+- GET-AS-002-0011: <i>AGET Serial Control with AsAd</i>
+- GET-AS-002-0012: <i>AsAd User Manual</i>
+
+@section sec_ref_AGET AGET
+ - GET-QA-000-0002: <i>AGET User Manual</i> (deprecated by GET-QA-000-0005).
+ - GET-QA-000-0005: <i>AGET Data Sheet v2</i> (deprecated by GET-QA-000-0014).
+ - <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AgetDocumentation/AGET_input_impedance_and_external_coupling_mode.pdf">AGET input impedance and external coupling mode</a>
+ - GET-QA-000-0010: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AgetDocumentation/AGET_MULTIPLICITY_NOTE.pdf">Note on the AGET multiplicity signal</a>
+ - GET-QA-000-0011: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AgetDocumentation/AGET_POSITIVE_POLARITY_NOTE.pdf">Note on the AGET chip functionality test mode in positive polarity mode</a>
+ - GET-QA-000-0013: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AgetDocumentation/AGET_POSITIVE_POLARITY.pdf"><i>Note on the AGET chip in positive polarity mode</i>
+ - <i>Note on the AGET chip hit register memory functionality</i></a>
+ - <b>GET-QA-000-0014</b>: <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AgetDocumentation/AGET_Data_Sheet_v3.pdf">AGET Data Sheet v3</a>@anchor ref_aget_data_sheet
+
+@section sec_ref_GANIL Ganil Run Control / Narval
+ - <a href="http://wiki.ganil.fr/gap/wiki/GANIL-SPIRAL2-DAQ-Packages-Distribution">GANIL-SPIRAL2 DAQ acquisition packages distribution</a>
+ - <a href="http://wiki.ganil.fr/gap/browser/Documents/SPIRAL2_DAQ/User_Manual/Ganil_Acquisition_HowtoStart_1.0.pdf">GANIL Acquisition How to start</a>
+ - <a href="http://attpc-daq.readthedocs.org">AT-TPC DAQ</a>
+ - <a href="http://wiki.ganil.fr/gap/wiki/SPIRAL2-Multiframe-Meta-Format">GANIL-SPIRAL2 MFM data formats</a>
+ 
+ $LastChangedDate$
+*/

@@ -1,0 +1,6 @@
+connect device asad
+writeReg ADC0 0x400
+writeReg ADC2 0x2A0
+writeReg ADC3 0x001
+writeReg ADC4 0x000
+writeReg ADC5 0x401

@@ -1,0 +1,679 @@
+// $Id: config_parameters.dox 1547 2016-03-16 08:34:32Z psizun $
+/**
+@page page_RunConfigParameters Configuration
+
+For more details, refer to @ref page_References.
+
+@tableofcontents
+
+@section sec_config_howto Frequently Asked Questions/How To
+
+@subsection subsec_astre ASTRE
+
+<ul>
+
+<li>
+<b>How to configure AsAd boards with ASTRE chips</b>
+<p>
+Only 3 configuration parameters differ between AGET and ASTRE chips:
+<ul>
+<li>Since the available peaking time values are different, the parameter <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.peackingTime</em> must be set accordingly.</li>
+<li>The parameter <em>CoBo[*].AsAd[*].Aget[*].Global.Reg2.triggerLvdsThreshold</em> allows to set the multiplicity level for the LVDS trigger.</li>
+<li>The parameter <em>CoBo[*].AsAd[*].Aget[*].Global.Reg2.multiplicityLevel</em> allows to set the unity multiplicity level.</li>
+</ul>
+See the document <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/Astre/ASTRE-DOC.pdf">ASTRE ASIC: Slow control modifications / AGET</a> for more details.
+</p>
+</li>
+
+
+@subsection subsec_mutant_getting_started Getting started with MUTanT
+
+<ul>
+
+<li>
+<b>How to get started with MUTanT</b>
+<p>
+See <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/Getting_Started_Guide_for_MUTANT_V1.1.pdf">Getting Started Guide for MUTanT v1.1</a>
+</p>
+</li>
+
+@subsection subsec_config_partial_readout Partial readout mode
+
+<ul>
+
+<li>
+<b>How to read all the channels of all chips</b>
+<p>
+To read all the channels of a chip, set its <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isAllChannelRead</em> parameter to <em>true</em>.
+This parameter should always be set to the same value for all chips.
+</p>
+</li>
+
+<li>
+<b>How to only read the channels that have been hit plus the FPN channels</b>
+<p>
+- set <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isAllChannelRead</em> to <em>false</em>;
+- set <em>CoBo[*].Module.enableWriteHittedRegister</em> to <em>false</em>;
+- set <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isFPNRead</em> to <em>true</em>;
+</p>
+</li>
+
+<li>
+<b>How to only read a specific channel</b>
+<p>
+To read only the data from a specific channel:
+- set <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isAllChannelRead</em> to <em>false</em>;
+- set <em>CoBo[*].Module.enableWriteHittedRegister</em> to <em>true</em>;
+- set <em>CoBo[*].AsAd[*].Aget[*].channel[*].Reading</em> to <em>never</em> for all channels except the channel to read;
+- set <em>CoBo[*].AsAd[*].Aget[*].channel[*].Reading</em> to <em>always</em> for the channel to read.
+</p>
+</li>
+
+</ul>
+
+@subsection subsec_config_external_trigger External trigger signal
+
+<b>How to trigger on an <em>external trigger</em> with a reduced CoBo ML507 board.</b>
+<p>
+On version 1 of the
+reduced CoBo adapter board, the input of the external trigger signal is the yellow SMA connector <em>J2</em>. On version 2.0, it is <em>X1</em>.
+The voltage level must be between 0 and 2.5 V.
+When the ML507 board is configured to use the external trigger mode, it triggers on the
+rising edge of the signal.
+</p>
+
+<b>How to trigger on an <em>external trigger</em> with a CoBo board</b>
+<p>
+Similarly, an external trigger signal can be injected into CoBo using one of the LEMO connectors on the front panel of the board.
+The inputs are high impedance, expecting a 3.3V to 5V digital signal.
+The CoBo will trigger on a logic high (3.1 V to 5 V) and will not trigger on a logic low (< 0.15).
+The <em>CoBo[*].LEMO.L[*].function</em> parameter of the chosen connector must be set to <em>external_trigger_input</em>.
+It is OK for more than one LEMO to share the same function.  If multiple LEMOs are configured to the same input signal, the firmware will OR the signals.
+</p>
+
+@subsection subsec_config_dac_thresholds DAC thresholds
+
+<ul>
+
+<li>
+<b>How to set the DAC thresholds</b>
+<p>
+The contribution of an AGET chip's channel to the chip's multiplicity trigger signal and to its hit channel pattern depends on how the amplitude of the channel signal compares to a 7-bit programmable threshold.
+- The parameter <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.GlobalThresholdValue</em> defines the value of the 3 most significant of these 7 bits. The value of this global threshold is common to all channels in the chip.
+- For each channel, a parameter <em>CoBo[*].AsAd[*].Aget[*].channel[*].LSBThresholdValue</em> defines the value of the 4 least significant bits of the threshold.
+- The parameter <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isThresholdSignedPositive</em> defines the polarity of the input signal. 
+</p>
+</li>
+
+</ul>
+
+@subsection subsec_config_readout_depth Readout depth and offset
+
+<b>How to read only 50 of the 512 time buckets?</b>
+<p>
+  - set the readout depth parameter <em>CoBo[*].Module.readoutDepth</em> to <em>50</em>
+  - set the readout offset <em>CoBo[*].AsAd[*].Aget[*].Global.ReadoutPointerOffset</em> to the time bucket you want to start reading from.
+</p>
+@note All AGET chips from a CoBo board should have the same readout pointer offset.
+Beware that, whatever the readout pointer offset, the bucket index of the data samples will start at zero.
+However, the <em>readOffset</em> field of the data frame header will contain the value of the AGET chips' readout pointer offset. 
+
+@subsection subsec_config_2pmode 2p mode
+
+<b>How to enable the 2p mode?</b>
+<p>
+  - set the CoBo 2p mode parameter <em>CoBo[*].Module.enableMem2pMode</em> parameter to <em>true</em>
+  - set the AGET parameter for splitting the SCA memory <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.SCA_Splitting</em> to <em>true</em>
+  - set the readout depth parameter <em>CoBo[*].Module.readoutDepth</em> to <em>256</em> or less
+  - select a trigger mode appropriate for the 2p mode
+</p>
+
+@subsection subsec_config_zero_suppression Zero suppression
+<b>How to enable zero suppression</b> (e.g. suppression by CoBo of data samples below a threshold value):
+<p>
+  - set the <em>CoBo[*].Module.enableZeroSuppression</em> parameter to <em>true</em>
+  - for each channel, set the value of the zero suppression threshold <em>CoBo[*].AsAd[*].Aget[*].channel[*].zeroSuppressionThreshold</em>
+  - for a positive polarity signal, configure CoBo to suppress samples with values above the thresholds rather than below, by setting <em>CoBo[*].Module.zeroSuppressionInverted</em> to <em>true</em>. 
+</p>
+
+@subsection subsec_asad_pulser AsAd pulser
+<b>How to generate pulses with the AsAd voltage generator</b>:
+<p>
+Generating charges on the input of the AGET channels using the AsAd voltage generator and getting CoBo to trigger on these pulses involves configuration parameters for AGET, AsAd, the CoBo firmware and the CoBo software.
+  - The <em>CoBo[*].Generator.periodicModeEnabled</em> parameter must be set to <em>true</em> for the CoBo software to repeatedly trigger the AsAd voltage generator.
+  - The <em>CoBo[*].Generator.poissonModeEnabled</em> parameter controls whether it will happen periodically or according to a Poisson random process.
+  - The <em>CoBo[*].Generator.period_ms</em> parameter defines the (mean) period, in milliseconds (values below 5 ms are discouraged).
+  - The <em>CoBo[*].Generator.amplitudeStart</em> parameter defines the amplitude of the pulse, in mV (if the <em>defaultVoltage</em> is set to zero).
+  - If  <em>CoBo[*].Generator.doublePulseEnabled</em> is set, each voltage step of voltage <em>CoBo[*].Generator.amplitudeStart</em> will be immediately followed by a second voltage step of voltage <em>CoBo[*].Generator.secondPulseAmplitude</em>
+  
+  - The AGET chip needs to be configured in one of its 3 test modes with the <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.TestModeSelection</em> parameter for the AsAd voltage step to result in a charge on the input of the AGET channel(s).
+  - For the <i>calibration</i> test mode, the AsAd parameter <em>isCalibMode</em> also needs to be set to true.
+  - The single or multiple (depending on the test mode) channel(s) selected is (are) selected with the <em>CoBo[*].AsAd[*].Aget[*].channel[*].isSelectedforTestMode</em> parameters.
+  
+  - For CoBo to trigger on the pulses, choosing a slow control or multiplicity trigger mode with the <em>CoBo[*].Module.triggerMode</em> parameter may be appropriate.
+
+For more details, refer to @ref page_References.
+</p>
+
+<b>How to trigger the AsAd voltage generator externally</b>:
+<p>
+	Rather than by slow control, it its possible for the AsAd voltage generator to be triggered by an external signal into the ISP1 line of the AsAd external instrument interface.
+	- The <em>CoBo[*].Generator.externalTriggerMode</em> parameter must be set to <em>true</em>.
+
+	After a pulse is generated, the generator must be reconfigured for an external signal to generate a new voltage step.
+	- If <em>CoBo[*].Generator.periodicModeEnabled</em> is set to <em>true</em>, it is done periodically.
+	- Otherwise, it is done after every CoBo trigger.
+</p>
+
+
+For more details, refer to @ref page_References.
+</p>
+
+@subsection subsec_positive_pol Positive polarity signal
+
+<b>How to work with a positive polarity signal</b>:
+<p>
+When switching to a positive polarity signal, you usually need to change the following parameters:
+- In the AGET  chip:
+  - The <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isPositivePolarity</em> boolean parameter must be set to <em>true</em> to adjust the DC voltage level of CSA, CR and Gain-2.
+  - The parameter <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.isThesholdSignedPositive</em> for the DAC sign must be set to <em>true</em>.
+  - The input common mode voltage of the analog output buffer  <em>CoBo[*].AsAd[*].Aget[*].Global.Reg1.Vicm</em> should be adjusted (usually to 1.55 or 1.65 V).
+- In the AsAd voltage generator:
+  - The parameters <em>CoBo[*].Generator.amplitudeStart</em> and <em>CoBo[*].Generator.defaultVoltage</em> should be set so that their difference corresponds to a positive voltage differential.
+- In the CoBo firmware:
+  - If using the zero suppression feature, set the <em>CoBo[*].Module.zeroSuppressionInverted</em> parameter to <em>true</em> in order for suppressed data samples to correspond to values above zero suppression thresholds instead of below (M-CoBo only).
+
+For more details, refer to the @ref ref_aget_data_sheet "AGET data sheet" and other @ref page_References.
+</p>
+
+@subsection subsec_data_format Data format
+
+<b> What is the mapping between data sample channel index, chip pin no. and chip physical channel index?</b>
+
+See @ref ref_aget_data_sheet "AGET data sheet" (section 13), @ref ref_asad_quick_start "AsAd v2.0 Quick Start Guide" (section 2.5) and @ref ref_cobo_data_format "GET CoBo Data Format".
+| Sample<br> channel index | AGET chip<br>channel  | AsAd ZAP connector<br> pin no.  | AGET chip<br> pin no.  |
+| :------------------: | :-----------: | :--------------------: | :-----------: |
+| 0  | In<1>  |  9 | 33 |
+| 1  | In<2>  | 10 | 32 |
+| 2  | In<3>  | 11 | 31 |
+| 3  | In<4>  | 12 | 30 |
+| 4  | In<5>  | 13 | 29 |
+| 5  | In<6>  | 14 | 28 | 
+| 6  | In<7>  | 15 | 27 | 
+| 7  | In<8>  | 16 | 26 | 
+| 8  | In<9>  | 17 | 25 | 
+| 9  | In<10> | 18 | 24 | 
+| 10 | In<11> | 19 | 23 | 
+| 11 | FPN<1> | NA | NA | 
+| 12 | In<12> | 20 | 22 | 
+| 13 | In<13> | 21 | 21 | 
+| 14 | In<14> | 22 | 20 | 
+| 15 | In<15> | 23 | 19 | 
+| 16 | In<16> | 24 | 18 | 
+| 17 | In<17> | 25 | 16 | 
+| 18 | In<18> | 26 | 15 | 
+| 19 | In<19> | 27 | 14 | 
+| 20 | In<20> | 28 | 13 | 
+| 21 | In<21> | 29 | 12 | 
+| 22 | FPN<2> | NA | NA | 
+| 23 | In<22> | 30 | 11 | 
+| 24 | In<23> | 31 | 10 | 
+| 25 | In<24> | 32 |  9 | 
+| 26 | In<25> | 33 |  8 | 
+| 27 | In<26> | 34 |  7 | 
+| 28 | In<27> | 35 |  6 | 
+| 29 | In<28> | 36 |  5 |
+| 30 | In<29> | 37 |  4 | 
+| 31 | In<30> | 38 |  3 | 
+| 32 | In<31> | 39 |  2 | 
+| 33 | In<32> | 40 |  1 | 
+| 34 | In<33> | 41 |120 | 
+| 35 | In<34> | 42 |119 | 
+| 36 | In<35> | 43 |118 | 
+| 37 | In<36> | 44 |117 | 
+| 38 | In<37> | 45 |116 | 
+| 39 | In<38> | 46 |115 | 
+| 40 | In<39> | 47 |114 | 
+| 41 | In<40> | 48 |113 | 
+| 42 | In<41> | 49 |112 | 
+| 43 | In<42> | 50 |111 | 
+| 44 | In<43> | 51 |110 | 
+| 45 | FPN<3> | NA | NA | 
+| 46 | In<44> | 52 |109 | 
+| 47 | In<45> | 53 |108 | 
+| 48 | In<46> | 54 |107 | 
+| 49 | In<47> | 55 |106 | 
+| 50 | In<48> | 56 |105 | 
+| 51 | In<49> | 57 |103 | 
+| 52 | In<50> | 58 |102 | 
+| 53 | In<51> | 59 |101 | 
+| 54 | In<52> | 60 |100 | 
+| 55 | In<53> | 61 | 99 | 
+| 56 | FPN<4> | NA | NA | 
+| 57 | In<54> | 62 | 98 | 
+| 58 | In<55> | 63 | 97 | 
+| 59 | In<56> | 64 | 96 |
+| 60 | In<57> | 65 | 95 |
+| 61 | In<58> | 66 | 94 |
+| 62 | In<59> | 67 | 93 |
+| 63 | In<60> | 68 | 92 |
+| 64 | In<61> | 69 | 91 |
+| 65 | In<62> | 70 | 90 |
+| 66 | In<63> | 71 | 89 |
+| 67 | In<64> | 72 | 88 |
+
+
+@subsection subsec_config_asad_isp AsAd inspection
+<b>How to select two signals ISP1 and ISP2 in the AsAd inspection interface</b>:
+<p>
+  - Select the device to inspect by setting the <em>AsAd[*].InspectionLines.deviceToInspect</em> parameter.
+  - Set the <em>ISP1</em> and <em>ISP2</em> parameters in the subsection of <em>AsAd[*].InspectionLines</em> named after the chosen device.
+  - To be able to inspect the multiplicity signal from an AGET chip, you also need to set AGET parameter <em>CoBo.AsAd.Aget.Global.Reg2.islvdsTriggerOutput</em>.
+
+See document GET-AS-002-003 in the @ref sec_ref_AsAd documentation and section 3.2.2 of the AGET data sheet for more details.
+</p>
+
+@subsection subsec_config_cobo_pll CoBo PLL
+<b>How to configure the PLL of the &mu;TCA CoBo board</b>:
+<p>
+  - By default (meaning, if the configuration file does not contain the recently added PLL-related section or if the parameters in this section have kept the default values they have in the example configuration file), the CoBo PLL is configured correctly for use with a Mutant board.
+  - To properly configure the PLL of a CoBo 1.0v board used in stand-alone (without a Mutant board),
+  set the parameters in the <em>Module.PLL</em> section according to the table below.
+
+  CoBo (any version) needs a reference clock to generate CKR, CKW, etc.
+
+  - On CoBo 0.2v, CLKin0 is the Global Master Clock (GMC) from Mutant while CLKin0 is floating i.e. does not exist.
+  - On CoBo 1.0v, CLKin0 is the GMC from Mutant and CLKin1 is a backup crystal on CoBo for stand-alone mode.
+  
+  When Mutant is present, CoBo's reference clock is CLKin0, coming from Mutant's GMC. The SYNC signal should be coming from Mutant and the PLL should be configured to accept an external SYNC.
+  
+  In stand-alone mode (without a MuTanT module):
+  - on CoBo 0.2v, you just use the internal VCO with PLL1 shut off and PLL2 running;
+  - on CoBo 1.0v, you select the backup crystal.
+  
+  Also, in stand-alone mode, enabling SYNC_PLL1_DLD and SYNC_PLL2_DLD guarantees that the PLLs indeed lock to the backup crystal. However, they should be disabled when Mutant is used because you
+want the holdover mode to kick in to maintain the same phase and frequency of the PLLs if Mutant PLL lock is gone.
+
+  See NSCL's <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=cobo_clocking">Clocking</a> wiki page and ticket <a href="https://dsm-trac.cea.fr/get/ticket/79">79</a> for more details.
+
+<table border="1">
+  <caption>How to configure CoBo's PLL device.</caption>
+  <tr>
+    <th>Register</th>
+    <th>Parameter</th>
+    <th>CoBo 1.0v or 0.2v<br>With Mutant</th>
+    <th>CoBo 0.2v<br>Stand-alone</th>
+    <th>CoBo 1.0v<br>Stand-alone</th>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>R10</td>
+    <td>VCO_DIV</td>
+    <td>1</td><td>0</td><td>0</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td rowspan="5">R11</td>
+    <td>MODE</td>
+    <td>0</td><td>6</td><td>0</td>
+  </tr>
+  <tr>
+    <td>EN_SYNC</td>
+    <td>true</td><td>true</td><td>true</td>
+  </tr>
+    <tr style="font-weight:bold">
+    <td>SYNC_POL_INV</td>
+    <td>false</td><td>true</td><td>true</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>SYNC_EN_AUTO</td>
+    <td>false</td><td>true</td><td>true</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>SYNC_TYPE</td>
+    <td>0</td><td>2</td><td>3</td>
+  </tr>
+  <tr>
+    <td rowspan="4">R12</td>
+    <td>LD_MUX</td>
+    <td>1</td><td>1</td><td>1</td>
+  </tr>
+  <tr>
+    <td>LD_TYPE</td>
+    <td>3</td><td>3</td><td>3</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>SYNC_PLL2_DLD</td>
+    <td>false</td><td>false</td><td>true</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>SYNC_PLL1_DLD</td>
+    <td>false</td><td>false</td><td>true</td>
+  </tr>
+  <tr>
+    <td rowspan="8">R13</td>
+    <td>HOLDOVER_MUX</td>
+    <td>3</td><td>3</td><td>3</td>
+  </tr>
+  <tr>
+    <td>HOLDOVER_TYPE</td>
+    <td>3</td><td>3</td><td>3</td>
+  </tr>
+  <tr>
+    <td>Status_CLKin1_MUX</td>
+    <td>1</td><td>1</td><td>1</td>
+  </tr>
+  <tr>
+    <td>Status_CLKin0_TYPE</td>
+    <td>2</td><td>2</td><td>2</td>
+  </tr>
+  <tr>
+    <td>Status_CLKin0_MUX</td>
+    <td>1</td><td>1</td><td>1</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>CLKin_SELECT_MODE</td>
+    <td>0</td><td>0</td><td>1</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>EN_CLKin1</td>
+    <td>false</td><td>false</td><td>true</td>
+  </tr>
+  <tr style="font-weight:bold">
+    <td>EN_CLKin0</td>
+    <td>true</td><td>true</td><td>false</td>
+  </tr>
+  <tr>
+    <td>R14</td>
+    <td>Status_CLKin1_TYPE</td>
+    <td>0</td><td>0</td><td>0</td>
+  </tr>
+</table> 
+
+</p>
+
+@section sec_config_parameters_list List of parameters
+
+@subsection subsec_config_cobo CoBo
+@htmlonly
+<table border="1">
+<caption>Brief description of the CoBo configuration file parameters.</caption>
+<tr><th>Name</th><th>Type</th><th>Range</th><th>Description</th></tr>
+<tr><td>ECC.parallelProcessing</td><td>boolean</td><td>{true, false}</td><td>Whether to configure CoBo boards (and MuTanT modules) in parallel or sequentially.</td></tr>
+<tr><td>ECC.DataMonitor</td><td>boolean</td><td>{true, false}</td><td>Enables or disables the display of data within GetController</td></tr>
+<tr><td>ECC.Verbose</td><td>boolean</td><td>{true, false}</td><td>Controls the verbosity of GetController</td></tr>
+<tr><td>CoBo.isActive</td><td>boolean</td><td>{true, false}</td><td>Whether the CoBo board is active and should be configured.</td></tr>
+<tr><td>CoBo.Module.nbEvent</td><td>integer</td><td></td><td>Defines the number of events for GetController to acquire before stopping the acquisition.</td></tr>
+<tr><td>CoBo.Module.frameType</td><td>string</td><td>{standard, test, threeBytes, zeroSuppression}</td><td>Deprecated. Specific to 1 AGET firmware.</td></tr>
+<tr><td>CoBo.Module.dataSource</td><td>integer</td><td>[0, 255]</td><td>Value of the 'dataSource' field in the header of the data frames.
+This Data source ID typically refers to the detector or detector type from which the Frame data have been extracted.</td></tr>
+<tr><td>CoBo.Module.coboId</td><td>integer</td><td>[0, 255]</td><td>Value of the CoBo index in the header of the data frames.</td></tr>
+<tr><td>CoBo.Module.readoutDepth</td><td>integer</td><td>[0, 512]</td><td>Number of time bucket(s) to read starting from readout offset. See parameter 'ReadoutPointerOffset'.</td></tr>
+<tr><td>CoBo.Module.isAcqTestMode</td><td>boolean</td><td>{true, false}</td><td>Deprecated. Whether to send a ramp instead of real data.</td></tr>
+<tr><td>CoBo.Module.enableWriteHittedregister</td><td>boolean</td><td>{true, false}</td><td>This setting only has an effect when the selected channels (partial readout) mode is used. When enabled,
+additional channels that were not hit can be read out and channels that were hit can be suppressed (see parameter CoBo.AsAd.Aget.channel.Reading). The modified hit pattern is OR'ed and AND'ed with registers 'readAlways' and 'readIfHit' respectively.</td></tr>
+<tr><td>CoBo.Module.enableMem2pMode</td><td>boolean</td><td>{true, false}</td><td>This enables the 2p mode for experiments that are looking for 2 proton decay.</td></tr>
+<tr><td>CoBo.Module.multiplicityThreshold</td><td>integer</td><td></td><td>Threshold of the multiplicity trigger mode (total of the 4 AsAd's). In 2p mode, this setting is only used for the first
+trigger. See the <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/ReducedCoBoMultiplicitySetupGuide.pdf">Reduced CoBo Multiplicity Configuration</a> document.</td></tr>
+<tr><td>CoBo.Module.multiplicityThreshold_2p</td><td>integer</td><td></td><td>In 2p mode, multiplicity threshold for the second trigger.</td></tr>
+<tr><td>CoBo.Module.multWindowSize</td><td>integer</td><td></td><td>Number of samples to sum in the multiplicity sliding window for the multiplicity mode. This setting is used for both triggers in
+2p mode.</td></tr>
+<tr><td>CoBo.Module.multSubtractAverage</td><td>boolean</td><td></td><td>When set to true, a moving average of the AGET’s multiplicity signal is 
+subtracted before the multiplicity is sent to the sliding window. This shifts the baseline close to 0 and is recommended when multiplicity trigger is used.</td></tr>
+<tr><td>CoBo.Module.multSubtractDevs</td><td>integer</td><td>[0, 7]</td><td>Twice the number of absolute deviations to subtract from multiplicity signal.  In testing, a value of 4 (2 deviations) worked well to prevent noise from causing triggers.</td></tr>
+<tr><td>CoBo.Module.triggerMode</td><td>string</td><td>{external, external_2p, noTrigger, onMultiplicity, onMultiplicity_2p, onRequest, onRequest_2p, onSlowControl, onSlowControl_2p, periodically, periodically_2p}</td><td>Trigger mode: standby (NoTrigger), trigger on external LVCMOS signal using a 2.5 V SMA cable (External), trigger on multiplicity above threshold (onMultiplicity), software trigger (onRequest), trigger on pulse sent via the AsAd internal pulser (onSlowControl), trigger after specified delay (periodically). In 2p mode: External_2p (2 pulses needed), onMultiplicity_2p (2 different thresholds, one for each half-memory), onRequest_2p, onSlowControl_2p, periodically_2p.</td></tr>
+<tr><td>CoBo.Module.secondaryTriggerMode</td><td>string</td><td>{external, noTrigger, onMultiplicity, onRequest, onSlowControl, periodically}</td><td>Mode for the secondary trigger (pulses sent on connector J6, pin 4 for external trigger logic).</td></tr>
+<tr><td>CoBo.Module.externalTriggerMode</td><td>string</td><td>{external, noTrigger, onMultiplicity, onRequest, onSlowControl, periodically}</td><td>Old name of secondaryTriggerMode (still accepted).</td></tr>
+<tr><td>CoBo.Module.triggerPeriod</td><td>integer</td><td></td><td>Delay, in milliseconds, to wait for between trigger events, in periodic mode. Ignored if triggerPeriod_10ns is defined. The actual period of the trigger will be
+slightly longer than the setting, because the counter for the trigger does not run during event readout
+(dead time). In 2p mode, this register affects only the first trigger.</td></tr>
+<tr><td>CoBo.Module.triggerDelay</td><td>integer</td><td></td><td>Delay (units of 10 ns) between event causing the trigger and actual freeze of the AGET SCA memory. It is used to shift the event data in the SCA so that the whole event is captured.</td></tr>
+<tr><td>CoBo.Module.triggerDelay_2p</td><td>integer</td><td></td><td>Delay (units of 10 ns), in 2p mode, between event causing the second trigger and actual freeze of the AGET SCA  second memory.</td></tr>
+<tr><td>CoBo.Module.triggerTimeOut_2p</td><td>integer</td><td></td><td>Maximum duration (in units of 10ns), in 2p mode, during which the firmware waits for the second trigger. After this delay, the first trigger is cancelled and CoBo begins to wait for another event.</td></tr>
+<tr><td>CoBo.Module.triggerDeadTime_2p</td><td>integer</td><td></td><td>Delay (units of 10 ns) after the first trigger after which the second trigger can be issued, in 2p mode. In "multiplicity 2p mode", this deadtime allows to make sure the second half of the SCA memory has enough time to be filled.</td></tr>
+<tr><td>CoBo.Module.triggerTime_2p</td><td>integer</td><td></td><td>In periodic 2p mode, delay between the first and second triggers, in units of 10 ns (used for testing).</td></tr>
+<tr><td>CoBo.Module.writingClockFrequency</td><td>integer</td><td><ul><li>R-CoBo: 3.125, 6.25, 12.5, 25.0, 50.0, 100.0</li><li>M-CoBo: 2000 MHz/N</li></ul></td><td>Frequency of the CoBo SCA writing clock CKW, in MHz.</td></tr>
+<tr><td>CoBo.Module.readingClockFrequency</td><td>integer</td><td>{25.0}</td><td>Frequency of the CoBo SCA reading clock CKR, in MHz. It must be set to 25 MHz.</td></tr>
+<tr><td>CoBo.Module.readDataDelay</td><td>integer</td><td></td><td>Manual delay from rising edge of SCR to data availability in CoBo. See calibrateAutoReadDataDelay and enableAutoReadDataDelay.</td></tr>
+<tr><td>CoBo.Module.calibrateAutoReadDataDelay</td><td>boolean</td><td>{true, false}</td><td>Whether the board shall automatically determine the cable delay during calibration.</td></tr>
+<tr><td>CoBo.Module.enableAutoReadDataDelay</td><td>boolean</td><td>{true, false}</td><td>Whether to use the automatic (true) or manual (false) read data delay.</td></tr>
+<tr><td>CoBo.Module.writeReadDelay</td><td></td><td></td><td>Delay (10 ns) between SCW low and SCR high. Also known as 'scwScrDelay'. Always set this to 0, it is only used for AGET testing.</td></tr>
+<tr><td>CoBo.Module.scwMultDelay</td><td></td><td></td><td>Delay, in CKR clock cycle(s), from rising edge of SCW signal to start of multiplicity sliding window. Always set this to a value of at least 50. When using multiplicity mode, the AGET v1.0 sends a pulse on
+the multiplicity data after the rising edge of SCW. This register sets a delay after the edge of SCW where
+the Reduced CoBo ignores the multiplicity data. (Otherwise the Reduced CoBo will trigger on the pulse
+and it will be impossible to get real data.)</td></tr>
+<tr><td>CoBo.Module.useExternalTimeReset</td><td>boolean</td><td>{true, false}</td><td>Whether to reset the timestamp and event counters through slow control at the beginning of each run (false) or not (true). This parameter should be enabled when using multiple boards in an experiment and disabled when a
+single Reduced CoBo is used.</td></tr>
+<tr><td>CoBo.Module.enableZeroSuppression</td><td>boolean</td><td>{true, false}</td><td>Whether to enable or disable zero suppression by CoBo. Each channel's zero suppression threshold should be set.</td></tr>
+<tr><td>CoBo.Module.zeroSuppressionInverted</td><td>boolean</td><td>{true, false}</td><td>Sets the polarity of the zero suppression threshold.</td></tr>
+<tr><td>CoBo.Module.skipPLLConfig</td><td>boolean</td><td>{true, false}</td><td>Debugging parameter; if set to true, the configuration of the CoBo PLL device will be skipped.</td></tr>
+<tr><td>CoBo.Module.PLL.VCO_DIV</td><td>integer</td><td>[0, 6]</td><td rowspan=19>Advanced configuration parameters for the CoBo PLL device.<br/>See LMK04806 datasheet.</td></tr>
+<tr><td>CoBo.Module.PLL.MODE</td><td>integer</td><td>[0, 16]</td></tr>
+<tr><td>CoBo.Module.PLL.EN_SYNC</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.SYNC_POL_INV</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.SYNC_EN_AUTO</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.SYNC_TYPE</td><td>integer</td><td>[0,6]</td></tr>
+<tr><td>CoBo.Module.PLL.LD_MUX</td><td>integer</td><td>[0, 18]</td></tr>
+<tr><td>CoBo.Module.PLL.LD_TYPE</td><td>integer</td><td>[0, 6]</td></tr>
+<tr><td>CoBo.Module.PLL.SYNC_PLL2_DLD</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.SYNC_PLL1_DLD</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.HOLDOVER_MUX</td><td>integer</td><td>[0, 18]</td></tr>
+<tr><td>CoBo.Module.PLL.HOLDOVER_TYPE</td><td>integer</td><td>[0, 6]</td></tr>
+<tr><td>CoBo.Module.PLL.Status_CLKin1_MUX</td><td>integer</td><td>[0, 6]</td></tr>
+<tr><td>CoBo.Module.PLL.Status_CLKin0_TYPE</td><td>integer</td><td>[0, 6]</td></tr>
+<tr><td>CoBo.Module.PLL.Status_CLKin0_MUX</td><td>integer</td><td>[0, 6]</td></tr>
+<tr><td>CoBo.Module.PLL.CLKin_SELECT_MODE</td><td>integer</td><td>[0, 7]</td></tr>
+<tr><td>CoBo.Module.PLL.EN_CLKin1</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.EN_CLKin0</td><td>boolean</td><td>{true, false}</td></tr>
+<tr><td>CoBo.Module.PLL.Status_CLKin1_TYPE</td><td>integer</td><td>[0, 6]</td></tr>
+<tr><td>CoBo.LEMO.L[*].function</td><td>string</td><td><ul><li>busy_output</li><li>external_timestamp_reset_input</li><li>external_trigger_input</li><li>none</li><li>pll_clkin0_input</li><li>pll_clkin0_output</li><li>pll_clkin1_input</li><li>pll_clkin1_output</li><li>pll_holdover_output</li><li>pll_ld_output</li><li>pll_sync_input</li><li>pll_sync_output</li><li>trigger_pulse_output</li></td><td>Defines the function of each of the 4 LEMO connectors on the CoBo front panel.It is OK for more than one LEMO to share the same function.  If multiple LEMOs are configured to the same input signal, the firmware will OR the signals.</td></tr>
+<tr><td>CoBo.Generator.amplitudeStart</td><td>integer</td><td>[-1000.0, 1000.0]</td><td>Value to (initially) set the output voltage of the generator to, expressed in mV w.r.t Vref= 1102mV. Together with <em>defaultVoltage</em>, it defines the amplitude of the AsAd pulser voltage step.</td></tr>
+<tr><td>CoBo.Generator.amplitudeStop</td><td>integer</td><td>[-1000.0, 1000.0]</td><td>Specific to the AGET test bench. Final amplitude, in mV, of internal AsAd pulser, when using calibration ramp.</td></tr>
+<tr><td>CoBo.Generator.amplitudeStep</td><td>integer</td><td></td><td>Specific to the AGET test bench. Step, in mV, between amplitude increments.</td></tr>
+<tr><td>CoBo.Generator.periodicModeEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether CoBo should periodically trigger the AsAd pulser.</td></tr>
+<tr><td>CoBo.Generator.period_ms</td><td>integer</td><td></td><td>Period (ms) at which the AsAd pulser is triggered.</td></tr>
+<tr><td>CoBo.Generator.doublePulseEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether CoBo should trigger the AsAd pulser twice per period instead of once.</td></tr>
+<tr><td>CoBo.Generator.secondPulseAmplitude</td><td>integer</td><td>[-1000.0, 1000.0]</td><td>Amplitude, in mV, of the second pulse when in double pulse mode.</td></tr>
+<tr><td>CoBo.Generator.poissonModeEnabled</td><td>boolean</td><td>{true, false}</td><td>Enables AsAd pulser pseudo-random Poisson mode instead of the strictly periodic mode.</td></tr>
+<tr><td>CoBo.Generator.defaultVoltage</td><td>integer</td><td>[-1000.0, 1000.0]</td><td>Default voltage at the output of the generator, expressed in mV w.r.t Vref= 1102mV.</td></tr>
+<tr><td>CoBo.Generator.externalTriggerMode</td><td>boolean</td><td>{true, false}</td><td>Whether voltage steps should be triggered from an AsAd ISP1 external signal rather than from the end of LSB data register loading. See GET-AS-002-0003.</td></tr>
+<tr><td>CoBo.CircularBuffer.startOfMemory</td><td>hexadecimal</td><td></td><td>Memory address of the beginning of the circular buffer of AsAd 0. Unused if defined at the AsAd level.</td></tr>
+<tr><td>CoBo.CircularBuffer.endOfMemory</td><td>hexadecimal</td><td></td><td>Memory address of the end of the circular buffer of AsAd 3. Unused if defined at the AsAd level.</td></tr>
+<tr><td>CoBo.CircularBuffer.interruptRate</td><td>hexadecimal</td><td></td><td>Number of events per CPU interrupt.</td></tr>
+<tr><td>CoBo.CircularBuffer.levelAlmostFullMemory</td><td>hexadecimal</td><td></td><td>Threshold (Bytes) indicating the amount of free space below which the firmware stops writing in the circular buffer. Should be greater than the maximum frame size.</td></tr>
+<tr><td>CoBo.CircularBuffer.levelAlmostEmptyMemory</td><td>hexadecimal</td><td></td><td>Level (Bytes) below which the firmware resumes writing data to the circular buffer.</td></tr>
+<tr><td>CoBo.Alarms.subscribe</td><td>boolean</td><td>{true, false}</td><td>Whether to subscribe to alarm notifications from CoBo.</td></tr>
+<tr><td>CoBo.Alarms.checkAsAd</td><td>boolean</td><td>{true, false}</td><td>Whether CoBo should check for AsAd alarms periodically.</td></tr>
+<tr><td>CoBo.AsAd.Control.isActive</td><td>boolean</td><td></td><td>Whether the AsAd board is active and should be configured.</td></tr>
+<tr><td>CoBo.AsAd.Control.checkPowerSupply</td><td>boolean</td><td></td><td>Whether to abort when the check of the AsAd power supply connection fails.</td></tr>
+<tr><td>CoBo.AsAd.Control.calibrationAgetId</td><td>integer</td><td>[0, 3]</td><td>Which of the 4 AGET chips to use for the delay calibration.</td></tr>
+<tr><td>CoBo.AsAd.Clocking.samplingClockDivider</td><td>float</td><td>[1.0, 200.0]</td><td>Ratio between writing clock frequency CKW provided by CoBo and actual sampling frequency WCKn.</td></tr>
+<tr><td>CoBo.AsAd.Clocking.phaseShiftAdcClock</td><td>integer</td><td>{0, 90, 180, 270}</td><td>Phase shift, in degrees, between master clock and ADC clock. Used to control the data sampling time. Always set to 270 degrees.</td></tr>
+<tr><td>CoBo.AsAd.Clocking.delayAdcClock</td><td>integer</td><td>{-5335, -5175, -5015, -4855, -4695, -4535, -4375, -4215, -4055, -3895, -3735, -3575, -3415, -3255, -3095, -2935, -2775, -2615, -2455, -2295, -2135, -1975, -1815, -1655, -1495, -1335, -1175, -1015, -855, -695, -535, 0, 535, 695, 855, 1015, 1175, 1335, 1495, 1655, 1815, 1975, 2135, 2295, 2455, 2615, 2775, 2935, 3095, 3255, 3415, 3575, 3735, 3895, 4055, 4215, 4375, 4535, 4695, 4855, 5015, 5175, 5335}</td><td>ADC clock delay, in ps, to fine tune the data sampling time. Always set to 5335 ps.</td></tr>
+<tr><td>CoBo.AsAd.Generator.isCalibMode</td><td>boolean</td><td>{true, false}</td><td>Switches between modes where the pulser signal goes directly to the AGET test input or goes through a calibrated external capacitor emulating a charge. Sets the T/C bit of the AsAd TCM0 register.</td></tr>
+<tr><td>CoBo.AsAd.Generator.injectValue</td><td>string</td><td>{1pF, 11pF}</td><td>Switches between two external capacitor values (1pF and 11pF). Register TCM0 bit RNG.</td></tr>
+<tr><td>CoBo.AsAd.CircularBuffer.startOfMemory</td><td>hexadecimal</td><td></td><td>Memory address of the beginning of the circular buffer of this AsAd board.</td></tr>
+<tr><td>CoBo.AsAd.CircularBuffer.endOfMemory</td><td>hexadecimal</td><td></td><td>Memory address of the end of the circular buffer of this AsAd board.</td></tr>
+<tr><td>CoBo.AsAd.ADC.*</td><td></td><td></td><td>Always leave at the default values. To be documented. See AsAd documentation.</td></tr>
+<tr style="border-bottom:solid 1px black"><th colspan="3">AsAd: Inspection Manager</th><td>See AsAd External Instruments Interface and AsAd Firmware Description documents</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.deviceToInspect</td><td>string</td><td>{ADC, AGET0, AGET1, AGET2, AGET3, DAC, ID, IM, LCM, Multiplicity, MONITOR, SCA0, SCA1, SCA2, SCA3, TCM}</td><td>Name of the device to inspect.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.ADC.ISP1</td><td>string</td><td>{CKR, CKS, MOSI, SPI_CS}</td><td>Name of ISP1 signal in Analog to Digital Converter device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.ADC.ISP2</td><td>string</td><td>{ACK, CAS, RCK, SPI_CK}</td><td>Name of ISP2 signal in Analog to Digital Converter device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET0.ISP1</td><td>string</td><td>{CKP, DIN, DOUT, SC_CS}</td><td>Name of ISP1 signal in AGET0 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET0.ISP2</td><td>string</td><td>{A0C, CA0, LAST_INIT, SC_CK}</td><td>Name of ISP2 signal in AGET0 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET1.ISP1</td><td>string</td><td>{CKP, DIN, DOUT, SC_CS}</td><td>Name of ISP1 signal in AGET1 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET1.ISP2</td><td>string</td><td>{A1C, CA1, LAST_INIT, SC_CK}</td><td>Name of ISP2 signal in AGET1 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET2.ISP1</td><td>string</td><td>{CKP, DIN, DOUT, SC_CS}</td><td>Name of ISP1 signal in AGET2 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET2.ISP2</td><td>string</td><td>{A2C, CA2, LAST_INIT, SC_CK}</td><td>Name of ISP2 signal in AGET2 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET3.ISP1</td><td>string</td><td>{CKP, DIN, DOUT, SC_CS}</td><td>Name of ISP1 signal in AGET3 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.AGET3.ISP2</td><td>string</td><td>{A3C, CA3, LAST_INIT, SC_CK}</td><td>Name of ISP2 signal in AGET3 Serial Control device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.DAC.ISP1</td><td>string</td><td>{CKS, MISO, MOSI, SPI_CS}</td><td>Name of ISP1 signal in Digital to Analog Converter device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.DAC.ISP2</td><td>string</td><td>{ACS, CAS, RESET_FAST, SPI_CK}</td><td>Name of ISP2 signal in Digital to Analog Converter device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.ID.ISP1</td><td>string</td><td>{CKS, MISO, MOSI, SPI_CS}</td><td>Name of ISP1 signal in Identifier device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.ID.ISP2</td><td>string</td><td>{ACS, CAS, IDLE, SPI_CK}</td><td>Name of ISP2 signal in Identifier device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.IM.ISP1</td><td>string</td><td>{CKS, MISO, MOSI, SPI_CS}</td><td>Name of ISP1 signal in Input Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.IM.ISP2</td><td>string</td><td>{ACS, CAS, IDLE, SPI_CK}</td><td>Name of ISP2 signal in Input Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.LCM.ISP1</td><td>string</td><td>{CKS, MOSI2, SPI_CK1, SPI_CS2}</td><td>Name of ISP1 signal in Local Clock Manager 1 and 2 device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.LCM.ISP2</td><td>string</td><td>{CAS, MOSI1, SPI_CK2, SPI_CS1}</td><td>Name of ISP2 signal in Local Clock Manager 1 and 2 device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.MONITOR.ISP1</td><td>string</td><td>{CKS, MISO, MOSI, SPI_CS}</td><td>Name of ISP1 signal in Monitoring device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.MONITOR.ISP2</td><td>string</td><td>{ACS, CAS, IDLE, SPI_CK}</td><td>Name of ISP2 signal in Monitoring device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.Multiplicity.ISP1</td><td>string</td><td>{CKO, TRGint}</td><td>Name of ISP1 signal in Multiplicity inspection device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.Multiplicity.ISP2</td><td>string</td><td>{CKO, CKW, DISCT0, DISCT1, DISCT2, DISCT3, SCW, TRGext}</td><td>Name of ISP2 signal in Multiplicity inspection device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA0.ISP1</td><td>string</td><td>{CKR, CKW, SCR_AGET, SCW_AGET}</td><td>Name of ISP1 signal in AGET0 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA0.ISP2</td><td>string</td><td>{RCK, SCR, SCW, WCK}</td><td>Name of ISP2 signal in AGET0 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA1.ISP1</td><td>string</td><td>{CKR, CKW, SCR_AGET, SCW_AGET}</td><td>Name of ISP1 signal in AGET1 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA1.ISP2</td><td>string</td><td>{RCK, SCR, SCW, WCK}</td><td>Name of ISP2 signal in AGET1 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA2.ISP1</td><td>string</td><td>{CKR, CKW, SCR_AGET, SCW_AGET}</td><td>Name of ISP1 signal in AGET2 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA2.ISP2</td><td>string</td><td>{RCK, SCR, SCW, WCK}</td><td>Name of ISP2 signal in AGET2 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA3.ISP1</td><td>string</td><td>{CKR, CKW, SCR_AGET, SCW_AGET}</td><td>Name of ISP1 signal in AGET3 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.SCA3.ISP2</td><td>string</td><td>{RCK, SCR, SCW, WCK}</td><td>Name of ISP2 signal in AGET3 SCA Manager device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.TCM.ISP1</td><td>string</td><td>{CKS, MISO, MOSI, SPI_CS}</td><td>Name of ISP1 signal in Test and Calibration device.</td></tr>
+<tr><td>CoBo.AsAd.InspectionLines.TCM.ISP2</td><td>string</td><td>{ACS, CAS, CKO, SPI_CK}</td><td>Name of ISP2 signal in Test and Calibration device.</td></tr>
+<tr><th colspan="4">AsAd: Monitoring</th></tr>
+<tr><td>CoBo.AsAd.Monitoring.isAlarmSet</td><td>boolean</td><td>{true, false}</td><td>Enables or disables AsAd alerts. See GET-AS-002-004.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.averagingDisabled</td><td>boolean</td><td>{true, false}</td><td>Whether to disable averaging of 16 measurements for all monitored items.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.fastConversionEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether to use ADC for monitoring in fast conversion mode (22.5 kHz) instead of 1.4 kHz.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.singleChannelModeEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether to use single channel mode instead of round-robin mode.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.singleChannelItem</td><td>string</td><td>{IDD, Text, Tint, VDD, VDD1}</td><td>Item to monitor when in single channel mode.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsVDD.lowerValue</td><td>float</td><td>[0.0, 3.74]</td><td>Lower limit of the AsAd 'VDD' main supply voltage [V].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsVDD.upperValue</td><td>float</td><td>[0.0, 3.74]</td><td>Upper limit of the AsAd 'VDD' main supply voltage [V].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsVDD.disableAlerts</td><td>boolean</td><td>{true, false}</td><td>Whether to disable VDD alerts.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsVDD1.lowerValue</td><td>float</td><td>[0.0, 7.0]</td><td>Lower limit of the AsAd 'VDD1' voltage [V].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsVDD1.upperValue</td><td>float</td><td>[0.0, 7.0]</td><td>Upper limit of the AsAd 'VDD1' voltage [V].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsIDD.lowerValue</td><td>float</td><td>[0.0, 3.0]</td><td>Lower limit of the AsAd 'IDD' current sunk through 'VDD' [A].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsIDD.upperValue</td><td>float</td><td>[0.0, 3.0]</td><td>Upper limit of the AsAd 'IDD' current sunk through 'VDD' [A].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsIDD.disableAlerts</td><td>boolean</td><td>{true, false}</td><td>Whether to disable IDD alerts.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsTint.lowerValue</td><td>integer</td><td>[0, 127]</td><td>Lower limit of the AsAd on-chip temperature 'Tint' [Celsius].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsTint.upperValue</td><td>integer</td><td>[0, 127]</td><td>Upper limit of the AsAd on-chip temperature 'Tint' [Celsius].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsText.lowerValue</td><td>integer</td><td>[0, 127]</td><td>Lower limit of the AsAd ADC-chips surroundings temperature 'Text' [Celsius].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsText.upperValue</td><td>integer</td><td>[0, 127]</td><td>Upper limit of the AsAd ADC-chips surroundings temperature 'Text' [Celsius].</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsText.disableAlertsTooHigh</td><td>boolean</td><td>{true, false}</td><td>Whether to disable alerts for 'Text' too high.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsText.disableAlertsTooLow</td><td>boolean</td><td>{true, false}</td><td>Whether to disable alerts for 'Text' too low.</td></tr>
+<tr><td>CoBo.AsAd.Monitoring.LimitsText.disableAlertsOutOfOrder</td><td>boolean</td><td>{true, false}</td><td>Whether to disable alerts for 'Text' sensor out of order.</td></tr>
+<tr style="border-bottom:solid 1px black"><th colspan="4">AGET</th></tr>
+<tr><td>CoBo.AsAd.Aget.Control.isActive</td><td>boolean</td><td>{true, false}</td><td>Whether the AGET chip should be configured.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.isAllChannelSelected</td><td>boolean</td><td>{true, false}</td><td>Deprecated.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.Position</td><td>string</td><td>{All, Four, One, Three, Two}</td><td>Deprecated. Use 'enableAsAdPosition' instead.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.enableAsAdPosition</td><td>boolean</td><td>{true, false}</td><td>Whether to enable AsAd ADC channel, readout command and sampling commands for this position.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.connectGroundToZAP</td><td>boolean</td><td>{true, false}</td><td>Whether VDD (false) or ground (true) should be switched at pins 77&78 of ZAP interface. Used to set AsAd 'IM0' register bit 'SWZ'.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.antiSparklingEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether to enable AsAd anti-sparkling protection for this AGET chip. Used to set AsAd 'IM1' register bit 'Dbi'.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.isGainAsChannel0</td><td>boolean</td><td>{true, false}</td><td>Deprecated?</td></tr>
+<tr><td>CoBo.AsAd.Aget.Control.scCheckMode</td><td>boolean</td><td>{true, false}</td><td>Whether to systematically check the slow control writing of AGET registers has been successful.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.ReadoutPointerOffset</td><td>integer</td><td></td><td>Time bucket offset to start reading from. See AGET register 12.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.suppressMultiplicity</td><td>boolean</td><td>{true, false}</td><td>Whether, in multiplicity trigger mode, the multiplicity of this AGET chip should be ignored (true) or not (false). See the Reduced CoBo Multiplicity Setup Guide.</td></tr>
+<tr style="border-bottom:solid 1px black"><th colspan="4">AGET: Register 1</th></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isIcsax2</td><td>boolean</td><td>{true, false}</td><td>If set, the nominal CSA bias current is multiplied by two.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.TestModeRange</td><td>string</td><td>{10pF, 120fF, 1pF, 240fF}</td><td>Internal test capacitor value.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.peackingTime</td><td>integer</td><td>{70, 117, 232, 280, 334, 383, 502, 541, 568, 632, 721, 760, 831, 870, 976, 1014}<br>{68, 116, 180, 225, 343, 442, 541, 641, 739, 836, 943, 1039, 2034, 3985, 5770, 7700}</td><td>Peaking time (ns) of the shaper. Different values for AGET and ASTRE.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.TestModeSelection</td><td>string</td><td>{calibration, functionality, nothing, test}</td><td>Selects the acquisition mode: nothing (physics mode); test; functional; calibration.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.IntegrationMode</td><td>string</td><td>{fixed_500ns, variable}</td><td>Selects variable (peaking time) or fixed 500 ns mode for the Pole Zero Cancellation circuit.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.SCA_Pointer</td><td>string</td><td>{anySCAPointer, col_0or128or256or384, col_0or256, column_0}</td><td>Defines the time marker of the SCA pointer pass. This marker defines the memory time of the trigger in the hit register.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.SCA_Splitting</td><td>boolean</td><td>{true, false}</td><td>Separates the SCA memory into two SCA of 256 cells (2p mode).</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.is32channels</td><td>boolean</td><td>{true, false}</td><td>Enables use of only 32 AGET channels instead of 64. Must be set to false, since the Reduced CoBo does not support 32 channels mode.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isAllChannelRead</td><td>boolean</td><td>{true, false}</td><td>Enables the full readout mode. This setting must be set the same for every AGET, since the Reduced CoBo firmware logic that processes the data is shared across all four AGETs.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isFPNRead</td><td>boolean</td><td>{true, false}</td><td>Enables the reading of Fixed Pattern Noise channels.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isPositivePolarity</td><td>boolean</td><td>{true, false}</td><td>Selects the input charge polarity (micromegas/GEM vs wire chamber).</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.Vicm</td><td>string</td><td>{1.25V, 1.35V, 1.55V, 1.65V}</td><td>Selects the input common mode voltage of the analog output buffer.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.GlobalThresholdValue</td><td>integer</td><td>[0, 7]</td><td>Value of the 3 most significant bits of the DAC threshold (common to all channels).</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isThresholdSignedPositive</td><td>boolean</td><td>{true, false}</td><td>Polarity of the DAC threshold.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.TriggerVetoOption</td><td>string</td><td>{4us, HitRegisterWidth, Undefined, none}</td><td>Specifies the use of the veto on the trigger building. Defines how long after a hit the channel can be read again.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isckwriteSynchro</td><td>boolean</td><td>{true, false}</td><td>Enables the sampling and synchronization of the output discriminator on the rising edge of the SCA CKW signal.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isTOTActive</td><td>boolean</td><td>{true, false}</td><td>Allows to have a trigger signal with the same width as the one of the discriminator output signal (Time Over Threshold).</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.isTriggerWidth200ns</td><td>boolean</td><td>{true, false}</td><td>Defines the width range of the trigger signal (100ns or 200 ns).</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.TriggerWidthRange</td><td>string</td><td>{width0, width1, width2, width3}</td><td>Adjusts the value of the trigger according to the process corners (table 15 and 16) and to the value of the Range_trigg_width value. Also controls the value of unity multiplicity signal.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg1.ExternalLink</td><td>string</td><td>{CSAStandby, Gain-2Input, SKFilterInput, none}</td><td>Specifies the access point in the external mode.</td></tr>
+<tr style="border-bottom:solid 1px black"><th colspan="4">AGET: Register 2</th></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.DebugSelection</td><td>string</td><td>{CR, CSA, Gain-2, NegativeInputDiscri, PositiveInputDiscri, none, standby, trigger}</td><td>Selects the internal signal multiplexed toward the Out_debug pin to be viewed on an oscilloscope.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isReadFromColumn0</td><td>boolean</td><td>{true, false}</td><td>If enabled, forces to start the readout from the physical column 0. In the normal mode (false), the readout starts from the column following the last written.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isDigitalOutputTest</td><td>boolean</td><td>{true, false}</td><td>If enabled, a test pattern is serialized to the output instead of the 9 bit address of the last read column.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isResetLevelUndefined</td><td>boolean</td><td>{true, false}</td><td>Specifies the reset level of the analog output during the reset operation. It must be set to false.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isMarkerEnable</td><td>boolean</td><td>{true, false}</td><td>If set, a digital marker (near gnd or vdd levels) is multiplexed to the analog output during the first of the reset states.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isResetLevelVdd</td><td>boolean</td><td>{true, false}</td><td>Sets the level of the digital marker (when isMarkerEnable is set). True means level near gnd; false means level near Vdd.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isBoostPower</td><td>boolean</td><td>{true, false}</td><td>If set, the output current of the GAIN-2 amplifier is increased by +20%.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isOutputscCkSynchro</td><td>boolean</td><td>{true, false}</td><td>If set, the Sc_dout output data is resynchronized by a clock edge Sc_ck, selected by isSynchroEdgeFalling.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isSynchroEdgeFalling</td><td>boolean</td><td>{true, false}</td><td>Selects the edge for the synchronizing of the Sc_dout output data. False selects the rising edge, true the falling.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isSCoutputBufferInTriState</td><td>boolean</td><td>{true, false}</td><td>If set, inhibits the 3rd state functionality of the Slow Control output buffer.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.currentBias</td><td>string</td><td>{current0, current1, current2, current3}</td><td>Controls the bias current of the 68 SCA line readout buffers.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.bufferCurrent</td><td>string</td><td>{1.503mA, 1.914mA, 2.7mA, 4.870mA}</td><td>Controls the bias current of the SCA output buffers.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isPWDonWrite</td><td>boolean</td><td>{true, false}</td><td>If set, puts the write section in power down mode.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isPWDonRead</td><td>boolean</td><td>{true, false}</td><td>If set, puts the read section in power down mode.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isAlternatePower</td><td>boolean</td><td>{true, false}</td><td>Sets alternatively the read and write sections in power down mode.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.is1bitShortResetReadSeq</td><td>boolean</td><td>{true, false}</td><td>Controls the length of the reset level data which is initially sent before the analog data of each SCA column in the SCA readout phase. Must be set to true because the Reduced CoBo does not support the long reset sequence.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isTriggerOutputDisable</td><td>boolean</td><td>{true, false}</td><td>Enables (false) or disables (true) the output of the trigger signal.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.isRisingedgeWriteAutoresetBank</td><td>boolean</td><td>{true, false}</td><td>Controls whether the reset of the SCA pointer is done on the write signal with a width equal to the SCAwrite clock (false) or automatically on the rising edge of the write signal (true).</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.islvdsTriggerOutput</td><td>boolean</td><td>{true, false}</td><td>This bit permits to disable (false) or enable (true) the output of the trigger signal in LVDS levels on the pads 85 and 86.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.inputDynamicRange_5pct</td><td>boolean</td><td>{true, false}</td><td>In AGET 2.2, the input dynamic range of the discriminator can be fixed to 5 percent (true) or 17.5 percent (false) of the input dynamic range of the analog channel. See AGET Data Sheet.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.triggerLvdsThreshold</td><td>integer</td><td>{1, 2, 4, 8}</td><td>ASTRE only. Multiplicity level for the LVDS trigger. See ASTRE Data Sheet.</td></tr>
+<tr><td>CoBo.AsAd.Aget.Global.Reg2.multiplicityLevel</td><td>integer</td><td>{1, 2, 4, 8}</td><td>ASTRE only. Unity multiplicity level. See ASTRE Data Sheet.</td></tr>
+<tr><th colspan="4">AGET: channel specific parameters</th></tr>
+<tr><td>CoBo.AsAd.Aget.channel.isActive</td><td>boolean</td><td>{true, false}</td><td>If false, sets isSelectedforTestMode=false, TriggerInhibition=none, LSBThresholdValue=0, Gain=120fC, Reading=never.</td></tr>
+<tr><td>CoBo.AsAd.Aget.channel.isSelectedforTestMode</td><td>boolean</td><td>{true, false}</td><td>Switch between physics mode and test mode (input capacitor for injection).</td></tr>
+<tr><td>CoBo.AsAd.Aget.channel.TriggerInhibition</td><td>string</td><td>{none, inhibit_channel, inhibit_trigger}</td><td>Permits to inhibit the contribution of a specific channel to the multiplicity (inhibit_trigger), or to both the multiplicity and the hit register (inhibit_channel). Only applies to the 64 physical channels. See registers 10 and 11 in AGET Data Sheet.</td></tr>
+<tr><td>CoBo.AsAd.Aget.channel.LSBThresholdValue</td><td>integer</td><td>[0, 15]</td><td>Value of the individual DAC threshold for the channel (4 least significant bits).</td></tr>
+<tr><td>CoBo.AsAd.Aget.channel.Gain</td><td>string</td><td>{10pC, 120fC, 1pC, 240fC}</td><td>Value of the channel gain (CSA charge capacitor).</td></tr>
+<tr><td>CoBo.AsAd.Aget.channel.Reading</td><td>string</td><td>{always, never, only_if_hit}</td><td>When to read the channel. This register only has an effect if 'isAllChannelRead' is set to false and 'enableWriteHittedregister' is set to true. If 'isAllChannelRead' is true, the channel will be read regardless of the setting in this register.
+If 'isAllChannelRead' and 'enableWriteHittedregister' are both false, the channel will only be read if it has been hit.</td></tr>
+<tr><td>CoBo.AsAd.Aget.channel.zeroSuppressionThreshold</td><td>integer</td><td>[0, 4095]</td><td>Threshold, below which to suppress data, for this channel. Has no effect unless 'enableZeroSuppression' is set.</td></tr>
+</table>
+@endhtmlonly
+@latexonly
+Refer to the HTML documentation for the list of configuration parameters.
+@endlatexonly
+
+@subsection subsec_config_mutant Mutant
+@htmlonly
+<table border="1">
+<caption>Brief description of the Mutant configuration file parameters.</caption>
+<tr><th>Name</th><th>Type</th><th>Range</th><th>Description</th></tr>
+<tr><td>Mutant.isSlave</td><td>boolean</td><td>{true, false}</td><td>Whether the MuTanT module is a master or a slave module.</td></tr>
+<tr><td>Mutant.readoutModeEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether to enable Mutant readout.</td></tr>
+<tr><td>Mutant.testModeEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether to enable the Mutant test mode.</td></tr>
+<tr><td>Mutant.centrumScalerInterface</td><td>string</td><td>{CENTRUM, Disabled, Scalers}</td><td>Whether to enable coupling with CENTRUM, or disable the CS interface, or enable scaler channels.</td></tr>
+<tr><td>Mutant.sourceId</td><td>integer</td><td>[0, 255]<td></td></tr>
+<tr><td>Mutant.frameType</td><td>integer</td><td>[0, 0]<td>Type of Mutant data frame (only one type so far).</td></tr>
+<tr><td>Mutant.preLoadTimestamp</td><td>boolean</td><td>{true, false}</td><td>Whether to preload Universal Clock counter and 2 proton time counter values during configuration.</td></tr>
+<tr><td>Mutant.preLoadedTimestamp</td><td></td><td></td><td>Value of the 48-bit timestamp to preload, in units of 10 ns, in 3 16-bit chunks</td></tr>
+<tr><td>Mutant.preLoadEventNumber</td><td>boolean</td><td>{true, false}</td><td>Whether to preload event counter value during configuration.</td></tr>
+<tr><td>Mutant.preLoadedEventNumber</td><td>hexadecimal</td><td>[0x0, 0xFFFFFFFF]</td><td>Value of the 32-bit event number to preload</td></tr>
+<tr><td>Mutant.clearCounters</td><td>boolean</td><td>{true, false}</td><td>Whether to reset all event counters during configuration and at the start of the run.</td></tr>
+<tr><td>Mutant.vcxoControl</td><td>hexadecimal</td><td>[0x0, 0xFF]</td><td>8 bit SPI digital potentiometer for tuning the VCXO frequency.</td></tr>
+<tr><td>Mutant.Master.enablePortA</td><td>boolean</td><td>{true, false}</td><td></td></tr>
+<tr><td>Mutant.Master.enablePortB</td><td>boolean</td><td>{true, false}</td><td></td></tr>
+<tr><td>Mutant.Slave.slavePort</td><td>string</td><td>{A, B}</td><td>Port from which this slave module is connected to master module (A means that connection is between slave port A and master port B).</td></tr>
+<tr><td>Mutant.Slave.slaveId</td><td>integer</td><td>{0, 1}</td><td>Slave number (for now, should be 0 if slave is connected from its port A to master port B, 1 otherwise).</td></tr>
+<tr><td>Mutant.Scalers.clearScalers</td><td>boolean</td><td>{true, false}</td><td>Whether to reset all scaler counters during configuration and at the start of the run.</td></tr>
+<tr><td>Mutant.Scalers.enableScaler[*]</td><td>boolean</td><td>{true, false}</td><td>Whether to enable counting for the given scaler or not.</td></tr>
+<tr><td>Mutant.levelPriority</td><td>string</td><td>{L0L1, L1L0}</td><td>L0L1: external trigger (L0) starts a coincidence window waiting for a valid L1 event;
+ L1L0: when Level 1 trigger occurs, a coincidence window is opened waiting for a L0 trigger validation.</td></tr>
+<tr><td>Mutant.Level[0].isEnabled</td><td>boolean</td><td>{true, false}</td><td>Enables Level 0 (external) trigger</td></tr>
+<tr><td>Mutant.Level[0].gateDelay</td><td>real</td><td>[0, 655.35]</td><td>Delay of the Level 0 gate, in microseconds</td></tr>
+<tr><td>Mutant.Level[0].gateDuration</td><td>real</td><td>[0.01, 655.35]</td><td>Duration of the Level 0 gate, in microseconds</td></tr>
+<tr><td>Mutant.Level[1].isEnabled</td><td>boolean</td><td>{true, false}</td><td>Enables Level 1 (multiplicity) trigger</td></tr>
+<tr><td>Mutant.Level[1].selection</td><td>string</td><td>{AND, HIGH, LOW, OR}</td><td>Condition for a valid L1 trigger: only low threshold, only high threshold, either, or both.</td></tr>
+<tr><td>Mutant.Level[1].postTriggerDelay</td><td>real</td><td>[0, 655.35]</td><td>Time added to a valid L1 trigger in order to delay the STOP sampling, in microseconds.</td></tr>
+<tr><td>Mutant.Level[1].L1A.lowMultThreshold</td><td>integer</td><td>[1, 65535]</td><td>Low multiplicity threshold.</td>
+<tr><td>Mutant.Level[1].L1A.highMultThreshold</td><td>integer</td><td>[1, 65535]</td><td>High multiplicity threshold.</td>
+<tr><td>Mutant.Level[1].L1A.lowNumBuckets</td><td>integer</td><td>[1, 511]</td><td>Number of buckets for Level 1A low trigger.</td>
+<tr><td>Mutant.Level[1].L1A.highNumBuckets</td><td>integer</td><td>[1, 511]</td><td>Number of buckets for Level 1A high trigger.</td>
+<tr><td>Mutant.Level[1].L1B.lowMultThreshold</td><td>integer</td><td>[1, 65535]</td><td>Low multiplicity threshold for Level 1B trigger.</td>
+<tr><td>Mutant.Level[1].L1B.highMultThreshold</td><td>integer</td><td>[1, 65535]</td><td>High multiplicity threshold for Level 1B trigger.</td>
+<tr><td>Mutant.Level[1].L1B.lowNumBuckets</td><td>integer</td><td>[1, 511]</td><td>Number of buckets for Level 1B low trigger.</td>
+<tr><td>Mutant.Level[1].L1B.highNumBuckets</td><td>integer</td><td>[1, 511]</td><td>Number of buckets for Level 1B high trigger.</td>
+<tr><td>Mutant.Level[1].L1B.timeout</td><td>real</td><td>[0, 1677000.00]</td><td>Timeout value in case of no L1B trigger, in microseconds.</td></tr>
+<tr><td>Mutant.Level[2].isEnabled</td><td>boolean</td><td>{true, false}</td><td>Enables Level 2 trigger</td></tr>
+<tr><td>Mutant.Level[2].hitPatternModified</td><td>boolean</td><td>{true, false}</td><td>Tells the trigger/timestamper state machine that a mask pattern will be provided to CoBos in case of L2 OK.</td></tr>
+<tr><td>Mutant.TwoProtonDecayMode.isEnabled</td><td>boolean</td><td>{true, false}</td><td>Enables the two proton decay mode.</td></tr>
+<tr><td>Mutant.TwoProtonDecayMode.halfEventReadout</td><td>boolean</td><td>{true, false}</td><td>Whether to send half-event after a timeout.</td></tr>
+<tr><td>Mutant.GlobalMasterClock.externalClockEnabled</td><td>boolean</td><td>{true, false}</td><td>Whether GMC is distributed by the internal VCXO (false) or by one of the front panel sources (true).</td></tr>
+<tr><td>Mutant.GlobalMasterClock.externalClockSelection</td><td>string</td><td>{FireWire1, FireWire2, Optical, VHDCI}</td><td>External GMC source: FireWire 1 (J10), FireWire 2 (J9), VHDCI source from board B or optical transceiver source.</td></tr>
+<tr><td>Mutant.Inspection.frontPanelInsp1</td><td>integer</td><td>[0,255]</td><td>Signal sent to front panel LEMO connector LOG INSP1.</td></tr>
+<tr><td>Mutant.Inspection.frontPanelInsp2</td><td>integer</td><td>[0,255]</td><td>Signal sent to front panel LEMO connector LOG INSP2.</td></tr>
+<tr><td>Mutant.Inspection.rearPanelInsp1</td><td>integer</td><td>[0,255]</td><td>Signal sent to rear panel LEMO connector TEST1.</td></tr>
+<tr><td>Mutant.Inspection.rearPanelInsp2</td><td>integer</td><td>[0,255]</td><td>Signal sent to rear panel LEMO connector TEST2.</td></tr>
+</table>
+@endhtmlonly
+@latexonly
+Refer to the HTML documentation for the list of configuration parameters.
+@endlatexonly
+For more details, refer to the @ref sec_ref_Mutant documentation.
+
+$LastChangedDate: 2020-03-05 09:25:18 -0500 (Thu, 05 Mar 2020) $
+*/

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConfigSetWorkspaceWidget</class>
+ <widget class="QMainWindow" name="ConfigSetWorkspaceWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="CCfg::Ui::EditorMainWindow" name="editor"/>
+  <widget class="QDockWidget" name="dockConfigSet">
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Config Set</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="CCfg::Ui::ConfigSetWidget" name="widgetConfigSet">
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockAttributeBuilder">
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Attribute Builder</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="CCfg::Ui::AttributeBuilderWidget" name="widgetAttributeBuilder">
+    <property name="font">
+     <font>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CCfg::Ui::ConfigSetWidget</class>
+   <extends>QWidget</extends>
+   <header>CCfg/Ui/ConfigSetWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CCfg::Ui::AttributeBuilderWidget</class>
+   <extends>QWidget</extends>
+   <header>CCfg/Ui/AttributeBuilderWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CCfg::Ui::EditorMainWindow</class>
+   <extends>QWidget</extends>
+   <header>CCfg/Ui/EditorMainWindow.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

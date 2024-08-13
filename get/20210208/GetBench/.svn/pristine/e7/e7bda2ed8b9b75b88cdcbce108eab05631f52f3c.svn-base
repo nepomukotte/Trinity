@@ -1,0 +1,66 @@
+exec switchToFastControl.ecc
+connect device ctrl
+writeReg aget_2p_initNow 1
+writeReg agetChipSelect 0
+writeReg maskSelect 0
+writeReg readDataDelay 14
+#write readDataDelay AGET0 15
+#write readDataDelay AGET1 14
+#write readDataDelay AGET2 14
+#write readDataDelay AGET3 14
+writeReg readAlwaysMask1_4 0x8
+writeReg readAlwaysMask5_36 0
+writeReg readAlwaysMask37_68 0
+writeReg readIfHitMask37_68 0xFFFFFFFF
+writeReg readIfHitMask5_36 0xFFFFFFFF
+writeReg readIfHitMask1_4 0xF
+writeReg maskSelect 1
+writeReg readDataDelay 14
+writeReg readAlwaysMask1_4 0
+writeReg readAlwaysMask5_36 0
+writeReg readAlwaysMask37_68 0
+writeReg readIfHitMask37_68 0xFFFFFFFF
+writeReg readIfHitMask5_36 0xFFFFFFFF
+writeReg readIfHitMask1_4 0xF
+writeReg maskSelect 2
+writeReg readDataDelay 14
+writeReg readAlwaysMask1_4 0
+writeReg readAlwaysMask5_36 0
+writeReg readAlwaysMask37_68 0
+writeReg readIfHitMask37_68 0xFFFFFFFF
+writeReg readIfHitMask5_36 0xFFFFFFFF
+writeReg readIfHitMask1_4 0xF
+writeReg maskSelect 3
+writeReg readDataDelay 14
+writeReg readAlwaysMask1_4 0
+writeReg readAlwaysMask5_36 0
+writeReg readAlwaysMask37_68 0
+writeReg readIfHitMask37_68 0xFFFFFFFF
+writeReg readIfHitMask5_36 0xFFFFFFFF
+writeReg readIfHitMask1_4 0xF
+writeReg maskSelect 0
+write pipeCtrl frameType 0
+writeReg aFullLevel 0x1000000
+writeReg aEmptyLevel 0x1000000
+writeReg dataReadyLevel 1
+writeReg triggerPeriod_10ns 35000
+writeReg triggerTime_10ns_2p 35000
+writeReg triggerMask 0
+write triggerMask manual 0
+write triggerMask timing 0
+write triggerMask timing_2p 0
+write pipeCtrl modeEnable_2p 0
+writeReg triggerDelay 700
+write readDepth d 512
+write pipeCtrl isFPNRead 1
+write pipeCtrl writeHitRegisterMaskEnable 0
+write pipeCtrl partialReadOut 0
+write pipeCtrl ScrScwOverride 0
+write pipeCtrl backpressure 0
+write pipeCtrl reset 0
+write pipeCtrl intEnable_asad0 1
+write pipeCtrl firmwareEnable 0
+write pipeCtrl reset 1
+write pipeCtrl reset 0
+write pipeCtrl firmwareEnable 1
+sleep 1

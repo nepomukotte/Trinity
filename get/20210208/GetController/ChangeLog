@@ -1,0 +1,41 @@
+2018-11-16  sizun
+	* Added ASTRE peaking time values to configuration file.
+
+2013-07-04  anvar
+	* Simplified event online display mechanism. Now, even when not storing data, events are displayed.
+
+2013-06-20  sizun
+	* Fixed 2p mode intialization.
+
+2013-06-18  sizun
+	* Implemented changes to AsAd ADC calibration sequence provided by Nathan (deserializer DESKEW sequence).
+
+2013-06-11  sizun
+	* Recoded test type 'Acq2pMode' for use of the AsAd pulser in 2p mode.
+	* Added to GetController configuration step the settings for the AsAd inspection manager.
+
+2012-11-23  sizun
+	* Added wizard to set data router parameters, including external router.
+	* Added display features: legend, "toggle channeels" button.
+
+2012-11-12  sizun
+	* Added support for Tcp and Zbuf data flow types, made Zbuf the default type instead of Ice.
+	* Now dumping data when buffer is full, and displaying only 1 event every 2s seconds.
+	
+2012-11-07  sizun
+	* Fixed longstanding bug causing failure of acquisition for trigger periods smaller than 30 ms.
+
+2012-10-18  sizun
+	* Switched to new logging paradigm.
+
+2012-10-05  sizun
+	* Cleaned up unreachable code, reduced console verbosity.
+	* Fixed bug: after configuring the registers of the 'aget' device for each ASIC individually, the mask indicating which of the 16 ASIC's to braodcast slow control commands to was not restored.
+
+2012-10-04  sizun
+	* Added automatic data delay calibration based on script from Nathan Usher.
+	* Added configuration parameter Setup[Conditions].CoBo[*].Module.enableAutoReadDataDelay to select manual or automatic delay.
+
+2012-10-04  sizun
+	* Added help message and possibility to provide both IP address and port of control and flow endpoints of the data router.
+	* Added configuration parameter Setup[Conditions].CoBo[*].Module.useExternalTimeReset to choose whether the timestamp and event counters should be reset during daqStart (false) or not (true).

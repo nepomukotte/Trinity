@@ -1,0 +1,211 @@
+<Daq>
+	<DCC>
+		<FEM id="*">
+			<isActive>false</isActive>
+			<acqType range="{calibration, standard}">standard
+			</acqType>
+			<nEvents range="[1, +inf[">10</nEvents>
+			<Module>
+				<pulserDelay>0xD0</pulserDelay>
+				<scaOffset range="[0x0, 0x1FF]">0x0</scaOffset>
+				<pedestalActive>false</pedestalActive>
+				<cmdRead range="{areq, dreq}">areq
+					<!--{areq,dreq}-->
+				</cmdRead>
+				<readMode range="{space, time}">time
+					<!--{space,time}-->
+				</readMode>
+				<compress>false</compress>
+				<isReadClockMask>true</isReadClockMask>
+				<isWriteClockMask>false</isWriteClockMask>
+				<divideScaClockBy>0x6</divideScaClockBy>
+				<nTimeBuckets>0x1FF</nTimeBuckets>
+				<nClocksBeforeStop>0xB00</nClocksBeforeStop>
+				<delayWriteReadClock>0x1FF</delayWriteReadClock>
+			</Module>
+			<FEC id="*">
+				<isActive>true</isActive>
+				<powerDown>false</powerDown>
+				<Generator>
+					<amplitude id="0" range="[0x0, 0x3FFF]">0x3FFF</amplitude>
+					<amplitude id="1">0x3F00</amplitude>
+					<amplitude id="2">0x3000</amplitude>
+					<amplitude id="3">0x2FF0</amplitude>
+					<amplitude id="4">0x2F00</amplitude>
+					<amplitude id="5">0x1F00</amplitude>
+					<tabMode>false</tabMode>
+					<amplitudeStart range="[0x0, 0x3FFF]">0x3FFF</amplitudeStart>
+					<amplitudeStop range="[0x0, 0x3FFF]">0x3DB8</amplitudeStop>
+					<amplitudeIncr>0x40</amplitudeIncr>
+				</Generator>
+				<ASIC id="*">
+					<enableShaping>true</enableShaping>
+					<isActive>true</isActive>
+					<doPACIgx2>true</doPACIgx2>
+					<gain unit="fC" range="{120, 240, 360, 600}">120
+						<!-- 600fC,360fC,240fC,120fC -->
+					</gain>
+					<peakingTime unit="ns" range="{100, 200, 400, 500, 600, 700, 900, 1000, 1100, 1200, 1400, 1500, 1600, 1700, 1900, 2000}">200
+						<!-- 100 ns; 200 ns; 400 ns; 500 ns; 600 ns;
+			 		700 ns; 900 ns; 1000 ns; 1100 ns; 1200 ns;
+			 		1400 ns; 1500 ns; 1600 ns; 1700 ns; 1900 ns; 2000 ns -->
+					</peakingTime>
+					<asicMode range="{calibration, functional, nothing, test}">calibration</asicMode>
+					<!-- nothing ; calibration ; test ; functionnal -->
+					<doMaxPowerWrite>false</doMaxPowerWrite>
+					<doPowerDownRead>false</doPowerDownRead>
+					<doAlternativePower>false</doAlternativePower>
+					<reg2>0xA000</reg2>
+					<channel id="*">
+						<isActive>true</isActive>
+						<isTestActive>true</isTestActive>
+						<threshold>0x12C</threshold>
+						<pedestal>0x30</pedestal>
+						<transferFunctionSlope unit="ADC/fC">3.4</transferFunctionSlope>
+						<transferFunctionAbscisse unit="ADC">12</transferFunctionAbscisse>
+					</channel>
+					<channel id="0" />
+					<channel id="1" />
+					<channel id="2" />
+					<channel id="3" />
+					<channel id="4" />
+					<channel id="5" />
+					<channel id="6" />
+					<channel id="7" />
+					<channel id="8" />
+					<channel id="9" />
+					<channel id="10" />
+					<channel id="11" />
+					<channel id="12" />
+					<channel id="13" />
+					<channel id="14" />
+					<channel id="15" />
+					<channel id="16" />
+					<channel id="17" />
+					<channel id="18" />
+					<channel id="19" />
+					<channel id="20" />
+					<channel id="21" />
+					<channel id="22" />
+					<channel id="23" />
+					<channel id="24" />
+					<channel id="25" />
+					<channel id="26" />
+					<channel id="27" />
+					<channel id="28" />
+					<channel id="29" />
+					<channel id="30" />
+					<channel id="31" />
+					<channel id="32" />
+					<channel id="33" />
+					<channel id="34" />
+					<channel id="35" />
+					<channel id="36" />
+					<channel id="37" />
+					<channel id="38" />
+					<channel id="39" />
+					<channel id="40" />
+					<channel id="41" />
+					<channel id="42" />
+					<channel id="43" />
+					<channel id="44" />
+					<channel id="45" />
+					<channel id="46" />
+					<channel id="47" />
+					<channel id="48" />
+					<channel id="49" />
+					<channel id="50" />
+					<channel id="51" />
+					<channel id="52" />
+					<channel id="53" />
+					<channel id="54" />
+					<channel id="55" />
+					<channel id="56" />
+					<channel id="57" />
+					<channel id="58" />
+					<channel id="59" />
+					<channel id="60" />
+					<channel id="61" />
+					<channel id="62" />
+					<channel id="63" />
+					<channel id="64" />
+					<channel id="65" />
+					<channel id="66" />
+					<channel id="67" />
+					<channel id="68" />
+					<channel id="69" />
+					<channel id="70" />
+					<channel id="71" />
+					<channel id="72" />
+					<channel id="73" />
+					<channel id="74" />
+					<channel id="75" />
+					<channel id="76" />
+					<channel id="77" />
+					<channel id="78" />
+				</ASIC>
+				<ASIC id="0" />
+				<ASIC id="1" />
+				<ASIC id="2" />
+				<ASIC id="3">
+					<channel id="32" />
+				</ASIC>
+			</FEC>
+			<FEC id="0" />
+			<FEC id="1" />
+			<FEC id="2" />
+			<FEC id="3" />
+			<FEC id="4" />
+			<FEC id="5" />
+		</FEM>
+		<FEM id="0">
+			<FEC id="5">
+				<isActive>false</isActive>
+			</FEC>
+			<FEC id="4">
+				<isActive>false</isActive>
+			</FEC>
+			<FEC id="3">
+				<isActive>false</isActive>
+			</FEC>
+			<FEC id="2">
+				<isActive>false</isActive>
+			</FEC>
+			<FEC id="1">
+				<isActive>false</isActive>
+			</FEC>
+		</FEM>
+	</DCC>
+	<Network>
+		<IpNode id="*">
+			<addrField id="0" range="[0, 255]">192</addrField>
+			<addrField id="1">168</addrField>
+			<addrField id="2">0</addrField>
+			<addrField id="3">0</addrField>
+			<port range="[1025, 32768]">7777</port>
+		</IpNode>
+		<IpNode id="LOCAL">
+			<addrField id="2">0</addrField>
+			<addrField id="3">1</addrField>
+		</IpNode>
+		<IpNode id="TARGET">
+			<addrField id="3">12</addrField>
+			<addrField id="2">10</addrField>
+		</IpNode>
+		<replyTimeout unit="ms" range="[10, 10000]">5000</replyTimeout>
+		<maxRetries range="[0, 10000]">5</maxRetries>
+		<udpSocketRcvBufferSize unit="KB" range="[0x40, 0x4000]">0x100</udpSocketRcvBufferSize>
+		<receiveBufferSize unit="KB" range="[0x100, 0x10000]">0x1000</receiveBufferSize>
+	</Network>
+	<Run>
+		<Trigger>
+			<type range="{external, internal}">external</type>
+			<maxRetries range="[0, +inf[">6</maxRetries>
+		</Trigger>
+		<File>
+			<maxSize unit="MB">0x400</maxSize>
+		</File>
+		<maxFiles range="[0, +inf[">0</maxFiles>
+		<maxEvents range="[0, +inf[">0</maxEvents>
+	</Run>
+</Daq>

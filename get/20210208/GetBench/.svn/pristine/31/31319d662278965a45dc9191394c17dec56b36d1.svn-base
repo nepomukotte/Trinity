@@ -1,0 +1,24 @@
+connect node 132.166.39.121
+connect daqserver 132.166.11.159
+#connect narval 132.166.11.159
+load PREFIX/share/get-bench/config/hardwareDescription_fullCoBoStandAlone.xml
+connect device ctrl
+write agetChipSelect d 0
+write asadSelect d 0
+exec powerUp.ecc
+exec beforeStart.ecc
+daqStart
+exec asadInjectCharge.ecc
+#connect device ctrl
+#writeReg triggerDelay 650
+#write triggerMask slowControl 1
+#asad-inject -1000
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+daqStop
+exec switchToSlowControl.ecc

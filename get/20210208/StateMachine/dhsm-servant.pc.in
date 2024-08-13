@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: dhsm-servant
+Description: An extension of the state machine framework to implement the servant of a distributed state machines. 
+Requires: dhsm@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -ldhsm-servant@DEBUG_SUFFIX@
+Cflags: -I${includedir} @PTHREAD_CFLAGS@

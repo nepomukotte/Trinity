@@ -1,0 +1,135 @@
+/**
+ * @file PostgreSqlTableBuilder.cpp
+ * @author sizun
+ * $Id$
+ */
+#include "PostgreSqlTableBuilder.h"
+
+namespace CCfg
+{
+namespace Io
+{
+namespace Db
+{
+////////////////////////////////////////////////////////////////////////////////
+// CCfg::Io:Db::PostgreSqlTableBuilder class methods body
+////////////////////////////////////////////////////////////////////////////////
+
+const char* const PostgreSqlTableBuilder::TYPE_NAMES[COLUMN_TYPES_COUNT] =
+{
+	"INTEGER",//< signed integer
+	"NUMERIC",
+	"REAL",
+	"BOOLEAN",
+	"VARCHAR",
+	"CHAR",
+	"TIMESTAMP",
+	"DATE",
+	"TIME"
+};
+const char* const PostgreSqlTableBuilder::REFERENCE_OPTION_NAMES[REFERENCE_OPTIONS_COUNT] =
+{
+	"RESTRICT",
+	"CASCADE",
+	"SET NULL",
+	"NO ACTION",
+	"SET DEFAULT"
+};
+
+/**
+ * Default constructor.
+ */
+PostgreSqlTableBuilder::PostgreSqlTableBuilder()
+{
+}
+
+/**
+ * Destructor.
+ */
+PostgreSqlTableBuilder::~PostgreSqlTableBuilder()
+{
+}
+
+/*
+ * (see inherited doc)
+ */
+std::vector<std::string> PostgreSqlTableBuilder::getSideQueries()
+{
+	return sideQueries;
+}
+
+/*
+ * (see inherited doc)
+ */
+const char* PostgreSqlTableBuilder::getTypeName(ColumnType type) const
+{
+	return TYPE_NAMES[type];
+}
+
+/*
+ * (see inherited doc)
+ */
+const char* PostgreSqlTableBuilder::getReferenceOptionName(ReferenceOption option) const
+{
+	return REFERENCE_OPTION_NAMES[option];
+}
+
+/*
+ * (see inherited doc)
+ */
+const char* PostgreSqlTableBuilder::getCurrentDateTimeSymbol() const
+{
+	return "CURRENT_TIMESTAMP";
+}
+
+void PostgreSqlTableBuilder::beforeBuild(std::ostringstream& query)
+{
+	for(size_t i = 0; i < columns.size(); ++i)
+	{
+		ColumnDesc& column = columns[i];
+		column.sign = Signed;
+		if(column.insertPolicy == AutoIncrement)
+		{
+			autoIncrementColumns.push_back(column.name);
+			column.insertPolicy = Manual;
+		}
+	}
+	/*for(size_t i = 0; i < foreignKeys.size(); ++i)
+	{
+		ForeignKeyDesc& fkDesc = foreignKeys[i];
+		fkDesc.onUpdate = NoAction; // Oracle doesn't support ON UPDATE clause, this value prevents the builder from adding it.
+		if(fkDesc.onDelete != Cascade and fkDesc.onDelete != SetNull)
+		{
+			fkDesc.onDelete = SetNull;
+		}
+	}*/
+}
+
+/*
+ * (see inherited doc)
+ */
+void PostgreSqlTableBuilder::afterBuild(std::ostringstream& query)
+{
+	for(size_t i = 0; i < autoIncrementColumns.size(); ++i)
+	{
+		const std::string& columnName = autoIncrementColumns[i];
+		std::ostringstream sequenceQuery;
+		sequenceQuery <<
+			"CREATE SEQUENCE " << dbName << '.' <<
+			tableName << '_' << columnName
+			<< " OWNED BY " << dbName << '.' << tableName << '.' << columnName << ';';
+		sideQueries.push_back(sequenceQuery.str());
+
+		std::ostringstream triggerQuery;
+		triggerQuery <<
+			"ALTER TABLE ONLY " << dbName << '.' << tableName << '\n' <<
+			"\tALTER COLUMN " << columnName <<
+			" SET DEFAULT nextval(\'" <<
+			dbName << '.' << tableName << '_' << columnName << "\');";
+		sideQueries.push_back(triggerQuery.str());
+	}
+}
+
+}
+}
+}

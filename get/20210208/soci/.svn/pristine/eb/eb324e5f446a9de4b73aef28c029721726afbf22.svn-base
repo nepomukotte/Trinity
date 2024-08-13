@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"  http-equiv="content-type" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>SOCI - basics</title>
+</head>
+
+<body>
+<p class="banner">SOCI - The C++ Database Access Library</p>
+
+<h2>Connections and simple queries</h2>
+
+<h3>Connecting to the database</h3>
+
+<p>The class <code>Session</code> encapsulates the database connection
+and other backend-related details, which are common to all the
+statements
+that will be later executed. Its constructor expects two parameters:
+the requested backend factory object and the generic connection string,
+which meaning is backend-dependent.</p>
+<p>Example:</p>
+
+<pre class="example">
+Session sql(oracle, "service=orcl user=scott password=tiger");
+</pre>
+
+<p>Another example might be:</p>
+
+<pre class="example">
+Session sql(postgresql, "dbname=mydb");
+</pre>
+
+<p>Above, the <code>sql</code> object is a local (automatic) object
+that encapsulates the connection.</p>
+
+<p>The <code>Session</code> constructor either connects successfully, or
+throws the exception.</p>
+
+<p>It is possible to have many active <code>Session</code>s at the same
+time, even using different backends.</p>
+
+<div class="note">
+<p><span class="note">Portability note:</span></p>
+<p>The following backend factories are currently available:</p>
+<ul>
+  <li><code><a href="backends/mysql.html">mysql</a></code> (requires <code>#include "soci-mysql.h"</code>)</li>
+  <li><code><a href="backends/oracle.html">oracle</a></code> (requires <code>#include "soci-oracle.h"</code>)</li>
+  <li><code><a href="backends/postgresql.html">postgresql</a></code> (requires <code>#include "soci-postgresql.h"</code>)</li>
+  <li><code><a href="backends/sqlite3.html">sqlite3</a></code> (requires <code>#include "soci-sqlite3.h"</code>)</li>
+  <li><code><a href="backends/odbc.html">odbc</a></code> (requires <code>#include "soci-odbc.h"</code>)</li>
+  <li><code><a href="backends/firebird.html">firebird</a></code> (requires <code>#include "soci-firebird.h"</code>)</li>
+</ul>
+</div>
+<h3>Simple SQL statements</h3>
+
+<p>In many cases, the SQL query is intended to be executed only once,
+which means that statement parsing and execution can go together.
+The <code>Session</code> class provides a special <code>once</code>
+member, which triggers parsing and execution of such one-time
+statements:</p>
+
+<pre class="example">
+sql.once &lt;&lt; "drop table persons";
+</pre>
+
+<p>For shorter syntax, the following form is also allowed:</p>
+
+<pre class="example">
+sql &lt;&lt; "drop table persons";
+</pre>
+
+<p>The IOStream-like interface is exactly what it looks like, so that
+the
+statement text can be composed of many parts, involving anything that
+is <i>streamable</i> (including custom classes, if they have
+appropriate <code>operator&lt;&lt;</code>):</p>
+
+<pre class="example">
+string tableName = "persons";
+sql &lt;&lt; "drop table " &lt;&lt; tableName;
+
+int id = 123;
+sql &lt;&lt; "delete from companies where id = " &lt;&lt; id;
+</pre>
+
+<table class="foot-links" border="0" cellpadding="2" cellspacing="2">
+  <tr>
+    <td class="foot-link-left">
+      <a href="errors.html">Previous (Errors)</a>
+    </td>
+    <td class="foot-link-right">
+      <a href="exchange.html">Next (Exchanging data)</a>
+    </td>
+  </tr>
+</table>
+
+<p class="copyright">Copyright &copy; 2004-2006 Maciej Sobczak, Stephen Hutton</p>
+</body>
+</html>

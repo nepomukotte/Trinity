@@ -1,0 +1,25 @@
+<RCC>
+  <qresource prefix="/tabwidget">
+    <file alias="closetab.png">../res/images/closetab.png</file>
+  </qresource>
+  <qresource prefix="/oxygen">
+    <file alias="network-server-database">../res/images/oxygen/32x32/places/network-server-database.png</file>
+    <file alias="application-exit">../res/images/oxygen/32x32/actions/application-exit.png</file>
+    <file alias="document-new">../res/images/oxygen/32x32/actions/document-new.png</file>
+    <file alias="document-open">../res/images/oxygen/32x32/actions/document-open.png</file>
+    <file alias="document-open-folder">../res/images/oxygen/32x32/actions/document-open-folder.png</file>
+    <file alias="document-save">../res/images/oxygen/32x32/actions/document-save.png</file>
+    <file alias="document-save-as">../res/images/oxygen/32x32/actions/document-save-as.png</file>
+    <file alias="document-save-all">../res/images/oxygen/32x32/actions/document-save-all.png</file>
+    <file alias="edit-find">../res/images/oxygen/32x32/actions/edit-find.png</file>
+    <file alias="edit-redo">../res/images/oxygen/32x32/actions/edit-redo.png</file>
+    <file alias="edit-undo">../res/images/oxygen/32x32/actions/edit-undo.png</file>
+  </qresource>
+  <qresource prefix="/builder">
+    <file alias="default_star.png">../res/images/default_star.png</file>
+  </qresource>
+  <qresource prefix="/application/cconfiged">
+    <file alias="oldlogo.png">../res/images/ccfg-logo.png</file>
+    <file alias="logo.svg">../res/images/ccfg-logo.svg</file>
+  </qresource>
+</RCC>

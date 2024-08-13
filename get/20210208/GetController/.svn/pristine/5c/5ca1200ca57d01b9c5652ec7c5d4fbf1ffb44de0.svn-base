@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GetController</class>
+ <widget class="QMainWindow" name="GetController">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1397</width>
+    <height>703</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GET Controller</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1397</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionNewTest"/>
+    <addaction name="actionOpenTest"/>
+    <addaction name="separator"/>
+    <addaction name="actionSwitchWorkspace"/>
+    <addaction name="separator"/>
+    <addaction name="actionEditTest"/>
+    <addaction name="actionEditConditions"/>
+    <addaction name="actionEditHardware"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionShowWindows"/>
+    <addaction name="separator"/>
+    <addaction name="actionSetTabbedViewMode"/>
+    <addaction name="actionTile_Windows"/>
+    <addaction name="actionCascaded_Windows"/>
+   </widget>
+   <widget class="QMenu" name="menuPref">
+    <property name="title">
+     <string>Preferences</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionSaveRawFrames"/>
+    <addaction name="separator"/>
+    <addaction name="actionDisplayHeader"/>
+    <addaction name="actionSetChannelDisplay"/>
+    <addaction name="actionSelectSymbol"/>
+    <addaction name="separator"/>
+    <addaction name="actionSelectDataRouter"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuWindows"/>
+   <addaction name="menuPref"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionEditConditions">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit conditions</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionEditHardware">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit hardware</string>
+   </property>
+   <property name="iconText">
+    <string>Edit hardware</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit hardware configuration</string>
+   </property>
+  </action>
+  <action name="actionNewTest">
+   <property name="text">
+    <string>New test</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionSave_Workspace">
+   <property name="text">
+    <string>Save Workspace</string>
+   </property>
+  </action>
+  <action name="actionSwitchWorkspace">
+   <property name="text">
+    <string>Switch Worskpace...</string>
+   </property>
+  </action>
+  <action name="actionClose_Workspace">
+   <property name="text">
+    <string>Close Workspace</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/file/quit.png</normaloff>:/file/quit.png</iconset>
+   </property>
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionSetTabView">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>setTabView</string>
+   </property>
+  </action>
+  <action name="actionSetTabbedViewMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Set Tabbed View Mode</string>
+   </property>
+  </action>
+  <action name="actionCreate_Test">
+   <property name="text">
+    <string>Create Test</string>
+   </property>
+  </action>
+  <action name="actionOpen_Test">
+   <property name="text">
+    <string>Open Test</string>
+   </property>
+  </action>
+  <action name="actionDestroy_Test">
+   <property name="text">
+    <string>Destroy Test</string>
+   </property>
+  </action>
+  <action name="actionTile_Windows">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Tile Windows</string>
+   </property>
+  </action>
+  <action name="actionCascaded_Windows">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Cascade Windows</string>
+   </property>
+  </action>
+  <action name="actionlogger">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show message logger</string>
+   </property>
+  </action>
+  <action name="actionSaveRawFrames">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save Raw Frames</string>
+   </property>
+  </action>
+  <action name="actionSaveDataMatrix">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save AGet data matrices</string>
+   </property>
+  </action>
+  <action name="actionSetChannelDisplay">
+   <property name="text">
+    <string>Select Displayed Channels</string>
+   </property>
+  </action>
+  <action name="actionDisplayHeader">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Print Headers</string>
+   </property>
+  </action>
+  <action name="actionMonitoringActive">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Display data</string>
+   </property>
+  </action>
+  <action name="actionOpenTest">
+   <property name="text">
+    <string>Open test</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionEditTest">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Edit test</string>
+   </property>
+  </action>
+  <action name="actionShowWindows">
+   <property name="text">
+    <string>Show Windows...</string>
+   </property>
+  </action>
+  <action name="actionSaveHeaders">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Save ASCII Headers</string>
+   </property>
+  </action>
+  <action name="actionSelectDataRouter">
+   <property name="text">
+    <string>Data Router</string>
+   </property>
+   <property name="toolTip">
+    <string>Configure data router</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionSelectSymbol">
+   <property name="text">
+    <string>Select Curve &amp;Symbol</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../GetController.qrc"/>
+ </resources>
+ <connections/>
+</ui>

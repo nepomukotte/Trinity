@@ -1,0 +1,108 @@
+if VXWORKS_KERNEL
+
+EXTRA_PROGRAMS =
+
+# ======================================================================================================================
+# VxWorks TEST PROGRAM: hwServer
+# ----------------------------------------------------------------------------------------------------------------------
+
+# ======================================================================================================================
+# VxWorks TEST PROGRAM: mdaq_test
+# ----------------------------------------------------------------------------------------------------------------------
+EXTRA_PROGRAMS          += mdaq_test_partialimage
+nodist_mdaq_test_SOURCES = mdaq_test_ctdt.c
+BUILT_SOURCES           += mdaq_test_ctdt.c
+CLEANFILES              += mdaq_test_ctdt.c mdaq_test_partialimage$(EXEEXT)
+mdaq_test_ctdt.c: mdaq_test_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+mdaq_test_partialimage_SOURCES = $(mdaq_test_SOURCES)
+mdaq_test_partialimage_LDADD   = $(mdaq_test_LDADD)
+
+if ICEE
+
+# ======================================================================================================================
+# VxWorks TEST PROGRAM: HwServerTest_server
+# ----------------------------------------------------------------------------------------------------------------------
+EXTRA_PROGRAMS                    += HwServerTest_server_partialimage
+nodist_HwServerTest_server_SOURCES = HwServerTest_server_ctdt.c
+BUILT_SOURCES                     += HwServerTest_server_ctdt.c
+CLEANFILES                        += HwServerTest_server_ctdt.c HwServerTest_server_partialimage$(EXEEXT)
+HwServerTest_server_ctdt.c: HwServerTest_server_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+HwServerTest_server_partialimage_SOURCES = $(HwServerTest_server_SOURCES)
+HwServerTest_server_partialimage_LDADD   = $(HwServerTest_server_LDADD)
+
+# ======================================================================================================================
+# VxWorks TEST PROGRAM: HwServerTest_local
+# ----------------------------------------------------------------------------------------------------------------------
+EXTRA_PROGRAMS                         += HwServerTest_local_partialimage
+nodist_EXTRA_HwServerTest_local_SOURCES = HwServerTest_local_ctdt.c
+BUILT_SOURCES                          += HwServerTest_local_ctdt.c
+CLEANFILES                             += HwServerTest_local_ctdt.c HwServerTest_local_partialimage$(EXEEXT)
+HwServerTest_local_ctdt.c: HwServerTest_local_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+HwServerTest_local_partialimage_SOURCES = $(HwServerTest_local_SOURCES)
+HwServerTest_local_partialimage_LDADD   = $(HwServerTest_local_LDADD)
+
+# ======================================================================================================================
+# VxWorks PROGRAM: hwServer
+# ----------------------------------------------------------------------------------------------------------------------
+EXTRA_PROGRAMS         += hwServer_partialimage
+nodist_hwServer_SOURCES = hwServer_ctdt.c	
+BUILT_SOURCES          += hwServer_ctdt.c
+CLEANFILES             += hwServer_ctdt.c hwServer_partialimage$(EXEEXT)
+hwServer_ctdt.c: hwServer_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+hwServer_partialimage_SOURCES = $(hwServer_SOURCES)
+hwServer_partialimage_LDADD   = $(hwServer_LDADD)
+
+# ======================================================================================================================
+# VxWorks PROGRAM: perfsend
+# ----------------------------------------------------------------------------------------------------------------------
+EXTRA_PROGRAMS         += perfsend_partialimage
+nodist_perfsend_SOURCES = perfsend_ctdt.c	
+BUILT_SOURCES          += perfsend_ctdt.c
+CLEANFILES             += perfsend_ctdt.c perfsend_partialimage$(EXEEXT)
+perfsend_ctdt.c: perfsend_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+perfsend_partialimage_SOURCES = $(perfsend_SOURCES)
+perfsend_partialimage_LDADD   = $(perfsend_LDADD)
+
+# ======================================================================================================================
+# VxWorks PROGRAMS: icestorm_logger_test_publisher icestorm_logger_test_subscriber
+# ----------------------------------------------------------------------------------------------------------------------
+if HAVE_ICESTORM
+EXTRA_PROGRAMS         += icestorm_logger_test_publisher_partialimage
+nodist_icestorm_logger_test_publisher_SOURCES = icestorm_logger_test_publisher_ctdt.c	
+BUILT_SOURCES          += icestorm_logger_test_publisher_ctdt.c
+CLEANFILES             += icestorm_logger_test_publisher_ctdt.c icestorm_logger_test_publisher_partialimage$(EXEEXT)
+icestorm_logger_test_publisher_ctdt.c: icestorm_logger_test_publisher_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+icestorm_logger_test_publisher_partialimage_SOURCES = $(icestorm_logger_test_publisher_SOURCES)
+icestorm_logger_test_publisher_partialimage_LDADD   = $(icestorm_logger_test_publisher_LDADD)
+
+EXTRA_PROGRAMS         += icestorm_logger_test_subscriber_partialimage
+nodist_icestorm_logger_test_subscriber_SOURCES = icestorm_logger_test_subscriber_ctdt.c	
+BUILT_SOURCES          += icestorm_logger_test_subscriber_ctdt.c
+CLEANFILES             += icestorm_logger_test_subscriber_ctdt.c icestorm_logger_test_subscriber_partialimage$(EXEEXT)
+icestorm_logger_test_subscriber_ctdt.c: icestorm_logger_test_subscriber_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+icestorm_logger_test_subscriber_partialimage_SOURCES = $(icestorm_logger_test_subscriber_SOURCES)
+icestorm_logger_test_subscriber_partialimage_LDADD   = $(icestorm_logger_test_subscriber_LDADD)
+endif
+
+# ======================================================================================================================
+# VxWorks PROGRAM: demoMonitor
+# ----------------------------------------------------------------------------------------------------------------------
+EXTRA_PROGRAMS            += demoMonitor_partialimage
+nodist_demoMonitor_SOURCES = demoMonitor_ctdt.c	
+BUILT_SOURCES             += demoMonitor_ctdt.c
+CLEANFILES                += demoMonitor_ctdt.c demoMonitor_partialimage$(EXEEXT)
+demoMonitor_ctdt.c: demoMonitor_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+demoMonitor_partialimage_SOURCES = $(demoMonitor_SOURCES)
+demoMonitor_partialimage_LDADD   = $(demoMonitor_LDADD) 
+
+endif #ICEE
+
+endif #VXWORKS_KERNEL

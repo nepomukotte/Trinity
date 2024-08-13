@@ -1,0 +1,1521 @@
+2021-02-08  sizun
+	* Added parameter to declare BEAST boards in AMC_TAG_ONLY and CLOCK_TREE_CONFIG1 registers of MuTanT:.
+
+2019-03-15  sizun
+	* Forced stop and un-prepare transition to run in sequential mode.
+
+2018-11-16  sizun
+	* Added ASTRE peaking time values to configuration file.
+
+2017-11-14  sizun, anvar
+	* Switch to branch with parallel and batched processing.
+
+2016-12-09  psizun
+	* Added SYNC_PULSE procedure where MuTanT modules send SYNC_PULSE signals so that CoBo PLL's become phase aligned.
+
+2016-11-18 15:24  psizun
+	* Fixed GCC6 build failure.
+	* Added check for version of CompoundConfig since we need the default value feature.
+
+2016-11-09 10:07  psizun
+	* Added description of register fields specific to ASTRE chip.
+	* Added configuration parameters for register fields specific to ASTRE chip.
+
+2016-10-19  psizun
+	* Fixed MuTanT configuration
+	  - Now setting gmc_sel field before multi-crate alignment procedure; otherwise it fails.
+	  - Storing contents CLOCK_TREE_CONFIG1 register after single crate alignment as it is overriden by multi-crate alignment but needed to set shelf mask.
+
+2016-04-22  psizun
+	* MuTanT configuration
+	  - Renamed parameter Scalers.clearCounters into Scalers.clearScalers to choose whether to clear scaler counters during configuration and at the start of each run.
+	  - Added parameter clearCounters to choose whether to clear event counters during configuration and at the start of each run.
+	  - Added parameter preLoadTimestamp to choose whether to preload a timestamp during configuration.
+	  - Added parameter preLoadEventNumber to choose whether to preload an event counter value during configuration.
+
+2016-04-13  psizun
+	* Modified breakup transition to switch CoBos back to Mutant-less mode.
+	  Otherwise, attemps to re-configure CoBo without going back to the Idle state fail.
+
+2016-03-13  psizun
+	* Inversed stop sequence to stop MUTanT modules before CoBo boards.
+	* Adapted to new MUTanT L1SEL<1..0> selection table (parameter "Level[1].selection")
+	* Adapted to new MUTanT resolution of L1B_TIMEOUT, changed default value of "L1B.timeout" to 2.56 us
+	* Tied parameter "GlobalMasterClock.externalClockSelection" to field GMC_SEL
+	* Edited hardwareDescription_Mutant.xcfg:
+		- added bitfields fifo_empty, fifo_full, fifo_almost_full, cfs0, cfs1, l2ptc
+		- added registers CENTRUM_TP_TS_LOW and CENTRUM_TP_TS_HIGH
+
+2015-12-03  psizun
+	* Fixed percentage of circular buffer which is occupied in statistics printed in CoBo console; fixes #113.
+
+2015-11-17  psizun
+	* Modified handling of CoBo boards present in topology but with parameter "isActive" set to false in configuration files: their AMC slot s no longer searched for and, more importantly, they are excluded from
+ 	the alignment procedure (during which their Mutant link mode is set to Disconnected);
+ 	consequently they should not appear in the Mutant CLOCK_TREE_CONFIG1/2 registers which is used to set the Mutant SHELF_MASK register
+
+2015-10-19  psizun
+	* Added to ECC state machine the readout of !AsAd Tint and Text temperatures before the end of each run.
+
+2015-06-26  psizun
+	* Renamed 4 Mutant registers (L1_A_LOW_TH_N_BUCKETS, L1_A_HIGH_TH_N_BUCKETS, L1_B_LOW_TH_N_BUCKETS, L1_B_HIGH_TH_N_BUCKETS)
+	* Added mutant-bram-check command to command line client to test 16-bit words of the MutantB BRAM.
+
+2015-05-20  psizun
+	* Added consistency check for 'suppressMultiplicity' configuration parameter: now rejecting configurations where
+	 suppression is enabled for an AGET position of an AsAd board but disabled for the same (active) AGET position
+	  of another AsAd board connected to the same CoBo board.
+	* Added consistency check for 'isAllChannelRead' configuration parameter: now rejecting configurations where
+	 not all AGET chips on a CoBo board are in the same readout mode.
+
+2015-04-30  psizun (on behalf of gwittwer)
+	* The Mutant register MASTER_MASK has been renamed into SHELF_MASK.
+    * The unused registers SLAVE_1_MASK and SLAVE_2_MASK have been renamed into USER_REG1 and USER_REG2.
+
+2015-04-16  braine
+	* Added 2 Mutant registers allowing readout of instantaneous multiplicity.
+
+2015-04-14  braine
+	* Implemented readout of Mutant.
+	* In Mutant register description, added bit to disable Mutant readout and removed delay line registers (directly set by alignment procedure).
+	* Added example configuration file for 2 CoBo boards with 1 Mutant board.
+
+2015-03-17  psizun
+	* Added 4 additional parameters for configuring CoBo's PLL device: SYNC_PLL2_DLD, SYNC_PLL1_DLD, EN_CLKin1, EN_CLKin0.
+	  See email from F. A.-N. about proper configuration of CoBo 1.0v's PLL in standalone mode.
+
+2015-01-19  psizun
+	* Added code to configure the AsAd inspection manager for inspection of the AGET multiplicity signal. 
+
+2014-12-01  psizun
+    * Added commands to switch between slow and fast control modes in command line client.
+    * Added command to select a single channel to always read per chip in command line client.
+    * Added command to select a single test channel per chip in command line client.
+
+2014-10-13  psizun (on behalf of braine)
+	* Setting CoBo's 'mutantConfig' bit before configuring the CoBo boards causes errors during the initialization of AsAd boards.
+	* On G.W.'s request, CoBo boards should temporarily be stopped before Mutant boards at least until upgrade of Mutant firmware.  
+	* Disabled check of the ready bits of Mutant slaves.
+	* Enabling/disabling Mutant module during start/stop.
+	* Uncommenting MutantNode::runInit seems to cause problems. 
+
+2014-10-01  psizun
+	* Added parameter Node[*].instance[*].isActive in 'describe' file so that users do not have to completely remove an instance to disable its use.
+	* Finished removing need for a 'prepare' file: the same 'configure' file is used for boath 'prepare' and 'configure' transitions.
+
+2014-09-30  psizun
+	* Improved resiliency of ECC to reboot of CoBo board.
+
+2014-09-29  psizun
+	* Added new sampling frequencies: in addition to the frequencies 100 MHz/2**N already allowed for both R-CoBo and M-CoBo,
+	frequencies 2000 MHz/N are now allowed on M-CoBo specifically (answers request from J-PARC for 40 MHz frequency).
+	* Added configuration code for CoBo's 'mutantConfig' register (bits 'initDone', 'mutantMode', 'l2Trigger').
+
+2014-09-19  psizun
+	* Reenabled all configuration code related to Mutant B (Bruno Raine).
+	* Workaround for Mutant B prototype returning 0xDF as power supply bits (Bruno Raine).
+
+2014-09-11  psizun
+	* Fixed memory leak in mangamenet of getEccSoapServer threads.
+
+2014-09-02  psizun
+	* Implemented a new type of MFM frame, the CoBo topology frame, to be sent by the CoBo software when using the FDT protocol when opening the connection to help the Narval actors (the event builder).
+	  It contains the list of active AsAd boards and a flag indicating whether the 2p mode is enabled; refs #47, #70.
+	* Adapted dataRouter to the reception of this frame; refs #71.
+	* Updated documentation; refs #56.
+
+2014-06-16  psizun
+	* Switched initialization of Mutant modules back to before alignment procedure. Updated documentation and log messages; refs #56.
+
+2014-06-05  psizun
+	* Optimized log messages from state machine to run control; refs #34, #50, #88.
+
+2014-06-04  psizun
+	* Made the alignment procedure the very first step of the prepare transition; otherwise it messes the configuration of the CoBo boards; refs #78.
+	* Switched to the non-verbose mode of the Mutant alignment procedure.
+	* Disabled all configuration code related to Mutant B until new
+	* Linux image is available with proper memory addresses.
+	* Updated documentation; refs #56.
+
+2014-05-23  psizun
+	* Added power off of all AsAd boards upon returning to the IDLE state; refs #50, #88.
+	* Now configuring GPIO_SW_LEDS device directions before checking power supply of Mutant A module; refs #50, #78.
+	* Re-disabled all CoBo PLL code on ML507 (had been enabled for debugging the new PLL related parameters); refs #88.
+	* Added state machine parameter to set the `zeroSuppressInvert` bit; refs #50, #88.
+	* Updated documentation; refs #56.
+
+2014-05-22  psizun
+
+	* Added VCO_DIV and SYNC_TYPE to the list of user-configurable PLL parameters; refs #50, #79, #88.
+	* Updated documentation; refs  #56.
+	* Added flags required by GCC 4.8; refs #84.
+	* Added parameters for advanced configuration of the CoBo PLL device,
+	  e.g. for CLKin_SELECT_MODE, MODE, EN_SYNC, SYNC_POL_INV,
+	  SYNC_EN_AUTO, LD_MUX, LD_TYPE, HOLDOVER_MUX, HOLDOVER_TYPE,
+	  Status_CLKin0_MUX, Status_CLKin0_TYPE, Status_CLKin1_MUX,
+	  Status_CLKin1_TYPE; refs #50, #79, #88.
+	* Updated documentation; refs  #56.
+
+2014-05-21  psizun
+	* FIXed inversion of CoBo LEDs in ECC: the LED to switch on when AsAd is connected and powered is P (like Plugged), not D (like Downlink); refs #50, #88, #90.
+	* Added description of "zeroSuppressInvert" bit of CoBo pipeCtrl register; refs #45.
+	* Fixed some clang warnings; refs #84.
+
+2014-05-20  psizun
+	* Temporarily disabled configuration of Mutant B registers to be able to test configuration of Mutant A registers and alignment procedure; refs #78.
+	* FIX: added missing flags causing build failure with clang; refs #84.
+	* Fixed description of pllStatus register; refs #45.
+
+2014-05-16  psizun
+	* Added parameters 'CoBo.LEMO.L[*].function' for the configuration of the "lemoMux" register by the state machine; refs #50, #88.
+	* Fixed description of "pllStatus" register; refs #45.
+	* Updated documentation; refs #56.
+	* Adjusted configuration of CoBo PLL following email from F. A.-N; refs #79, #88.
+	  With these values the FPGA will be able to detect a loss of CLKin0 (Mutant's GMC) on Status_CLKin0_MUX.
+	  It can also detect if PLL1 has locked on LD_status pin.
+
+2014-05-15  psizun
+	* Added XML description of the new CoBo registers "lemoMux" and "pllStatus"; refs #45.
+	* Modified documentation to point to newly released CoBo data format specification; refs #56.
+
+2014-05-14  psizun
+	* Reverted to old configuration of CoBo PLL device (to be used with Mutant GMC, not CoBo standalone); refs #88.
+
+	* Modified handling of invalid write pointer values (no need to copy these invalid write values, it can lead to an endless loop sending data); refs #70.
+
+2014-05-13  psizun
+	* Renamed new data format description files for clarity; refs #56.
+
+2014-05-12  psizun
+	* Added new CoBo format revision to data files to install, incremented package version, changed from 32 bit items with 2 samples to 16 bit items with 1 sample; refs #84, #56.
+	* Added CompoundConfig description of revision 5 of CoBo data formats (new compact format without channel index and bucket index); refs #45.
+
+2014-04-30  psizun
+	* Synchronized description of Mutant registers with Bruno's version; refs #50, #78.
+
+2014-04-28  psizun
+	* Fixed bug caused by removal of filtering of inherited default objects in CConfig iterator; refs #50.
+
+2014-04-25  psizun
+	* Implemented changes in RCC-ECC SOAP interface made according to AGATA's needs (all transitions now have the same signature); see email from F. Saillant on April 23rd, 2014; refs #34.
+	* The configuration used for the CoBo PLL device now depends (when its is not skipped altogether) on the value of the CoBo 'firmwareDate' register; refs #79, #88.
+
+2014-04-30  psizun
+	* Updated description of Mutant registers.
+
+2014-04-25  psizun
+	* Modified configuration of the CoBo PLL device: it now depends on the value of the CoBo 'firmwareDate' register.
+	* Implemented changes in RCC-ECC SOAP interface made according to AGATA's needs (all transitions now have the same signature); see email from F. Saillant.
+
+2014-04-24  psizun
+	* Renamed new parameter 'pllConfigEnabled' into 'skipPLLConfig'; refs #50, #79, #56.
+
+2014-04-22  psizun
+	* Added to state machine and documentation the new parameter 'skipPLLConfig'; refs #50, #56.
+	* Added parameter 'pllConfigEnabled' so that users can disable the
+	  configuration of the CoBo PLL device for debugging.
+	  Modified configuration of the coBo PLL device according to emails
+	  from F. A.-N. on April 18th to be able to make new firmware work
+	  without a Mutant module:
+	  R11/MODE = 6 instead of 0, R11/SYNC_POL_INV=1 instead of 0,
+	  R13/Status_CLKin0_MUX = 1 instead of 0.
+	  refs #79, #88
+
+2014-04-17  psizun
+	* First test at handling CoBo LED's from the ECC stae machine and from the CoBo software:
+	  - all LEDs are switched off at the beginning of the configuration;
+	  - if an AsAd board is detected, power supplied and powered on, the 'D' green LED is switched on;
+	  - if an AsAd board to be used is not connected or not power supplied, the 'B' red LED is pulsing slowly;
+	  - the embedded thread checking every 30s the status of the AsAd
+		board now makes the 'B' red LED of the boards in auto-protection mode pulse fast.
+	  refs #50, #70, #90
+
+2014-04-15  psizun
+	* Decreased verbosity of AsAd pulser reset; refs #70.
+	* Added FAQ entry on external triggering mode of the AsAd pulser; refs #56.
+	* Added feedback between CoBo triggers and the re-initialization of
+	  the AsAd voltage generator in its external triggering mode, to get it ready for the next external signal; refs #70, #85, #50.
+
+2014-04-04  psizun
+	* Fixed data router issue: when establishing a new connection, the data receiver must reset the data processor to avoid leftovers
+	  from the previous connection (data reconstruction should not resume where it had been stopped but start over); refs #71.
+	* Added protection against duplicate start of the system; refs #88.
+	* Updated documentation (Mageia, CoBo circular buffers); refs #56.
+	* Improved handling of error when provided with an invalid data router port number (greater than 65535); refs #50.
+
+2014-04-03  psizun
+	* - DAQ statistics are now printed even when no new data have been
+	  sent, if the interrupt counter has been incremented.
+	  - DAQ statistics are updated before flushing the data and not
+	  afterwards to have a better view of the occupancy of the circular
+	  buffers.
+	  - When looping over the 4 circular buffers, errors are now
+	  handled outside the loop, since there is no point in emptying a
+	  buffer if we are not sure we sent an integer number of frames
+	  from the previous buffer.
+	  - The FrameStorage mode of the dataRouter now logs the fact that
+	  it _started_ rebuilding a frame to avoid giving the idea that it
+	  is idle when waiting for 15 GB of data that will never come.
+	  refs #70, #71
+
+2014-03-31  psizun
+	* Fixed typo; refs #84.
+	* Added interface for disconnecting data sender from its data router; refs #50, #88.
+	* AsAd TCM device (refs #70, #85, #50, #56); see GET-AS-002-0005:
+	  - added parameter externalTriggerMode to trigger the AsAd
+	  generator by an external signal on the ISP1 input rather than by slow control.
+	  - added parameter defaulVoltage to customize generator default
+	  output voltage rather than using 1 V; this allows use of full +/-
+	  2 V of the generator instead of just +/- 1 V.
+	  - added parameter triggerDelay to set the output step triggering delay.
+
+2014-03-20  psizun
+	* Fixed values proposed for AsAd external capacitance (bit RNG of AsAd register TCM0) to 1 pF and 11 pF; refs #50, #56, #85.
+	* Documented configuration of AsAd inspection manager; refs #56.
+	* Added new Mutant user configuration parameters to documentation; refs #56.
+
+2014-03-19  psizun
+	* Added FAQ entry on AsAd pulser configuration; refs #56.
+	* Completed code for configuration of Mutant modules; refs #50, #78, #88.
+
+2014-03-18  psizun
+	* Added new class SystemManager to avoid cluttering backend with configuration-related code; refs #50, #88.
+	  Fixed open issues in Mutant-related code following visioconf of March 14th; refs #78.
+
+2014-03-17 09:39  psizun
+	* Added command 'cobo-led-pulse' to getEccClient to do some tests
+	  with the CoBo LED device; refs #70, #88.
+
+2014-03-14 15:27  psizun
+	* Added command 'cobo-led-flip' to getEccClient to do some tests
+	  with the CoBo LED device; refs #70, #88.
+
+2014-03-13 15:18  psizun
+	* Added command 'cobo-led-set' to etEccClient to do some tests with
+	  the CoBo LED device; refs #70, #88.
+
+2014-03-12 13:24  psizun
+	* Added property --Ice.IPv6=0 to communicator of getEccServer,
+	  dataRouter, getEccSoapServer and GetController to disable Ice
+	  support for IPv6; refs #88.
+	  By default, IPv6 support is enabled in Ice 3.5. On a host without
+	  IPv6 stack (like sedipcc212?), the use of the wildcard address
+	  when starting a server on all interfaces causes an Ice::SocketException: Address family not supported by protocol.
+	  See:
+	  - http://www.zeroc.com/forums/help-center/6184-address-family-not-supported-protocol.html
+	  - http://doc.zeroc.com/display/Ice/New+Features+in+Ice+3.5#NewFeaturesinIce3.5-IPv6nowenabledbydefault
+	  - http://doc.zeroc.com/display/Ice/Ice+Transport+Properties#IceTransportProperties-Ice.IPv6
+	  Updated documentation; refs #56.
+
+2014-03-07 18:06  psizun
+	* - Added getEccClient command 'cobo-led-blink-all'.
+	  - Commented code for configuration of AsAd LCM1 register.
+	  - Fixed bug introduced in previous commit (mixing CKW and CKR frequency parameters). refs #88, #70
+
+2014-03-06 16:25  psizun
+	* Changed data transfer algorithm to avoid desynchronisation
+	  between AsAd buffers: each step (write pointer update, data
+	  transfer, read pointer update) is applied to all buffers in
+	  batch; TO BE TESTED; refs #70.
+
+2014-03-05 15:41  psizun
+	* Updated code for configuration of AsAd LCM2 documentation to
+	  stick more closely to GET-AS-002-0006 and GET-As-002-0010; refs
+	  #56, #88.
+
+2014-02-28 17:22  psizun
+	* Some modifications to avoid duplicating code for AsAd LCM
+	  configuration between GetBench and GetController; refs #88.
+
+2014-02-27 17:24  psizun
+	* Implemented step 'configure' and 'prepare' of the Mutant
+	  module(s) configuration; refs #50, #78, #88.
+	  Added description of Mutant registers; refs #45.
+
+2014-02-26 10:22  psizun
+	* Implement steps 'describe' and 'prepare' of the Mutant module(s)
+	  configuration; refs #50, #78, #88.
+	  Updated Homebrew documentation; refs #56.
+
+2014-02-24 14:34  psizun
+	* First steps of Mutant module configuration; refs #50, #78.
+
+2014-02-24 11:50  psizun
+	* Added command 'mutant-align' to GET ECC command line client to
+	  trigger alignment procedure of the current Mutant node; refs #77,
+	  #87, #88.
+
+2014-02-21 15:54  psizun
+	* Adapted ECC soap sever and client to gSOAP 2.8.17 (installed by
+	  Homebrew on OS X); refs #34, #84.
+
+2014-02-21 14:48  psizun
+	* Fixed last reference to get::daq::FdtDataSender (moved to the mdaq::daq namespace); refs #70.
+
+2014-02-21 14:41  psizun
+	* Fixed bug in configure.ac (missing square bracket); refs #84.
+
+2014-02-21 12:15  psizun
+	* Moved FdtDataSender class from GetBench to MDaq; refs #70.
+
+2014-02-20 09:01  psizun
+	* Taking act of the fact that the "prepare" and "configure"
+	  transitions use the same configuration file, removed forbidden
+	  configuration ID triplets from the list of configurations
+	  proposed to the run control; refs #50.
+
+2014-02-17  psizun
+	* Updated documentation; refs #56.
+
+2014-02-14  psizun
+	* Fixed description of Mutant-related CoBo registers; refs #45.
+
+2014-02-13  psizun
+	* Modified AsAd pulser manager so that it accesses device objects
+	  locally. It suppresses the 20 ms dead time per pulse; refs #70.
+	  Reduced priority of the pulser thread.
+	  Updated documentation; refs #56.
+
+2014-02-12  psizun
+	* Added documentation for Homebrew; refs #56.
+
+2014-02-11  psizun
+	* Fixed issue in "2p mode" of the AsAd pulser; refs #70.
+	* Archiving hardware description file with new Mutant-related registers; refs #45.
+
+2014-02-10  psizun
+
+	* Reduced duration of AsAd pulse operation from 30 ms to 20 ms; refs #70.
+	  Updated script to download software.
+
+2014-02-07  psizun
+	* Fixed failure to build getEccSoapServer on Mac OS X: the file
+	  system being case-insensitive, the object file from the
+	  eccServer.cpp (built) source file was overwriting the object file
+	  from the EccServer.cpp source file, leading to unreferenced
+	  symbols when linking; refs #34, #63, #84.
+
+2014-02-06  psizun
+	* Updated Ice M4 macro in GetBench so that path to Ice does not
+	  have to be provided on Mac OS X; refs #84.
+	  Improved installation scripts, added CeCILL license.
+	* Improved installation script; refs #84.
+
+2014-02-05  psizun
+	* Switched to Boost random number generators (there still seems to
+	  be a bias: the mean period of the sample is smaller than the
+	  parameter of the distribution); refs #16.
+	  fixed installation scripts, added choice of log level; refs #84.
+
+2014-02-04  psizun
+	* Changed default IP address of getEccServer from INADDR_NONE to
+	  INADDR_ANY (behavior is the same as both addresses leads to an
+	  Ice proxy listening to all interfaces) and default addresses of
+	  dataRouter from 127.0.01 to INADDR_ANY; refs #88.
+	* Ensuring backward compatibility of new ECC versions with old
+	  embedded server where new random pulser is not available; refs
+	  #88.
+
+2014-02-03  psizun
+
+	* Added pseudo-random Poisson mode to the AsAd pulser manager; refs
+	  #50, #70.
+	  Updated documentation; refs #56.
+
+2014-01-29  psizun
+
+	* Moved subscription to alarm notifications to immediately after
+	  activation of AsAd monitoring to ease detection of AsAd alarms
+	  occurring during the configuration; refs #50.
+	  Added to doc the instructions for installing get-config-wizard;
+	  refs #56.
+
+2014-01-21  psizun
+	* Restored old ECC operation asadInjectCharge (with deprecated
+	  slice directive) for the sake of the old AGET test bench
+	  versions; refs #88.
+	* 
+	  - Added double pulse feature to AsAd periodic pulser (for 2p
+	  mode); refs #50, #70.
+	  - Added check of compatibility between readout depth and 2p mode
+	  parameters.
+	  - Updated documentation (new parameters
+	  CoBo.Generator.doublePulseEnabled and
+	  CoBo.Generator.secondPulseAmplitude); refs #56.
+	* Slightly improved periodicity of periodic tasks; refs #70.
+
+2014-01-20  psizun
+	* Fixed incompatibility with older firmware versions where the
+	  'hardwareVersion' register did not exist and is found to have a
+	  value of 0xffffffff; refs #88.
+	  Interpreting this value as aM-CoBo value leads to assuming the
+	  existence of the PLL device which leads to the crash of VxWorks
+	  image.
+	  Updated documentation; refs #56.
+	* Modified AsAd alarm watcher so that it checks not only the
+	  asadStatus register but also the asadEnable register since, on
+	  M-CoBo, the alarm bit is set for disconnected AsAd boards; refs
+	  #70.
+	* Incremented GetBench library version-info; refs #84.
+
+2014-01-17  psizun
+	* Created parameters for configuring the alarm notification service
+	  in the ECC state machine, updated documentation; refs #50, #56,
+	  #88.
+	* Added choice of port for alarm notifications to restore
+	  possibility to create several instances of getEccServer and
+	  getEccSoapServer; refs #88.
+
+2014-01-16  psizun
+	* Fixed Makefile issue; refs #84.
+	* Added mechanism for ECC o subscribe to alarms detected by CoBo
+	  and to relay them to the GANIL alarm service; refs #47, #50, #70.
+
+2014-01-14  psizun
+	* Modified values returned for field 'Transition' (now one value
+	  per transition instead of simply 0 or 1); refs #34, #50.
+
+2014-01-13  psizun
+	* Modified ECC/RCC state machine (added field 'Transition' to state
+	  returned by getState method) so that the interface is identical
+	  to that of the AGATA experiment; refs #34.
+	  Rewrote SOAP ECC server to remain responsive while handling long
+	  transitions; refs #50.
+
+2014-01-10  psizun
+	* Added periodic task to check AsAd alarm bits every 30 seconds.
+	  For now, it is only started by the 'asad-alarm-monitor' command
+	  of the ECC command line client.
+	  If there is an alarm, its is simply logged in the VxWorks
+	  console; in the future, it will have to be relayed to the ECC
+	  server and then to the GANIL Run Control Alarm service (see
+	  https://dsm-trac.cea.fr/get/raw-attachment/wiki/GanilSpiral2DAQDocumentation/ICC_DAQ_Logging%26Alarms_1.0.pdf).
+	  refs #70, #87
+
+2014-01-08  psizun
+	* All the AsAd DAC registers are now systematically initialized,
+	  instead of relying on their supposed power-on default value; refs
+	  #50, #86.
+	  Indeed, it was observed that the DAC1 register sometimes had the
+	  value 0x8 instead of 0, leading to some weird data.
+	  
+	  Added description of all the DAC registers; refs #45.
+	  
+	  Fixed bug in state machine causing runs to be started on CoBo
+	  boards described but not activated.
+
+2014-01-07  psizun
+	* Added to state machine configuration parameters
+	  'AsAd.Generator.periodicModeEnabled' and
+	  'AsAd.Generator.period_ms' to configure the CoBo periodic AsAd
+	  pulser; refs #50, #85.
+	  Fixed build issue on MacOSX; refs #84.
+
+2014-01-06  psizun
+	* Fixed linker issue revealed by GCC 4.7.2 on Mageia; refs #84.
+	* Removed reference to no longer existing header; refs #84.
+	  Updated documentation; refs #56.
+	* Transfered to CoBo embedded server the management of the AsAd
+	  voltage generator; refs #70, #85.
+	  Added commands to start/stop periodic pulses (the boost::system
+	  library is now required for the VxWorks platform as well).
+	  Fixed documentation; refs #56.
+
+2013-12-20  anvar
+	* Set Eclipse build command back to "make -j ${MAX_JOBS}" to speed
+	  up build. refs #84
+
+2013-12-19  psizun
+	* Modified CoBo embedded server to bind data link to interface
+	  named !CoBoDataNode; refs #70.
+	  Minor fixes in documentation and SOAP client;
+
+2013-12-17  psizun
+	* Embedded !VxWorks server now binds to address of interface with
+	  hostname 'CoBoCtrlNode' (or 'vxTarget' if not found); refs #70.
+
+2013-12-16  psizun
+	* Completed Narval/RCC documentation; refs #56.
+
+2013-12-12  psizun
+	* Fixed database configuration manager; refs #50.
+	  Improved ECC log messages for run control.
+	  Added Mutant to documentation references; refs #56.
+	* Synchronized default port (8083) used by ECC SOAP server and
+	  client; refs #34.
+
+2013-12-10  psizun
+	* Fixed bug introduced earlier; refs #84.
+	* Fixed documentation to allow the generation of PDF by doxygen;
+	  refs #56.
+
+2013-12-09  psizun
+	* src/main/getEccServer.cpp:
+	  Fixed incompatibility with version 1.41 of Boost on CentOS 6.4;
+	  refs #17.
+
+2013-12-06  psizun
+	* Added Log4cxx to choice of logging backends of ICE ECC server;
+	  refs #61.
+
+2013-12-05  psizun
+	* Modified PLL device configuration:
+	  - changed initial configuration to all clocks at 25 MHz
+	  - adapted code to swap of CLK5 with CLK10
+	  - now handling 6.25 MHz and 12.5 MHz in addition to 25, 50 and
+	  100 MHz CKW frequencies
+	  refs #79
+	* Removed possibility to select a CKR frequency other than 25 MHz; refs #62.
+	* Fixed bug in parsing of argument of 'pll-write' command; refs #79
+
+2013-12-02  psizun
+	* Added to state machine the readout of the AsAd board identifier;
+	  the trick seems to be to read the 4 AsAd Identity Manager
+	  registers in the right order; refs #50, #83.
+	* Updated and completed description of AsAd Identity Manager
+	  registers; refs #45.
+	  Added SO_REUSEADDR socket option to GANIL SAOP ECC server; refs
+	  #34.
+
+2013-11-28  psizun
+	* Changed to 8083 the default port of the ECC soap server to
+	  reflect the default value in RCC GUI.
+	  Added handler for SIGINT signal in getEccSoapServer so that, when
+	  killed with Ctrl-C, it shuts down properly and frees its port
+	  immediately; refs #34.
+	  Updated log4j properties so that ECC log messages are displayed
+	  by RCC GUI.
+	  Updated documentation; refs #56.
+
+2013-11-26  psizun
+	* Added to ECC state machine the configuration of the CoBo
+	  'readOffset' register; refs #50.
+	* Adding to ECC state machine the new configuration parameters
+	  already added to GetController: "connectGroundToZAP" and
+	  "antiSparklingEnabled" to allow users to ine non-default value to
+	  the AsAD IM0 register; refs #50, #82.
+
+2013-11-25  psizun
+	* Updated documentation; refs #56.
+	* Added description of CoBo "readOffset" register; refs #45.
+
+2013-11-22  psizun
+	* Removed reference to header registerDescription.h deleted back in
+	  rev 816; refs #17.
+	* Updated external references of GetBench to get new M4 macros and
+	  automake include files; refs #17.
+
+2013-11-22  anvar
+	* Cosmetics refs #61
+
+2013-11-22  fchateau
+	* dropped usage of AX_FLAG_REINITIALIZATION: flags more specific
+	  than -Wall and -Werror should be specified during configure
+	  because there are too many compatibility issues with them.
+	  Removed -Wno-portability-recursive: new versions of ice.am,
+	  ax_lib_ice.m4, autotroll.am, autotroll.m4 should address these
+	  problems, refs #52.
+
+2013-11-22  psizun
+	* FIXed test/main.cpp to adapt to new boost paradigm; refs #17.
+
+2013-11-12  psizun
+	* Added invocation of PLL configuration method for targets for
+	  which the 'hardwareVersion' register exists and has a value equal
+	  to or greater than 2; refs #16, #50.
+	* Added to ECC state machine the use of the new 'calibrationAget'
+	  CoBo register; setting this register to a value different from 0
+	  does allow to pass the AGET calibration sequence even though AGET
+	  no. 0 is disabled but it seems to have adverse consequences on
+	  the AGET chip configuration later on (the register values read
+	  completely differ from the values written); refs #50.
+	* Added to ECC state machine the readout of the new CoBo registers
+	  'firmwareRelease', 'firmwareDate' and 'hardwareVersion'; refs #50.
+	  See https://project-get.cea.fr/Groups/100_todolist/400_wp4_data_acquisi/reduced_cobo_4_aget1226/view
+
+2013-11-08  psizun
+	* Updated OS X documentation; refs #56.
+	* Added description of new CoBo registers ("hardwareVersion",
+	  “firmwareDate", “firmwareRelease", “calibrationAget"); refs #45.
+
+2013-11-06  psizun
+	* It seems that, with Ice 3.5.1, the out parameter of an ICE method
+	  should not be named 'response' as it hides the 'response' data
+	  member of type Response defined in the callback in the generated
+	  code; refs #17, #53.
+
+2013-11-04  psizun
+	* Makefile.am, configure.ac:
+	  Added missing linker flags for VxWorks build; refs #17, #70.
+	* Added parameter AsAd[*].Control.checkPowerSupply to allow user
+	  not to abort configuration when the check of the AsAd AL line
+	  seems to indicate there is no power supply connection; refs #61.
+
+2013-10-29  psizun
+	* Revised configuration of AsAd ADC channels and AsAd Inputs
+	  Manager in light of the "AsAd SCA Management" document.
+	  Added parameter 'Aget.Control.enableAsAdPosition', deprecated
+	  parameter 'Aget.Control.Position'.
+	  refs #50
+
+2013-10-25  psizun
+	* Fixing MDaq flags in !GetBench; refs #17.
+	* Adapted !GetBench package to changes in structure of the MDaq
+	  library; refs #17.
+	  Added comments to AsAd ADC configuration sequence; refs #56.
+
+2013-10-23  psizun
+	* Added check of initial monitoring alert status of connected and
+	  active AsAd board(s); refs #50.
+
+2013-10-22  psizun
+	* No longer loading MFM data formats from the FrameStorgae
+	  constructor so that GetController will not have to be started
+	  from a directory containing these formats.
+	  This is however still a requirement for dataRouter as I do not
+	  want the GetBench package to depend on the Qt library (for
+	  QCoreApplication::applicationDirPath).
+	  refs #61.
+	* Recoded configuration of AsAd monitoring device (now conform to
+	  GET-AS-002-0004 and fully configurable); refs #50.
+	* Updated documentation on AsAd monitoring parameters; refs #56.
+
+2013-10-21  psizun
+	* Fixed detection of Boost libraries on Ubuntu 13.10; refs #17.
+	* Modified linker flags to ensure use of runtime search path added
+	  to Mac OS X section of ICE M4 macro; refs #17.
+	  Updated doc; refs #56.
+
+2013-10-17  psizun
+	* Forceing use of latest MDaq package in GetBench; refs #17.
+
+2013-10-15  psizun
+	* Updated documentation (merged data frames) and register
+	  description (AsAd alarm status); refs #56.
+
+2013-10-11  psizun
+	* Added format of GANIL frames for merged data; refs #45.
+	  Added check of AsAd connection to its power supply; refs #50, #56.
+
+2013-10-04  psizun
+	* Added configuration of zero suppression registers; refs #45, #50, #56.
+
+2013-10-03  psizun
+	* Fixed all compiler warnings and doxygen warnings; refs #61, #56.
+
+2013-09-30  psizun
+	* Added CoBo-Mutant interface ICE header to installed headers for
+	  GetController; refs #17.
+	* Added ICE interface in gethwServer to setup the Cobo-Mutant link
+	  through XGPIO; refs #80.
+	  Added configure option --with-bsp-drv-xsrc to specify the
+	  location of the headers for the BSP drivers.
+	  Added ECC command 'mutant-link-set' to access this interface.
+	  It seems we still can distribute the same embedded server for
+	  R-CoBo and M-CoBo.
+
+2013-09-27  psizun
+	* Made CKW frequency a parameter of the ECC pll-configure command; refs #45.
+	* Replaced use of hardcoded masks by MDaq bit fields in PLL
+	  configuration code; refs #79.
+	* Added description of PLL bit fields; refs #45.
+	* Fixed address of PLL write packet FIFO status register; refs #45.
+
+2013-09-26  psizun
+	* Modified default PLL config to reflect what our version of
+	  coboTest.out does; refs#79.
+	* Integrated PLL management code into ECC; refs #79.
+	* Added PLL device description; refs #45.
+
+2013-09-24  psizun
+	* Adding image to doc; refs #56.
+
+2013-09-23  psizun
+	* Updated doc on embedded linux; refs #56.
+
+2013-09-18  psizun
+	* Added ECC manager for Mutant board; refs #50, #78.
+	* Added sample log4j properties; refs #34, #56.
+	* Improved handling of invalid configuration repository URL at the
+	  start of both ICE and SOAP ECC servers; refs #61.
+
+2013-09-13  psizun
+	* Minor doc fixes; refs #56.
+
+2013-09-12  psizun
+	* Adapting to Trac's new version of doxygen with markdown support; refs #56.
+	* Another try at displaying SVG images in Trac; refs #56.
+	* Another try at displaying SVG images in Trac; refs #56.
+	* Added to state machine the parameter CoBo[*].Module.readouDepth
+	  to set the number of AGET time buckets to read out; refs #50.
+	  Updated doc; refs #56.
+	* Giving up on SVG in Trac/doxygen; refs #56.
+
+2013-09-11  psizun
+	* Yet another attempt at displaying SVG images in doxygen/trac; refs #56.
+	* Fixed doc table of contents; refs #56.
+
+2013-09-09  psizun
+	* Updated IceStorm M4 macro for compatibility with version 3.4.2_2
+	  of MacPorts port zeroc-ice34; refs #63, #17.
+	* Updated ICE M4 macro for compatibility with version 3.4.2_2 of
+	  MacPorts port zeroc-ice34; refs #63, #17.
+	* Testing doxygen/trac display of SVG images; refs #56.
+	* Added BOOST library flags missing on Mac OS X; refs #17.
+	* Added test of SVG display in Trac doxygen page; refs #56.
+
+2013-09-06  psizun
+	* Updated doxygen doc; refs #56.
+	* Updated package dependencies in doc; refs #56.
+
+2013-09-05  psizun
+	* Updated state machine SOAP interface (renamed Break into Breakup); refs #34.
+
+2013-09-02  psizun
+	* Added option to ECC SOAP client to customize host address and
+	  port of server (default still is localhost:8061); refs #34.
+	* Added protection against multiple run starts; refs #61.
+
+2013-08-30  psizun
+	* Updated documentation (to be completed); refs #56.
+
+2013-08-29  psizun
+	* Added to state machine the possibility to adjust the location and
+	  size of each of the 4 circular buffers of each CoBo board; refs
+	  #50.
+	* Fixed hard-coded addresses of registers containing start and end
+	  addresses of AsAd3 circular buffer; refs #70.
+	  Fixed bug in handling of register 2 bit 21 failure; refs #50.
+
+2013-08-28  psizun
+	* Added explicit initialization of the circular buffer read
+	  pointers to the circular buffer start addresses (is it needed? is
+	  it done by the firmware?) at the run start; refs #50.
+
+2013-08-26  psizun
+	* Fixed bug in configuration of the AsAd generator; any use of the
+	  writeField method on an AsAd register field requires to have
+	  first set both the ASAD_sc_mask and the asadSelect CoBo registers
+	  properly; refs #50.
+
+2013-08-23  psizun
+	* Fixed state machine handling of exception when failing to connect
+	  to data router; refs #50.
+	* Synchronized the ECC state machine with the latest changes in
+	  GetController related to MicroTCA CoBo; refs #50.
+
+2013-08-21  psizun
+	* - Modified dataRouter FrameStorage so that frames from different
+	  AsAd boards are stored in different files; refs #71. Since
+	  dataRouter creates a new file each time the event ID of a new
+	  frame gets smaller than the ID of the previous frame,
+	  it led, when working with several AsAd boards, to new files being
+	  created every event.
+	  - dataRouter still does not look at the CoBo ID: when working
+	  with several CoBo boards, each dataRouter instance should be
+	  started in a different directory to avoid conflicts between file
+	  streams.
+	  - GetController still saves all data in a single file without
+	  looking at the AsAd ID.
+	  - Updated HTML doc; refs #56.
+
+2013-08-09  psizun
+	* Adapted DAQ classes to the readout of 4 AsAd boards; refs #61.
+
+2013-08-08  psizun
+	* Increased package version to ensure new GetController will be
+	  used with new GetBench library; refs #17.
+
+2013-07-30  psizun
+	* Added register 'ASAD_sc_mask' to select which AsAd boards to send
+	  slow control commands to (the 'asad_sc_start' register is now
+	  only used to start the slow control operation); refs #45.
+
+2013-07-26  psizun
+	* Updated documentation references; refs #56.
+	* Updated documentation for AGET channel inhibition; refs #56.
+	* Recoded configuration of AGET registers 10 and 11 (channel inhibition): 4th value of the 2 bits field per channel is not to be used.
+
+2013-07-03  psizun
+	* Updated instructions for Mac OS X; refs #56.
+
+2013-07-02  psizun
+	* Updated instructions for Mac OS X; refs #56.
+
+2013-07-01  psizun
+	* - Adapted !GetBench to changes in class names in package
+	  StateMachine; refs #17.
+	  - Re-decreased verbosity level for test bench; refs #61.
+
+2013-06-20  psizun
+	* Re-increased verbosity of GetBench for debugging the Micro-TCA CoBo; refs #61.
+
+2013-06-18  psizun
+	* Implemented in the state machine the changes to AsAd ADC
+	  calibration sequence provided by Nathan (deserializer DESKEW
+	  sequence); refs #50, #76.
+	  Improved documentation of ADC registers in hardware description
+	  file; refs #56.
+
+2013-06-14  psizun
+	* Restored alias "intEnable_asad0" for bit "intEnable" to keep old
+	  software working with new hardware description file; refs #61.
+	* - Modified description of "pipeCtrtl" register (see email from N.
+	  Usher):
+	  - Removed bits 31:29, since we are doing one CPU interrupt per
+	  CoBo instead of one per AsAd.
+	  - Added a new bit 8 "adcDeskew" to initiate CoBo deserializer
+	  deskew sequence.
+	  - Adapted state machine code o the removal of bits 31:29.
+	  refs #45,#50
+
+2013-06-11  psizun
+	* Added to state machine the configuration of the AsAd inspection
+	  lines; refs #75, #50.
+	  Modified existing code to allow GetController to do the same.
+	  Updated documentation; refs #56.
+
+2013-06-10  psizun
+	* Fixed typo; refs #56.
+	* Completed doxygen documentation (added description of AGET
+	  register 2 parameters); refs #56.
+	* doc/config_parameters.dox:
+	  Fixed doxygen documentation of parameter
+	  CoBo.AsAd.channel.Reading; refs #56.
+
+2013-05-31  psizun
+	* Updated doxygen doc to include instructions for Eclipse
+	  environment variables; refs #56.
+	* Removed MORDICUS_INSTALL_ROOT and PKG_CONFIG_PATH from the
+	  GetBench Eclipse project configurations; refs #17.
+	  Added test bench to the script for creating tags.
+
+2013-05-30  psizun
+	* - Added alias 'writeReadDelay' for parameter 'scwScrDelay' (when
+	  did its name change?); refs #50.
+	  - Updated documentation; refs #16.
+
+2013-05-17  psizun
+	* Reduced getEccServer verbosity to speed up the test bench (no
+	  significant gain); refs #61.
+
+2013-05-15  psizun
+	* Modified links to eDoc in HTML doc to ensure access to all
+	  visitors; refs #56.
+	* Modified links to eDoc in HTML doc to ensure access to all
+	  visitors; refs #56.
+
+2013-05-14  psizun
+	* Added parameter CoBo.AsAd.Age.Global.Reg2.inputDynamicRange_5pct
+	  in GetController to set bit 24 of AGET 2.2 register 2 ; refs #50.
+	  Updated documentation accordingly; refs #56.
+	  See AGET Data Sheet, January 2013:
+	  https://project-actar-get.cea.fr/Groups/100_todolist/200_wp2_front_end_el/100_aget/aget_production/get-qa-000-00057610/view
+	* Added missing field "Input_dynamic_range" in AGET register 2
+	  (defined in version 2.2 of the chip); refs #45.
+
+2013-05-13  psizun
+	* Added to state machine the missing initialization of 'readDepth'
+	  register from 'ReadoutPointerOffset' parameter; refs #73.
+
+2013-05-06  psizun
+	* Added systematic checks in configuration of AGET registers; refs #50.
+	* Modified AGET device policy so that we systematically wait for
+	  the busy signal to be off before reading or writing to a
+	  register; refs #70.
+
+2013-05-02  psizun
+	* Reduced sleeping time in daqStart from 1 second to 20 ms; refs #61.
+
+2013-04-27  psizun
+	* Fixed documentation typos; refs #56.
+
+2013-04-26  psizun
+	* Improved GET User Documentation (refs #56).
+
+2013-04-25  psizun
+	* Fixed bug in value of FDT heart beat, found during visit to GANIL
+	  on April 25th; refs #47.
+
+2013-04-17  psizun
+	* Improved exception handling (socket exceptions when starting
+	  duplicate hardware server and when starting a run while FDT
+	  router is not available); refs #61.
+
+2013-04-12  psizun
+	* Removed 'SCRAutoDelayEnable0'; refs #61.
+	* Adapted ECC to changes in the firmware and the harwadre
+	  description; refs #50, #61.
+
+2013-04-11  psizun
+	* Fixed offset of fields 'MultSubtractAverage' and
+	  'MultSubtractDevs' in register 'ctrl'/'pipeCtrl', removed fields
+	  'SCRAutoDelayEnable1', 'SCRAutoDelayEnable2' and
+	  'SCRAutoDelayEnable3', renamed 'SCRAutoDelayEnable0' into
+	  'SCRAutoDelayEnable'; refs #45.
+
+2013-04-10  psizun
+	* Fix for CENBG build environement (customized Ubuntu 11.10 ?);
+	  refs #17.
+
+2013-04-05  psizun
+	* refs #71, #56
+	  - Added milliseconds in timestamp used for naming data file so
+	  that, when two frames are received at almost the same time and
+	  the event ID of the second frame is smaller, the new file created
+	  will not overwrite the one where the first frame has been stored;
+	  also, timestamp now follows ISO8061.
+	  - Fixed some doxygen doc warnings.
+
+2013-03-27  psizun
+	* Added FDT protocol sender/receiver for interface between R-CoBo
+	  and Narval (with heart beats every 3 seconds of idle time); refs
+	  #47.
+
+2013-03-14  psizun
+	* Synchronized ECC state machine with latest !GetController
+	  modifications (refs #50):
+	  - Added possibility to configure the number of events per CPU
+	  interrupt ('interruptRate' parameter).
+	* Synchronized ECC state machine with latest !GetController
+	  modifications (refs #50):
+	  - Added possibility to configure the dataSource field in the
+	  header of the data frames.
+	  - Added possibility to configure the CoBo index field in the
+	  header of the data frames.
+	  - Renamed recently added parameter externalTriggerMode into
+	  secondaryTriggerMode.
+	  Fixed some doxygen warnings.
+
+2013-03-13  psizun
+	* Synchronized ECC state machine with recent !GetController
+	  modifications (secondary trigger, multiplicity moving average
+	  subtraction, trigger periods shorter than 1 ms); refs #50.
+	* Improved error management of data sender so that a brutal
+	  disconnection of the data router does not irreparably crash the
+	  embedded server; refs #70.
+	  Removed some unnecessary configuration file examples.
+
+2013-03-12  psizun
+	* refs #45
+	  - Added fields "MultSubtractAverage" and "MultSubtractDevs" in
+	  register "ctrl"/"pipeCtrl".
+	  - Added fields "slowControl_out", "multiplicity_out",
+	  "timing_out", "manual_out", "external_out" in register
+	  "ctrl"/"triggerMask" for external trigger logic.
+	* Fixed state machine bug in case not enough data links are
+	  provided; refs #34.
+	* Modified SOAP ECC server so that logger properties can be loaded
+	  from external log4j property file; refs #34.
+	* Modified ECC/RCC interface to follow decisions made on March 4th,
+	  GANIL/IRFU meeting; refs #34.
+
+2013-03-07  psizun
+	* Fixed Fedora 15 (Boost 1.46) build issue; refs #17, #34.
+	* refs #34
+	  - Added part of structures for ECC/RCC XML exchanges (ConfigId,
+	  ConfidIdSet, SubConfigIdSet)
+	  - Fixed problem in state machine when setting AGET reg1 registers
+	  (caused by commands executed too close to each other?)
+
+2013-03-04  psizun
+	* Adapted code to latest hardware description (suppression of
+	  dataReadyLevel register, addition of three more
+	  SCRAutoDelayEnable# registers); refs #50.
+
+2013-02-27  psizun
+	* - Fixed incompatibilities with Linux Mageia 2 e.g. with Ice 3.3.1
+	  (refs #17):
+	  - Removed (dead) code using Ice 3.4 API for Asynchronous Method
+	  Invocation.
+	  - Added missing header for use of IceUtil::ThreadControl
+	  - Fixed some doxygen comments and tagging script.
+
+2013-02-21  psizun
+	* Added explicit "no-portability-recursive" automake option so that
+	  ICE custom rules work with automake 1.13, since, starting from
+	  automake 1.13, the silent rules option no longer disables the
+	  warnings in the 'portability-recursive' category ; refs #17.
+
+2013-02-15  psizun
+	* Partial implementation of the modifications of the RCC/ECC SOAP
+	  interface decided during February 13th's meeting; refs #34.
+	  See details on
+	  [https://project-actar-get.cea.fr/Groups/100_todolist/10000_meeting/minutes_of_meeting/minutes_of_ganilirf3548/view
+	  eDoc].
+
+2013-02-07  psizun
+	* Added description of version 3.2 (e.g. revision 4) of the MFM
+	  format of CoBo frames; refs #45.
+	* Fixed order of DAQ stop sequence; refs #67.
+
+2013-02-01  psizun
+	* Added flush of circular buffer data at the end of runs; refs #67.
+
+2013-01-30  psizun
+	* Added description of the register for setting the 'dataSource'
+	  header field of the data frames; refs #45.
+
+2013-01-25  psizun
+	* Set default data router options to flow of type 'Tcp' and
+	  processor of type 'FrameStorage'; refs #61.
+	* Added scripts to download and build packages; refs #17.
+
+2013-01-24  psizun
+	* Adapted test program to new data sender API (which reference to
+	  circular buffer); refs #67.
+
+2013-01-23  attpc
+	* Added print of run duration in VxWorks console; refs #61.
+	* Fixed issues regarding the sending of frames and the proper
+	  handling of the circular buffer; refs #67.
+
+2013-01-22  attpc
+	* Added registers 'extTriggerCnt' and 'fifoHighWaterMark'; refs #45.
+
+2013-01-22  psizun
+	* Added 'interruptRate' register, replacing 'dataReadyLevel' register; refs #45.
+	* Changed data emission policy to send all circular buffer contents
+	  after an interrupt instead of just the expected number of frames;
+	  frame decoding is thus avoided; refs #66.
+
+2013-01-21  psizun
+	* First implementation of the new interrupt scheme; refs #66.
+
+2013-01-11  psizun
+	* Added possibility to reset and disable AsAd monitoring in GetBench state machine; refs #65.
+
+2013-01-08  psizun
+	* Minor modifications; refs #50.
+
+2013-01-04  psizun
+	* Enabled the Apache log4cxx logging backend in the SOAP version of the ECC server; refs #34.
+
+2012-12-18  psizun
+	* refs #17
+	  - Fixed 'integer constant is too large for long type' warnings on
+	  i686 systems when affecting literal to Ice::Long
+	  - Defined __STDC_CONSTANT_MACROS before including
+	  boost/cstdint.hpp so that the UINT32_C and UINT64_C macros be
+	  defined on SL6.
+	* refs #61
+	  - Added IceStorm logger to GetBench versions of the ECC sever and
+	  client.
+	  - Added log4cxx to doc.
+	  - Some changes to ensure backward compatibility of the muti-CoBo
+	  state machine with mono-CoBo config files.
+
+2012-12-17  psizun
+	* Fixed dist traget on Scientific Linux 6 (removed gsoap generated
+	  files from distributed sources; why did it work on other
+	  platforms?); refs #17.
+	* Fix: bug unveiled on 32 bit environments when using std::min with
+	  one vector::size_type parameter and one unsigned long literal
+	  parameter; refs #17.
+
+2012-12-04  psizun
+	* Fixing bug in configuration of AGET register 1; refs #50.
+	* refs #17, #56
+	  - Updated installation doc after Fedora 15 tests.
+	  - Disabled database support in Eclipse build configuration.
+
+2012-11-30  psizun
+	* Fixed requirements in documentation; refs #56.
+	* Removed GetBench requirement that Boost version be 1.44 or newer
+	  to be compatible with CentOS 6.3; refs #17.
+
+2012-11-29  psizun
+	* refs #56, #61
+	  - Added setting of 'ScwMultDelay' and 'ScwScrDelay' registers to
+	  ECC 'configure' transition.
+	  - Added doc to install QwtPlot3d.
+
+2012-11-26  psizun
+	* Added possibility to add/retrieve a configuration into/from the
+	  configuration manager; refs #50.
+
+2012-11-23  psizun
+	* Minor changes (refs #19):
+	  - added two fake data senders that only count the number of Bytes
+	  (respectively frames) to send without actually sending them.
+	  - statistics of data sender (bits/s, interruptions) are printed
+	  every 10 seconds.
+	  - some API changes to ease development of GetController.
+
+2012-11-19  psizun
+	* Updated state machine soap interface; refs #50.
+
+2012-11-15  psizun
+	* - Implemented parsing of data router addresses in state machine
+	  configure transition (refs #50).
+	  - Removed switch of intEnable in MemRead::sendData (refs #19).
+
+2012-11-12  psizun
+	* doc/get_state_machine_diagram.png, src/get/rc/BackEnd.cpp,
+	  src/get/rc/BackEnd.h, src/get/rc/CoBoNode.cpp,
+	  src/get/rc/CoBoNode.h:
+	  Minor update to state machine; refs #50.
+
+2012-11-08  psizun
+	* Makefile.am, configure.ac, src/get/daq/DataRouter.cpp,
+	  src/get/daq/FrameStorage.cpp, src/get/daq/FrameStorage.h,
+	  src/get/rc/CoBoNode.cpp:
+	  Disabled build on Mac OS X of classes in GetBench using MDaq
+	  timer class; fixed other Mac OS X specific issues; refs #63.
+
+2012-11-07  psizun
+	* Optimisation of the data router (refs #19).
+
+2012-11-05  psizun
+	* refs #50, #61
+	  * Upgraded state machine structure.
+	  * Added data processor type to debug data acquisition speed.
+
+2012-10-19  psizun
+	* refs #17, #63
+	  * Applied patch to Boost Filesystem library detection macro for Mac OS X
+	  * Removed flag -Wno-vla recently added to silent warnings when
+	  compiling gSoap code, flag seems to be missing on
+	  MacPorts-provided compiler (to be investigated).
+	* refs #50, #61
+	  * Added console logging backend to getEccClient and getEccServer.
+	  * Fixed case of register names for AsAd temperature limits.
+
+2012-10-18  psizun
+	* Changed log level flag from LOG_LEVEL into UTL_LOG_LEVEL; refs #61.
+	* refs  #50
+	  * Incremented version number to ensure downstream modules
+	  (GetController) use version of Utilities including new logging
+	  interface.
+	  * Modified configuration manager so that hardware description use
+	  the concept of configuration ID (refs #61).
+
+2012-10-17  psizun
+	* Fixed compilation (refs #17) and doxygen (refs #56) warnings.
+	  - fixed warnings about ignored volatile type qualifier using
+	  boost::remove_volatile
+	  - silenced warnings about varaible length arrays in gSoap
+	  generated code using -Wno-vla flag
+	* Switched !GetBench to new logging paradigm (refs #61).
+	* Partial implementation of the ECC state machine transitions
+	  (describe, prepare, configure) based on the contents of
+	  GetController; to be completed (refs #50).
+
+2012-10-15  psizun
+	* Fixed bug in configure.ac (AM_CONDITIONAL run conditionally);
+	  refs #17.
+
+2012-10-12  psizun
+	* refs #50
+	  * Added configuration managers for file directory and database.
+	  * To enabled the database features, use the --enable-database-support flag.
+	  * Use option --config-repo-url of getEccServer to specify the
+	  location of configurations.
+
+2012-10-10  psizun
+	* Added pkg-config file for ECC client library for use by
+	  !GetController; refs #17.
+	* Added new state machine diagram (refs #56).
+	* Modified ECC stae machine diagram (refs #50):
+	  * divided 'inactive' super-state' into 3 states 'Idle',
+	  'Described' and 'Prepared'
+	  * added 'Reset' transition to go back to the 'Idle' state
+
+2012-10-04  psizun
+	* Removed reset of the timestamp and event counters from the
+	  daqStart command (refs #58); minor documentation update (#refs
+	  56);
+	* Documentation: added readline and ncurses to requirements.
+	* ECC backend: to allow external reset, timestamp and event counters are no longer systematically reset during daqStart operation.
+
+2012-09-29  psizun
+	* Added AC_CONFIG_AUX_DIR in GetBench configure script to avoid
+	  failure of first autogen.sh invocation; refs #57.
+
+2012-09-28  psizun
+	* Added last read cell index registers; refs #45.
+	* Ensured that, before connecting to data router, possible existing
+	  connection gets closed, so that the router accepts the new
+	  connection (refs #19).
+	  Fixed handling of Ice options in data router.
+	  Fixed doxygen syntax errrors (refs #56).
+
+2012-09-26  psizun
+	* Added ECC access to ZBuf connection type, simplified API for the
+	  3 DAQ connection types, increased project version number; refs #19.
+	* Added missing launch of data receiver at start of the data
+	  router. Fixed documentation details. refs #19, #56
+
+2012-09-24  psizun
+	* Fixed formatting issues in GetBench Doxygen doc (refs #56).
+
+2012-09-21  psizun
+	* Added Doxygen documentation pages (refs #56); fixed issues
+	  causing failure of the distcheck target (refs #17).
+
+2012-09-19  anvar
+	* Simplified daq architecture by adapting daq classes to new MDaq
+	  daq architecture. The project compiles but has not been tested at
+	  runtime. refs #19 #47
+
+2012-09-11  anvar
+	* Added support of ZBuf connectivity to daq process (using ZBuf
+	  connection in MDaq embedded process). refs #19
+
+2012-09-10  psizun
+	* Added missing headers; refs #17.
+
+2012-09-03  anvar
+	* Rationalized networking classes and suppressed all redundancies. refs #19
+
+2012-08-31  psizun
+	* Added revision 3 of Cobo data format (refs #45).
+	  Removed old, duplicate .xcfg and .ecc files (refs #13).
+
+2012-08-21  psizun
+	* Now using Tcp instead of Fdt for narval data router; refs #19.
+
+2012-08-21  anvar
+	* Adapted !GetBench to mdaq daq modifications. refs #19
+
+2012-08-20  psizun
+	* Adapting GetBench to recent changes in variable names for MDaq
+	  default port numbers; refs #17.
+
+2012-08-03  psizun
+	* Merging GetBench branch back into trunk; refs #12.
+
+2012-07-11  psizun
+	* Fixing management of exceptions when launcing a second DAQ server using the same address; fixes #49.
+
+2012-07-04  psizun
+	* Adapted GetBench to reorganization of the MDaq libraries (refs #17).
+	  Added ECC soap client (refs #34).
+
+2012-07-03  psizun
+	* Added new mdaq-utl library in pkgconfig file
+	  getbench-eccserver.pc; refs #17.
+	* Added requirement of MDaq >= 1.3.2 and libmdaq-utl library flags
+	  to fix Ice::UnmarshalOutOfBoundsException errors; fixes #48.
+
+2012-06-28  psizun
+	* Ensuring compatibility of configure scripts with automake
+	  versions older than 1.12; fixes #38.
+
+2012-06-27  psizun
+	* Fixing SOAP encoding; refs #34.
+	* Added zero suppression threshold registers; refs #45.
+
+2012-06-26  psizun
+	* Fixed Fdt DAQ connection; refs #47.
+	* Fixing Fdt DAQ server; refs #47.
+
+2012-06-25  psizun
+	* Changes to Fdt DAQ server/client code; refs #47.
+
+2012-06-25  anvar
+	* Modified data transfer server architecture. refs #47
+
+2012-06-25  psizun
+	* Added error management in ECC SOAP server; added draft of ECC
+	  soap client; refs #34.
+	* Added debug messages and ICE handle on IceDataProcessor for use
+	  in GetController; refs #47.
+
+2012-06-22  psizun
+	* Added draft version of ECC soap server; refs #34.
+
+2012-06-22  anvar
+	* Corrected a few erroneous include files refs #47
+
+2012-06-22  psizun
+	* Added missing launch of DAQ server (refs #47); some other
+	  cosmetic changes.
+
+2012-06-22  anvar
+	* Overhauled the daq part of !GetBench in order to allow other data
+	  transfer protocols such as FDT for easy integration with Narval
+	  actor at Ganil. refs #47
+
+2012-06-22  psizun
+	* Added 'suppressMultiplicity' bit field ; added read data delay
+	  for each AGET; refs #45.
+	* - Added GET-specific ECC client (getEccClient).
+	  - Fixed bug in date string of frame files.
+	  - Move implementation of Get ECC server into separate back end
+	  class (refs #46).
+	  - Added skeleton of state machine (refs #34).
+
+2012-06-20  psizun
+	* Adding commented hardware config. file and data format files to
+	  GetBench project; refs #45.
+
+2012-06-20  anvar
+	* Added config id list for run-control backend object. refs #34
+
+2012-06-14  psizun
+	* Added method reset() to SLICE interface of the DAQ server (refs
+	  #40); explicit specification of an IP address for the DAQ server
+	  DataAcquisition class (refs #42), removed Ice communicator
+	  creation/destruction from class; increased version number to
+	  1.1.0.
+
+2012-06-08  psizun
+	* src/get/daq/DataAcquisition.cpp, src/get/daq/DataAcquisition.h:
+	  Added cast to short in dump of data; refs #13.
+
+2012-06-05  anvar
+	* Added data dump to frame decoding in case of decoding error (for
+	  debugging purposes) refs #39 #13
+
+2012-05-04  psizun
+	* Added AM_PROG_AR in the GetBench project to fix automake extra
+	  portability issues; fixes #38, refs #17.
+
+2012-04-16  psizun
+	* Frames are now reconstructed using the !FrameBuilder class
+	  provided by the MultiFrame library (you might need to update your
+	  version of this library); refs #13.
+	* Added files necessary to enable automatic doxygen-ation within
+	  Trac; switched to new format of svn:externals definitions
+	  (subversion >= 1.5); refs #35.
+
+2012-04-06  anvar
+	* Added stubs to integrate with Ganil software. refs #19 #34
+	* Added examples of configurations and ecc scripts to serve as
+	  reference. refs #13
+
+2012-04-05  anvar
+	* Corrected bug in !daqServer which caused some frames to be stored
+	  twice. refs #33
+
+2012-04-05  psizun
+	* Added MultiFrame to the 'Requires' section of the GetBench
+	  pkg-config file, so that GetController finds the MFM headers
+	  wherever they have been installed; refs #17.
+	* Fixed change introduced in revision 281 so that it is backward
+	  compatible; refs #17.
+	* Added missing MDaq SPPFLAGS for slice2cpp so that MDaq slice
+	  definitions can be found event if MDaq has not been installed
+	  where GetBench is being installed; see corresponding changes in
+	  MDaq; refs #17.
+
+2012-04-04  anvar
+	* Some modifications to rule out potential culprits in the
+	  acquisition failure. Added new code to accomodate Ganil run
+	  control. refs #33 #34
+	* Suppressed debug messages in embedded software that slowed down
+	  the acquisition. refs #21
+	* Modified !daqStop and !daqStart in !GetEcc implementation in
+	  order to ease daq failure debugging (all registers are left
+	  unchanged after daq stop, re-initializations are done just before
+	  !daqStart. refs #33
+
+2012-04-03  anvar
+	* Implemented software modifications for 4AGET firmware. From this
+	  version on, the software is no more compatible with the 1AGET
+	  firmware. Also make note of the fact that the data format of the
+	  4AGET firmware complies with version 3.1 of the CoBo data format.
+	  All decoding is done using the MultiFrame library from the
+	  mordicus repository: you will need to checkout and install this
+	  project for the new !GetBench software to compile. refs #13
+
+2012-04-02  anvar
+	* Asad injection completed with 2p mode. refs #32
+
+2012-03-08  psizun
+	* Added Mac OS X build configuration to GetBench Eclipse project;
+	  refs #17.
+
+2012-02-21  anvar
+	* Takes into account MDaq modifications for correct ecc scripting. refs #27
+
+2012-02-17  anvar
+	* Added a launcher object for HW server. refs #21
+
+2012-02-14  anvar
+	* Integrated MDaq refactorizations. Adapted embedded module for new
+	  !VxWorks image and begun adapting to 4-AGET firmware. Added
+	  useful Eclipse variables to environment (for indexer) refs #27
+	  #17.
+
+2012-02-09  anvar
+	* Referring to correct !VxWorks m4 macro. refs #17
+
+2012-02-07  psizun
+	* Fixed behaviour when Boost missing (refs #17).
+
+2012-02-01  anvar
+	* Added Eclipse indexer settings. Suppressed source files that were not used any more. refs #17
+
+2012-02-01  psizun
+	* Fixing dependency issues in pkg-config files; refs #17.
+	* Fixing conflict between Ice cflags macros and pkg-config; refs #17.
+
+2012-01-31  psizun
+	* Applied agreed-upon policy for vxworks eclipse settings; refs #17, #29.
+	* Added IceE flags to VxWorks conf of new CDT project; refs #29.
+
+2012-01-30  psizun
+	* Upgrading GetBench to version 2.x of Eclipse CDT Autotools plugin (refs #29).
+	* Adding missing explicit linkage dependencies required by GCC 4.6 (refs #28).
+
+2012-01-25  anvar
+	* Merged back the more advanced branch of !TestBench1AGET with the !GetBench trunk. refs #27
+
+2011-04-11  jchavas
+	* version used for Lacanau demo refs #8
+
+2011-04-05  jchavas
+	* refs #10
+
+2011-04-04  jchavas
+	* resolve conflicts -- minor refs #10
+
+2011-04-01  jchavas
+	* changes for the !GetBench 010411, working with the !GetController refs #10
+
+2011-03-09  anvar
+	* Adapted Get code to MDaq evolution in
+	  [https://dsm-trac.cea.fr/mordicus/changeset/519 changeset 519 of
+	  project mordicus]. Completed Eclipse/Autotools build config. refs
+	  #11 #10
+
+2011-03-04  jchavas
+	* Separation between MDaq specific modules and !GetBench specific modules refs #10
+
+2011-02-09  jchavas
+	* compiling on win32 refs #8
+
+2011-02-07  jchavas
+	* Minor changes on GetBench software refs #8
+
+2011-01-26  jchavas
+	* Changes of the flags for mingw32 refs #8
+
+2011-01-24  jchavas
+	* Ice enabled by default -- minor corrections refs #10
+	* update of the m4 and am externals refs #10
+	* Prototype used for the 12/10 GET integration test refs #10
+
+2010-12-13  jchavas
+	* major changes in preparation for the GET testbench refs #10
+
+2010-10-11  jchavas
+	* Modifications for the october GET testbench included. Compilation for windows included. refs #10
+
+2010-10-05  jchavas
+	* minor refs#10
+	* bug fixes in !AsAdController driver refs #10
+	* library getbench-daq created. Class !DataAcquisition available
+	  for the !GetController. Demo given with demo/daqServer.cpp. refs #10
+
+2010-09-28  jchavas
+	* First implementation of AGETBus refs #10
+
+2010-09-20  jchavas
+	* compilation tested refs #10
+	* svn:externals added refs #10
+	* some generated docs suppressed refs #10
+	* sources of the sources tested with Nathan refs #10
+

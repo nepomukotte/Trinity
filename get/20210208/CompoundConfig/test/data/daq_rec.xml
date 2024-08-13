@@ -1,0 +1,13 @@
+<Daq>
+	<!--The data acquistion duration for a frame-->
+	<frameDuration unit="ms">100
+		<!--10 per second-->
+	</frameDuration>
+	<readOutFreq unit="Mb/s" range="[10, 80]">25</readOutFreq>
+	<Channel id="*" include="default_channel_rec.xml" />
+	<Channel id="0" />
+	<Channel id="1">
+		<isActive>false</isActive>
+	</Channel>
+	<Channel id="2" />
+</Daq>

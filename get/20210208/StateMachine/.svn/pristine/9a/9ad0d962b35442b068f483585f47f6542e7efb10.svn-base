@@ -1,0 +1,87 @@
+#! /bin/sh
+echo '============================================'
+echo 'Running the test suite of the dhsm framework'
+echo '============================================'
+
+curdir=$(readlink -f $(dirname $0))
+result=0
+logfile="$curdir/test_dhsm.log"
+
+if test "@LOGGING@" = "true"
+then
+	suffix="log.txt"
+else
+	suffix="out.txt"
+fi
+
+cat > $logfile <<EOF
+===================
+Test suite log file
+===================
+EOF
+
+printf 'Local state machine test... '
+$curdir/StateMachineTest > $curdir/standalone_${suffix} 2>&1
+diff -u standalone_${suffix} @srcdir@/ref/standalone_${suffix} >> $logfile
+if test $? -ne 0
+then
+	echo 'Failed'
+	result=1
+else
+	echo 'Ok'
+fi
+
+if test -x $curdir/RunControlServant -a -x $curdir/RunControlMaster
+then
+	printf 'Distributed state machine test... '
+	dist_result=0
+	servant_count=10
+	servants_result=0
+	for mode in 'work' 'fail' 'hang' 'crash' 'critical'
+	do
+		for i in $(seq $servant_count)
+		do
+			if test "$i" -eq "$servant_count"
+			then
+				$curdir/RunControlServant -n $i -b $mode > $curdir/servant_${mode}_${i}.txt 2>&1 &
+			else
+				$curdir/RunControlServant -n $i > $curdir/servant_${mode}_${i}.txt 2>&1 &
+			fi
+		done
+		sleep 1
+		$curdir/RunControlMaster -s $servant_count > $curdir/master_${mode}.txt 2>&1
+
+		diff -u master_${mode}.txt @srcdir@/ref/master_${mode}_${suffix} >> $logfile
+		if test $? -ne 0
+		then
+			dist_result=1
+		fi
+
+		for i in $(seq $servant_count)
+		do
+			if test "$i" -eq "$servant_count"
+			then
+				reffile=servant_${mode}_${suffix}
+			else
+				reffile=servant_no${mode}_${suffix}
+			fi
+			diff -u servant_${mode}_${i}.txt @srcdir@/ref/$reffile >> $logfile
+			if test $? -ne 0
+			then
+				dist_result=1
+			fi
+		done
+	done
+	
+	if test $dist_result -ne 0
+	then
+		echo 'Failed'
+		result=1
+	else
+		echo 'Ok'
+	fi
+fi
+
+exit $result
+
+	

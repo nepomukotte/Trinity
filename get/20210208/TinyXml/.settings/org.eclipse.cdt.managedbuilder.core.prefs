@@ -1,0 +1,4 @@
+#Wed Mar 02 10:58:46 CET 2011
+eclipse.preferences.version=1
+environment/buildEnvironmentInclude/org.eclipse.linuxtools.cdt.autotools.configuration.build.1320048966=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable name\="CPLUS_INCLUDE_PATH" operation\="remove"/>\n<variable name\="CPATH" operation\="remove"/>\n<variable name\="C_INCLUDE_PATH" operation\="remove"/>\n</environment>\n
+environment/buildEnvironmentInclude/org.eclipse.linuxtools.cdt.autotools.configuration.build.1320048966.657278030.1903971513.722487562=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<environment append\="true" appendContributed\="true">\n<variable name\="CPLUS_INCLUDE_PATH" operation\="remove"/>\n<variable name\="CPATH" operation\="remove"/>\n<variable name\="C_INCLUDE_PATH" operation\="remove"/>\n</environment>\n

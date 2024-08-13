@@ -1,0 +1,232 @@
+/**
+\page page_Build Build Instructions
+
+\section sec_Build_Content Content
+<ul>
+	<li>\ref sec_Build_Tools </li>
+	<ul>
+		<li>\ref subsec_Build_Tools_Linux </li>
+		<li>\ref subsec_Build_Tools_Windows </li>
+	</ul>
+	<li>\ref sec_Build_Libraries </li>
+	<ul>
+		<li>\ref subsec_Build_Libraries_Linux </li>
+		<li>\ref subsec_Build_Libraries_Window </li>
+	</ul>
+	<li>\ref sec_Build_Commands </li>
+</ul>
+
+\section sec_Build_Tools Development tools
+<p>
+The development environment requires the installation of several tools:
+<ul>
+	<li>g++</li>
+	<li>autotools (automake, autoconf, libtool)</li>
+	<li>pkg-config</li>
+</ul>
+<p>
+The installation procedure will be explained separately for each platform.
+
+\subsection subsec_Build_Tools_Linux Installation on Linux
+<p>
+The installation procedure is very simple for Linux systems having a packaging
+tools like apt-get or yum. Here are the commands to execute with apt-get, to
+install things step by step.
+<p>
+g++ installation
+\verbatim
+sudo apt-get install g++
+\endverbatim
+<p>
+Autotools installation
+\verbatim
+sudo apt-get install automake libtool
+\endverbatim
+<p>
+Pkg-config installation
+\verbatim
+sudo apt-get install pkg-config
+\endverbatim
+
+
+\subsection subsec_Build_Tools_Windows Installation on Windows
+<p>
+The installation procedure is significantly harder on Windows systems because
+you have to pick quite a few zipped packages and installers from the MinGW
+website and extract/install them one after another.
+<p>
+\subsubsection sub2sec_Build_Tools_Windows_Mingw Mingw and MSys installation
+<ul>
+	<li>mingw: go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435">MinGWdownloads</a>,
+		and <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=240780">Automated MinGW Installer</a>,
+		download the latest version (eg: <a href="http://downloads.sourceforge.net/mingw/MinGW-5.1.3.exe?modtime=1168811236&big_mirror=1">MinGW-5.1.3.exe</a>), and run the installer.
+	</li>
+	<ul>
+		<li>select "download and install"</li>
+		<li>select the current version</li>
+		<li>select Mingw Base Tool, g++ Compiler, MinGW Make</li>
+	</ul>
+	<li>gdb: go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=20507">GNU Source-Level Debugger</a>,
+		select the latest version (technology preview) (eg: <a href="http://downloads.sourceforge.net/mingw/gdb-6.7.50.20071127-mingw.tar.bz2?modtime=1196199985&big_mirror=1">gdb-6.7.50.20071127-mingw.tar.bz2</a>),
+		and extract it to your MinGW folder, overwriting any file in the way.
+	</li>
+	<li>mingw-utils: go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=61599">MinGW Utilities</a>,
+		download <a href="http://downloads.sourceforge.net/mingw/mingw-utils-0.3.tar.gz?modtime=1077362266&big_mirror=1">mingw-utils-0.3.tar.gz</a>,
+		and extract it to your MinGW directory.</li>
+	<li>MSys: go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=24963">MSYS Base System</a>,
+		select the current version (eg: <a href="http://downloads.sourceforge.net/mingw/MSYS-1.0.10.exe?modtime=1079444447&big_mirror=1">MSYS-1.0.10.exe</a>),
+		and run the installer.
+	</li>
+	<li>msysDTK: go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=67879">MSYS Supplementary Tools</a>,
+		download current release (eg: <a href="http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe?modtime=1041430674&big_mirror=1">msysDTK-1.0.1.exe</a>),
+		and run the installer (don't forget to specify the correct MSys directory).
+	</li>
+	<li>add the MSys and MinGW bin directories (eg: C:\\msys\\1.0\\bin;C:\\mingw\\bin) to the PATH environment variable</li>
+	<li>add the MSys local/bin directory (eg: C:\\msys\\1.0\\local\\bin) to the PATH (otherwise installed DLL will fail to load)</li>
+</ul>
+
+\subsubsection sub2sec_Build_Tools_Windows_Autotools Autotools installation
+<p>
+Here we will use the latest version, not the old ones provides with msysDTK,
+because they lack some required macros.
+<ul>
+	<li>in <a href="http://sourceforge.net/project/showfiles.php?group_id=2435">MinGW downloads</a>,
+		go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=227249">MSYS System Builder</a>
+		and download the latest versions of:
+	</li>
+	<ul>
+		<li>autoconf (eg: <a href="http://downloads.sourceforge.net/mingw/autoconf-2.61-MSYS-1.0.11-1.tar.bz2?modtime=1206460029&big_mirror=1">autoconf-2.61-MSYS-1.0.11.tar.bz2</a>)</li>
+		<li>automake (eg: <a href="http://downloads.sourceforge.net/mingw/automake-1.10-MSYS-1.0.11-1.tar.bz2?modtime=1206460075&big_mirror=1">automake-1.10-MSYS-1.0.11.tar.bz2</a>)</li>
+		<li>libtool (eg:  <a href="http://downloads.sourceforge.net/mingw/libtool1.5-1.5.25a-20070701-MSYS-1.0.11-1.tar.bz2?modtime=1206460129&big_mirror=1">libtool1.5-1.5.25a-20070701-MSYS-1.0.11.tar.bz2</a>)</li>
+	</ul>
+	<li>in <a href="http://sourceforge.net/project/showfiles.php?group_id=2435">MinGW downloads</a>,
+		go to <a href="http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=67879">MSYS Supplementary Tools</a>
+		and download the latest version of:
+	</li>
+	<ul>
+		<li>autogen-bin (eg: <a href="http://downloads.sourceforge.net/mingw/autogen-5.9.2-MSYS-1.0.11-1-bin.tar.gz?modtime=1206735979&big_mirror=1">autogen-5.9.2-MSYS-1.0.11-1-bin.tar.gz</a>)</li>
+		<li>autogen-dev (eg: <a href="http://downloads.sourceforge.net/mingw/autogen-5.9.2-MSYS-1.0.11-1-dev.tar.gz?modtime=1206736015&big_mirror=1">autogen-5.9.2-MSYS-1.0.11-1-dev.tar.gz</a>)</li>
+		<li>autogen-dll25 (eg: <a href="http://downloads.sourceforge.net/mingw/autogen-5.9.2-MSYS-1.0.11-1-dll25.tar.gz?modtime=1206736046&big_mirror=1">autogen-5.9.2-MSYS-1.0.11-1-dll25.tar.gz</a>)</li>
+		<li>m4 (eg:  <a href="http://downloads.sourceforge.net/mingw/m4-1.4.7-MSYS.tar.bz2?modtime=1162303978&big_mirror=1">m4-1.4.7-MSYS.tar.bz2</a>) it may be located in "current release" instead of "technology preview"</li>
+	</ul>
+	<li>extract all these packages to your MSys directory (eg: C:\\msys\\1.0)</li>
+</ul>
+
+\subsubsection sub2sec_Build_Tools_Windows_PkgConfig Pkg-config installation
+<ul>
+	<li>go to <a href="http://www.gtk.org/download-windows.html">GTK win32 downloads</a></li>
+	<li>download the files under the following links (See <a href="http://www.mingw.org/MinGWiki/index.php/pkg-config">this wiki</a>
+		for more details):
+	</li>
+	<ul>
+		<li>"GTK+" section</li>
+		<ul>
+			<li>GLib binairies (eg: <a href="http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.16/glib-2.16.1.zip">glib-2.14.6-2.zip</a>)</li>
+			<li>GLib dev (eg: <a href="http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.16/glib-dev-2.16.1.zip">glib-dev-2.14.6-2.zip</a>)</li>
+		</ul>
+	</ul>
+	<ul>
+		<li>"Third Party Dependencies" section</li>
+		<ul>
+			<li>GNU libiconv: Binaries & dev (eg: <a href="http://www.gimp.org/~tml/gimp/win32/libiconv-1.9.1.bin.woe32.zip">libiconv-1.9.1.bin.woe32.zip</a>)</li>
+			<li>gettext-runtime: binaries (eg: <a href="http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime-0.17-1.zip">gettext-runtime-0.17-1.zip</a>)</li>
+			<li>pkg-config: Tool binaries (eg: <a href="http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config-0.23-2.zip">pkg-config-0.23-2.zip</a>)</li>
+		</ul>
+	</ul>
+	<li>unzip all archives into your MinGW (not MSYS) directory tree.</li>
+	<li>create a file named "dirlist" in the share/aclocal directory of your
+		MSys directory (eg: C:\\msys\\1.0\\share\\aclocal), and put the line
+		/mingw/share/aclocal in it. Otherwise, aclocal won't be able to find the
+		PKG_CHECK_MODULES macro.
+	</li>
+	<li>create an environment variable PKG_CONFIG_PATH with the path of the
+		local/lib/pkgconfig directory of your MSys directory (eg:
+		C:\\msys\\1.0\\local\\lib\\pkgconfig). Otherwise pkg-config won't be
+		able to locate your installed packages.
+	</li>
+</ul>
+
+
+
+\section sec_Build_Libraries Libraries
+<p>
+Building CompoundConfig requires to install a few libraries that it depends on.
+<ul>
+	<li>TinyXml</li>
+	<li>Boost (headers only)</li>
+</ul>
+<p>
+As TinyXml is not available as a Linux binary package (deb or rpm), you will
+have to build it from sources. We have modified TinyXml build system so that it
+uses autotools. You should have received this package along with the
+CompoundConfig package.
+<p>
+The compilation is nearly identical on Windows and on Linux. In both
+system, extract the TinyXml package somewhere, open a shell (MSys shell on
+Windows) and move to the directory where the content of the package is. Then
+type:
+\verbatim
+./autogen.sh && mkdir -p build/release build/debug && cd build/release &&
+../../configure && make -j 4 && cd ../debug && ../../configure
+--enable-debug --disable-shared && make -j 4 && cd ../..
+\endverbatim
+This will compile the release and debug version of TinyXml. Then you need to
+install it. To do so, either log as root and type:
+\verbatim
+cd build/release && make install && cd ../debug && make install
+\endverbatim
+or (using sudo), type:
+\verbatim
+cd build/release && sudo make install && cd ../debug && sudo make install
+\endverbatim
+On Windows, forget about root and sudo stuff, and just type the first of these
+install commands.
+
+<p>
+Now that TinyXml is installed, we need to install the second library: Boost.
+The procedure depends on the system, we will see that in the following sections.
+
+\subsection subsec_Build_Libraries_Linux Installation on Linux
+<p>
+To install boost headers on Linux, just type
+\verbatim
+sudo apt-get install libboost-dev
+\endverbatim
+
+\subsection subsec_Build_Libraries_Window Installation on Windows
+<p>
+Here are the steps to install boost header on Windows:
+<ol>
+	<li>download Boost (in the download menu of http://www.boost.org, pick
+whatever package type (zip, tar.gz...) you like)</li>
+	<li>unzip it in the directory where you want to install it (eg: C:\\. no
+need to create a boost directory, there is already one in the archive)</li>
+	<li>add the boost top directory (eg: C:\\boost_1_34_1) to the
+CPLUS_INCLUDE_PATH environment variable (you will probably have to create it).
+Here is how to create an environment variable:</li>
+	<ol>
+		<li>left click on "My Computer" ("Poste de travail" in French
+editions)</li>
+		<li>click on the "Properties" item</li>
+		<li>click on the "Advanced" tab</li>
+		<li>click on the "Environment variables" button</li>
+		<li>in the user variables part (upper), click on the "new" button</li>
+		<li>enter the name of the variable and its value</li>
+	</ol>
+</ol>
+<p>
+Note: it is not necessary to compile the libraries because we only use
+template classes. You can even remove all extracted files except the "boost"
+(eg: C:\\boost_1_34_1\\boost) directory, if you want to save disk space.
+
+
+
+
+\section sec_Build_Commands Build commands
+<p>
+Now everything is ready to build CompoundConfig. The compilation process is
+exactly the same as TinyXml's one, so just
+\ref sec_Build_Libraries "return here" and follow the instructions (the only
+difference is the package to extract).
+
+ */

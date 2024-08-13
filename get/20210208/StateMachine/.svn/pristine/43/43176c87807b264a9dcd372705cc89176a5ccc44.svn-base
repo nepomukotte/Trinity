@@ -1,0 +1,18 @@
+#######################
+RTEMS build/run notes: 
+#######################
+
+Only dshm-servant can be enabled, since we are using IceE.
+
+1. example configure line for Leon2/RTEMS target (with dhsm-servant enabled):
+
+   ../StateMachine/configure --host=sparc-rtems --enable-rtems-bsp=leon2 --enable-rtems-toolchain=gaisler --prefix=/home/pkestene/UTS/LeonCpu/RTEMS/local_at697_gaisler4.10 --with-boost=/home/pkestene/UTS/LeonCpu/RTEMS/local_at697_gaisler4.10/ --enable-distributed-sm-libs=servant --with-icee-bin=/usr/bin --with-icee=/home/pkestene/UTS/LeonCpu/RTEMS/local_at697_gaisler4.10
+
+2. how to run a simple test with one RunControlServant running on Leon/RTEMS and RunControlMaster on the Linux/PC :
+
+ 2.1 start servant from GrMon (Leon monitor)
+ 2.2 start master from a Linux/PC terminal and tell it to connect to 1 servant, which is our remote Leon target at IP 132.166.9.214:
+
+     ./RunControlMaster -s 1 -h 132.166.9.214
+
+It should run perfectly.

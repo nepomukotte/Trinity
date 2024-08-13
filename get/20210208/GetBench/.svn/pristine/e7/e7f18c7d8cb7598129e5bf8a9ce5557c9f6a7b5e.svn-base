@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node id="ZedBoard">
+	<Device id="*">
+		<registerAccess>AdcReg32</registerAccess>
+		<registerWidth unit="bytes">4</registerWidth>
+		<baseAddress>0x0</baseAddress>
+		<Register id="*">
+			<offset>0x0</offset>
+			<BitField id="*">
+				<offset unit="bit">0</offset>
+				<width unit="bits" range="[1, 64]">1</width>
+			</BitField>
+		</Register>
+	</Device>
+<!-- See documentation B. Lacachacinski Specification technique AsAd Lite.-->	
+	<Device id="ADC">
+		<Register id="*">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+		</Register>
+		<!-- See documentation B. Lacachacinski Specification technique AsAd Lite.-->
+		<Register id="reg0">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<offset>0x0</offset>
+			<BitField id="Stby">
+				<offset>0</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="Pdn CLKout">
+				<offset>2</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="RST">
+				<offset>4</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="REF">
+				<offset>5</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="LVDSCMOS">
+				<offset>8</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="COARSEGAIN">
+				<offset>9</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="PDNOBUF">
+				<offset>10</offset>
+				<width>1</width>
+			</BitField>
+		</Register>
+		<Register id="reg1">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<offset>0x1</offset>
+			<BitField id="CLKOUTPOSN">
+				<offset>8</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="CLKOUTEDGE">
+				<offset>9</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="DATAOUTPOSN">
+				<offset>10</offset>
+				<width>1</width>
+			</BitField>
+		</Register>
+		<Register id="reg2">
+			<offset>0x2</offset>
+			<BitField id="Bit-Wise or Byte-Wise">
+				<offset>10</offset>
+				<width>1</width>
+			</BitField>
+		</Register>
+		<Register id="reg3">
+			<offset>0x3</offset>
+			<BitField id="TEST PATTERN">
+				<offset>5</offset>
+				<width>3</width>
+			</BitField>
+			<BitField id="DATA FORMAT">
+				<offset>10</offset>
+				<width>1</width>
+			</BitField>
+		</Register>
+		
+		<Register id="reg4">
+			<offset>0x4</offset>
+			<BitField id="CUSTOM LOW">
+				<offset>5</offset>
+				<width>6</width>
+			</BitField>	
+		</Register>
+		<Register id="reg5">
+			
+			<offset>0x5</offset>
+			<BitField id="CUSTOM HIGHT">
+				<offset>0</offset>
+				<width>5</width>
+			</BitField>
+			<BitField id="FINE GAIN">
+				<offset>8</offset>
+				<width>3</width>
+			</BitField>
+		</Register>
+		
+		<Register id="reg6">
+			<offset>0x6</offset>
+			<BitField id="CURRENT DOUBLE">
+				<offset>0</offset>
+				<width>2</width>
+			</BitField>
+			<BitField id="LVDS CURRENT">
+				<offset>2</offset>
+				<width>2</width>
+			</BitField>
+			<BitField id="LVDS TERMINAISON">
+				<offset>4</offset>
+				<width>6</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg7">
+			<offset>0x7</offset>
+			<BitField id="DRIVE STRENGHT">
+				<offset>4</offset>
+				<width>4</width>
+			</BitField>
+		</Register>
+		<Register id="reg8">
+			<offset>0x8</offset>
+			<BitField id="N_CLK_SYNC">
+				<offset>4</offset>
+				<width>4</width>
+			</BitField>
+		</Register>
+		
+		<!-- Defines the value of the individual channel threshold. -->
+		
+		<baseAddress>0x43C00000</baseAddress>
+		<registerWidth>4</registerWidth>
+		<registerAccess>AdcReg32</registerAccess>
+	</Device>
+<!-- See documentation B. Lacachacinski Specification technique AsAd Lite.-->	
+	<Device id="AGET">
+		<Register id="*">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+		</Register>
+		<!-- See documentation AGET_User.pdf.-->
+		<Register id="reg0">
+			<offset>0x0</offset>
+		</Register>
+		<!-- Register 1. See documentation AGET_User.pdf. -->
+		<Register id="reg1">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<offset>0x1</offset>
+			<!-- If set, the nomical CSA bias current is multiplied by two. -->
+			<BitField id="Icsa">
+				<offset>0</offset>
+				<width>1</width>
+			</BitField>
+			<!-- LSb and MSb of the internal test capacitor in Teest mode. -->
+			<BitField id="Gain">
+				<offset>1</offset>
+				<width>2</width>
+			</BitField>
+			<!-- Sets the peaking time (ns) of the shaper by switching resistors on the PZC  SK filters. -->
+			<BitField id="Time">
+				<width>4</width>
+				<offset>3</offset>
+			</BitField>
+			<!-- Defines the test mode: none (0), calibraation (01), test (10), functionality (11). -->
+			<BitField id="Test">
+				<width>2</width>
+				<offset>7</offset>
+			</BitField>
+			<!-- Bit integrator mode; see AGET doc. -->
+			<BitField id="Integrator_mode">
+				<width>1</width>
+				<offset>9</offset>
+			</BitField>
+			<!-- Bit SCA pointer 0 to pointer 1; see AGet doc. -->
+			<BitField id="SCApointer">
+				<width>2</width>
+				<offset>10</offset>
+			</BitField>
+			<!-- Bit SCA splitting; if set, enables the 2p mode by dividng the memory in two blocks. -->
+			<BitField id="SCAsplitting">
+				<width>1</width>
+				<offset>12</offset>
+			</BitField>
+			<!-- Bit 32 channels mode. If set, only the first 32 channels are used.-->
+			<BitField id="Mode32Channels">
+				<width>1</width>
+				<offset>13</offset>
+			</BitField>
+			<!-- Bit readout mode; switches between full and partial readout modes. If set, full readout. -->
+			<BitField id="Readout_mode">
+				<width>1</width>
+				<offset>14</offset>
+			</BitField>
+			<!-- Bit FPN readout: if set, forces the readout of the FPN channels (e.g. even in partial readout mode).-->
+			<BitField id="FPNreadout">
+				<width>1</width>
+				<offset>15</offset>
+			</BitField>
+			<!-- Bit polarity. Controls the value of the DC voltage levels. Usually set to zero?-->
+			<BitField id="Polarity">
+				<width>1</width>
+				<offset>16</offset>
+			</BitField>
+			<!-- Input common mode voltage (VICM) of the analog output buffer. Usually 0 e.g. 1.25 V?-->
+			<BitField id="Vicm">
+				<width>2</width>
+				<offset>17</offset>
+			</BitField>
+			<!-- DAC value (first 3 bits) and DAC polarity (0 for negative). -->
+			<BitField id="DAC">
+				<width>4</width>
+				<offset>19</offset>
+			</BitField>
+			<!-- DAC threshold value.-->
+			<BitField id="DACthreshold">
+				<width>3</width>
+				<offset>19</offset>
+			</BitField>
+			<!-- DAC polarity (0 for negative). -->
+			<BitField id="DACpolarity">
+				<width>1</width>
+				<offset>22</offset>
+			</BitField>
+			<!-- Trigger bit: specifies the use of the veto on the trigger building. Defines how long after a hit the channel can be read again.
+			 Values: 0 (none), 01 ( 4 microseconds), 10 (hit register width). -->
+			<BitField id="Trigger_veto">
+				<width>2</width>
+				<offset>23</offset>
+			</BitField>
+			<BitField id="Synchro_discri">
+				<width>1</width>
+				<offset>25</offset>
+			</BitField>
+			<BitField id="tot">
+				<width>1</width>
+				<offset>26</offset>
+			</BitField>
+			<BitField id="Range_trigg_width">
+				<width>1</width>
+				<offset>27</offset>
+			</BitField>
+			<BitField id="Lsb_trigg_width">
+				<width>1</width>
+				<offset>28</offset>
+			</BitField>
+			<BitField id="Msb_trigg_width">
+				<offset>29</offset>
+			</BitField>
+			<BitField id="External">
+				<width>2</width>
+				<offset>30</offset>
+			</BitField>
+		</Register>
+		<Register id="reg2">
+			<offset>0x2</offset>
+			<!-- Selects the internal signal to be viewed on scoop. -->
+			<BitField id="debug">
+				<width>3</width>
+				<offset>0</offset>
+			</BitField>
+			<!-- If set, forces to start the readout from column 0. -->
+			<BitField id="read_from_0">
+				<offset>3</offset>
+			</BitField>
+			<!-- If set, a test pattern is serialized to the output instead of the 9 bit address of the last read column. -->
+			<BitField id="test_digout">
+				<offset>4</offset>
+			</BitField>
+			<!-- Selects the analog reset level during "reset operation". -->
+			<BitField id="set_i0_when_rst">
+				<offset>5</offset>
+			</BitField>
+			<BitField id="en_mker_rst">
+				<offset>6</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="rst_lv_to1">
+				<offset>7</offset>
+			</BitField>
+			<BitField id="boost_pw">
+				<offset>8</offset>
+			</BitField>
+			<BitField id="out_resync">
+				<offset>9</offset>
+			</BitField>
+			<BitField id="synchro_inv">
+				<offset>10</offset>
+			</BitField>
+			<BitField id="force_eout">
+				<offset>11</offset>
+			</BitField>
+			<BitField id="Cur_RA">
+				<width>2</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="Cur_BUF">
+				<width>2</width>
+				<offset>14</offset>
+			</BitField>
+			<BitField id="power_down_write">
+				<offset>16</offset>
+			</BitField>
+			<BitField id="power_down_read">
+				<offset>17</offset>
+			</BitField>
+			<BitField id="alternate_power">
+				<offset>18</offset>
+			</BitField>
+			<BitField id="ShortReadSeq">
+				<offset>19</offset>
+			</BitField>
+			<!--This bit enables ("0") or disables ("1") the output of the trigger signal.-->
+			<BitField id="Dis_Multiplicity_Out">
+				<offset>20</offset>
+			</BitField>
+			<!--This bit controls the reset of the SCA pointer. For "0", the reset is done on the write signal with a width equal to the SCAwrite clock. For "1", the reset is done automatically on the rising edge of the write signal.-->
+			<BitField id="AutoresetBank">
+				<offset>21</offset>
+			</BitField>
+			<!-- This bit permits to disable ("0") or enable ("1") the output of the trigger signal in LVDS level on the pads 85 and 86.-->
+			<BitField id="En_trigg_lvds">
+				<offset>22</offset>
+			</BitField>
+			<!-- This bit permits to select the value of the channel input dynamic range of the discriminator: 5% ("1") or 17.5% ("0").-->
+			<BitField id="Input_dynamic_range">
+				<offset>24</offset>
+			</BitField>
+			
+		</Register>
+		<!-- Used to select the channel for the test. -->
+		<Register id="reg3">
+			<BitField id="select_c22_32">
+				<width>11</width>
+			</BitField>
+			<BitField id="select_cfpn2">
+				<offset>11</offset>
+			</BitField>
+			<BitField id="select_c12_21">
+				<width>10</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="select_cfpn1">
+				<offset>22</offset>
+			</BitField>
+			<BitField id="select_cfpn3_11">
+				<width>9</width>
+				<offset>23</offset>
+			</BitField>
+			<offset>0x3</offset>
+		</Register>
+		<Register id="reg3msb">
+			<BitField id="select_c1_2">
+				<width>2</width>
+			</BitField>
+			<offset>0xD</offset>
+		</Register>
+		<!-- Used to select the channel for the test. -->
+		<Register id="reg4">
+			<BitField id="select_c43_33">
+				<width>11</width>
+			</BitField>
+			<BitField id="select_cfpn3">
+				<offset>11</offset>
+			</BitField>
+			<BitField id="select_c53_44">
+				<width>10</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="select_cfpn4">
+				<offset>22</offset>
+			</BitField>
+			<BitField id="select_c62_54">
+				<width>9</width>
+				<offset>23</offset>
+			</BitField>
+			<offset>0x4</offset>
+		</Register>
+		<!-- Used to select the channel for the test. -->
+		<Register id="reg4msb">
+			<BitField id="select_c64_63">
+				<width>2</width>
+			</BitField>
+			<offset>0xE</offset>
+		</Register>
+		<Register id="reg5">
+			<!-- Contains the version number of the AGET circuit. -->
+			<BitField id="version">
+				<width>16</width>
+			</BitField>
+			<offset>0x5</offset>
+		</Register>
+		<!-- Defines the gain of the 32 first channels. Each channel needs 2 bits to select its CSA charge capacitor among 4. -->
+		<Register id="reg6">
+			<offset>0x6</offset>
+		</Register>
+		<Register id="reg6msb">
+			<offset>0xF</offset>
+		</Register>
+		<!-- Defines the gain of the 32 last channels. Each channel needs 2 bits to select its CSA charge capacitor among 4. -->
+		<Register id="reg7">
+			<offset>0x7</offset>
+		</Register>
+		<Register id="reg7msb">
+			<offset>0x10</offset>
+		</Register>
+		<!-- Defines the value of the individual channel threshold. -->
+		<Register id="reg8_0">
+			<offset>0x8</offset>
+		</Register>
+		<Register id="reg8_1">
+			<offset>0x11</offset>
+		</Register>
+		<Register id="reg8_2">
+			<offset>0x15</offset>
+		</Register>
+		<Register id="reg8_3">
+			<offset>0x17</offset>
+		</Register>
+		
+		<!-- Defines the value of the individual channel threshold. -->
+		<Register id="reg9_0">
+			<offset>0x9</offset>
+		</Register>
+		<!-- Defines the value of the individual channel threshold. -->
+		<Register id="reg9_1">
+			<offset>0x12</offset>
+		</Register>
+		<!-- Defines the value of the individual channel threshold. -->
+		<Register id="reg9_2">
+			<offset>0x16</offset>
+		</Register>
+		<!-- Defines the value of the individual channel threshold. -->
+		<Register id="reg9_3">
+			<offset>0x18</offset>
+		</Register>
+		<!-- Permits to inhibit a specific channel to the trigger building or to the trigger data. -->
+		<Register id="reg10">
+			<offset>0xA</offset>
+		</Register>
+		<!-- Permits to inhibit a specific channel to the trigger building or to the trigger data. -->
+		<Register id="reg10msb">
+			<offset>0x13</offset>
+		</Register>
+		<!-- Permits to inhibit a specific channel to the trigger building or to the trigger data. -->
+		<Register id="reg11">
+			<offset>0xB</offset>
+		</Register>
+		<Register id="reg11msb">
+			<offset>0x14</offset>
+		</Register>
+		<Register id="reg12">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<!-- Permits to reduce the number of SCA memory cell during the readout phase by adding an offset on the readout pointer address.-->
+			<BitField id="readoutPtrOffset">
+				<width>9</width>
+			</BitField>
+			<offset>0xC</offset>
+		</Register>
+		<Register id="hit">
+			<offset>0xF</offset>
+		</Register>
+		<Register id="hitmsb">
+			<offset>0x10</offset>
+		</Register>
+		<baseAddress>0x43C10000</baseAddress>
+		<registerWidth>4</registerWidth>
+		<registerAccess>AgetReg32</registerAccess>
+	</Device>
+<!-- See documentation B. Lacachacinski Specification technique AsAd Lite.-->	
+	<Device id="DAC">
+		<Register id="*">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+		</Register>
+		<!-- See documentation B. Lacachacinski Specification technique AsAd Lite.-->
+		<Register id="reg0">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<offset>0x0</offset>
+			<BitField id="Exref">
+				<offset>0</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="ClkOff">
+				<offset>1</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="Sleep">
+				<offset>2</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="Pdn">
+				<offset>3</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="Lngins">
+				<offset>4</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="SwRst">
+				<offset>5</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="DataDir">
+				<offset>6</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="SdioDir">
+				<offset>7</offset>
+				<width>1</width>
+			</BitField>
+		</Register>
+		<Register id="reg1">
+			<offset>0x1</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="CalClk">
+				<offset>0</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="ClkDiff">
+				<offset>2</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="DesKew">
+				<offset>3</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="DclkPol">
+				<offset>4</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="DataFmt">
+				<offset>7</offset>
+				<width>1</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg2">
+			<offset>0x2</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="Version">
+				<offset>0</offset>
+				<width>4</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg3">
+			<offset>0x3</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="DivSel">
+				<offset>0</offset>
+				<width>3</width>
+			</BitField>
+			<BitField id="CalMem">
+				<offset>4</offset>
+				<width>2</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg4">
+			<offset>0x4</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="UnCal">
+				<offset>0</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="SmemRd">
+				<offset>2</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="SmemWr">
+				<offset>3</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="Calen">
+				<offset>6</offset>
+				<width>1</width>
+			</BitField>
+			<BitField id="CalStat">
+				<offset>7</offset>
+				<width>1</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg5">
+			<offset>0x5</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="MemAddr">
+				<offset>0</offset>
+				<width>6</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg6">
+			<offset>0x6</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="MemData">
+				<offset>0</offset>
+				<width>6</width>
+			</BitField>
+			
+		</Register>
+		<Register id="reg7">
+			<offset>0x7</offset>
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<BitField id="CalDacfs">
+				<offset>4</offset>
+				<width>1</width>
+			</BitField>
+			
+		</Register>
+		
+		<!-- Defines the value of the individual channel threshold. -->
+		
+		<baseAddress>0x43C40000</baseAddress>
+		<registerWidth>4</registerWidth>
+		<registerAccess>DacReg32</registerAccess>
+	</Device>
+	<Device id="ISP">
+		<Register id="*">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+		</Register>
+		<!-- See documentation B. Lacachacinski Specification technique AsAd Lite.-->
+		<Register id="ISPM">
+			<BitField id="*">
+				<width>1</width>
+			</BitField>
+			<offset>0x0</offset>
+			<BitField id="Isp2">
+				<offset>0</offset>
+				<width>2</width>
+			</BitField>
+			<BitField id="Isp1">
+				<offset>2</offset>
+				<width>2</width>
+			</BitField>
+			<BitField id="Periph">
+				<offset>4</offset>
+				<width>4</width>
+			</BitField>
+			
+		</Register>
+		
+		<!-- Defines the value of the individual channel threshold. -->
+		
+		<baseAddress>0x43C50000</baseAddress>
+		<registerWidth>4</registerWidth>
+		<registerAccess>IspReg32</registerAccess>
+	</Device>
+	
+</Node>

@@ -1,0 +1,338 @@
+/**
+ * @file EccSoapServer.cpp
+ * @date Jan 13, 2014
+ * @author sizun
+ * 
+ * @note SVN tag: $Id$
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the GetBench software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "EccSoapServer.h"
+#include "get/rc/ConfigIdSet.h"
+#include "get/rc/SM.h"
+#include <CCfg/Io/Url.h>
+#include "utl/Logging.h"
+
+#ifdef HAVE_LOG4CXX
+#include "mdaq/utl/Log4cxxLoggingBackend.h"
+#include <log4cxx/basicconfigurator.h>
+#include <log4cxx/defaultconfigurator.h>
+#include <log4cxx/consoleappender.h>
+#include <log4cxx/logmanager.h>
+#include <log4cxx/patternlayout.h>
+#endif
+
+#include ICEUTIL_HEADER(Lock.h)
+
+using get::rc::ConfigId;
+using get::rc::ConfigIdSet;
+using get::rc::SM;
+
+namespace get
+{
+namespace soap
+{
+//__________________________________________________________________________________________________
+EccServer::EccServer()
+{
+	updateCachedState();
+	cachedState_.Transition = SM::NO_TRANS;
+}
+//__________________________________________________________________________________________________
+#define HANDLE_SM_EXCEP_RESP(instruction, resp)		\
+	try												\
+	{												\
+		resp.ErrorCode = 0;							\
+		resp.ErrorMessage = "";						\
+		instruction;								\
+	}												\
+	catch (const get::rc::SM::Exception & e)		\
+	{												\
+		const int t = cachedState().Transition;		\
+		resp.ErrorCode = (SM::NO_TRANS != t)?t:1;	\
+		resp.ErrorMessage = e.errorMessage;			\
+	}												\
+	catch (const std::exception & e)				\
+	{												\
+		const int t = cachedState().Transition;		\
+		resp.ErrorCode = (SM::NO_TRANS != t)?t:1;	\
+		resp.ErrorMessage = e.what();				\
+	}												\
+	catch (const std::string & s)					\
+	{												\
+		const int t = cachedState().Transition;		\
+		resp.ErrorCode = (SM::NO_TRANS != t)?t:1;	\
+		resp.ErrorMessage = s;						\
+	}												\
+	catch (const char * s)							\
+	{												\
+		const int t = cachedState().Transition;		\
+		resp.ErrorCode = (SM::NO_TRANS != t)?t:1;	\
+		resp.ErrorMessage = s;						\
+	}												\
+	catch (...)										\
+	{												\
+		const int t = cachedState().Transition;		\
+		resp.ErrorCode = (SM::NO_TRANS != t)?t:1;	\
+		resp.ErrorMessage = "Unknown error";		\
+	}
+//__________________________________________________________________________________________________
+ecc__ResponseState EccServer::cachedState() const
+{
+	IceUtil::RecMutex::Lock lock(statusMutex_);
+	return cachedState_;
+}
+//__________________________________________________________________________________________________
+void EccServer::updateCachedState()
+{
+	IceUtil::RecMutex::Lock lock(statusMutex_);
+
+	rc::SM::Status status;
+	ecc__Response r;
+	HANDLE_SM_EXCEP_RESP(backEnd_.getStateMachineStatus(status), r)
+
+	cachedState_.ErrorCode = r.ErrorCode;
+	cachedState_.ErrorMessage = r.ErrorMessage;
+	cachedState_.State = status.state;
+}
+//__________________________________________________________________________________________________
+bool EccServer::isBusy() const
+{
+	return (SM::NO_TRANS != cachedState().Transition);
+}
+//__________________________________________________________________________________________________
+bool EccServer::setBusy(const SM::Transition & t, int & code, std::string & msg)
+{
+	IceUtil::RecMutex::Lock lock(statusMutex_);
+	if (SM::NO_TRANS == t)
+	{
+		updateCachedState();
+	}
+	else if (SM::NO_TRANS != cachedState_.Transition)
+	{
+		code = t;
+		msg = "The ECC state machine is busy!";
+		return false;
+	}
+	cachedState_.Transition = t;
+	return true;
+}
+
+//__________________________________________________________________________________________________
+int EccServer::getState(ecc__ResponseState & rs)
+{
+	rs = cachedState();
+
+	if (SM::NO_TRANS != rs.Transition)
+	{
+		rs.ErrorMessage = "The ECC state machine is busy!";
+	}
+
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::describe(std::string xmlConfigId, std::string /* options */, ecc__ResponseText & rt)
+{
+	if (not setBusy(SM::DESCRIBING, rt.ErrorCode, rt.ErrorMessage)) return SOAP_OK;
+
+// Parse configuration ID
+	ConfigId configId;
+	configId.fromXml(xmlConfigId);
+
+// Execute 'describe' transition
+	HANDLE_SM_EXCEP_RESP(backEnd_.describe(configId.subConfigId(ConfigId::Describe)), rt)
+
+// Return XML list of data senders
+	if (0 == rt.ErrorCode)
+	{
+		HANDLE_SM_EXCEP_RESP(rt.Text = backEnd_.dataSenders().toXml(), rt)
+	}
+
+	setBusy(SM::NO_TRANS, rt.ErrorCode, rt.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::prepare(std::string xmlConfigId, std::string /* options */, ecc__ResponseText & rt)
+{
+	if (not setBusy(SM::PREPARING, rt.ErrorCode, rt.ErrorMessage)) return SOAP_OK;
+
+// Parse configuration ID
+	ConfigId configId;
+	configId.fromXml(xmlConfigId);
+
+// Execute 'prepare' transition
+	HANDLE_SM_EXCEP_RESP(backEnd_.prepare(configId.subConfigId(ConfigId::Prepare)), rt)
+
+	setBusy(SM::NO_TRANS, rt.ErrorCode, rt.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::configure(std::string xmlConfigId, std::string dataLinks, ecc__ResponseText & rt)
+{
+	if (not setBusy(SM::CONFIGURING, rt.ErrorCode, rt.ErrorMessage)) return SOAP_OK;
+
+// Parse configuration ID
+	ConfigId configId;
+	configId.fromXml(xmlConfigId);
+
+// Execute 'configuration' transition
+	HANDLE_SM_EXCEP_RESP(backEnd_.configure(configId.subConfigId(ConfigId::Configure), dataLinks), rt)
+
+	if (0 == rt.ErrorCode)
+	{
+		std::ostringstream oss;
+		// Return XML list of data links
+		HANDLE_SM_EXCEP_RESP(oss << backEnd_.dataLinks().toXml(), rt)
+		// Return contents of configuration
+		HANDLE_SM_EXCEP_RESP(oss << '\n' << backEnd_.getLastConfigSet(), rt)
+		rt.Text = oss.str();
+	}
+
+	setBusy(SM::NO_TRANS, rt.ErrorCode, rt.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::specialCmd(std::string command, std::string /* options */, ecc__ResponseText & rt)
+{
+	ecc__Response r;
+	HANDLE_SM_EXCEP_RESP( rt.Text = backEnd_.specialCmd(command), r )
+
+	rt.ErrorCode = r.ErrorCode;
+	rt.ErrorMessage = r.ErrorMessage;
+
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::undo(ecc__ResponseText & r)
+{
+	if (not setBusy(SM::RESETTING, r.ErrorCode, r.ErrorMessage)) return SOAP_OK;
+	HANDLE_SM_EXCEP_RESP(backEnd_.reset(), r)
+	setBusy(SM::NO_TRANS, r.ErrorCode, r.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::start(ecc__ResponseText & r)
+{
+	if (not setBusy(SM::STARTING, r.ErrorCode, r.ErrorMessage)) return SOAP_OK;
+	HANDLE_SM_EXCEP_RESP(backEnd_.start(), r)
+	setBusy(SM::NO_TRANS, r.ErrorCode, r.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::stop(ecc__ResponseText & r)
+{
+	if (not setBusy(SM::STOPPING, r.ErrorCode, r.ErrorMessage)) return SOAP_OK;
+	HANDLE_SM_EXCEP_RESP(backEnd_.stop(), r)
+	setBusy(SM::NO_TRANS, r.ErrorCode, r.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::pause(ecc__ResponseText & r)
+{
+	if (not setBusy(SM::PAUSING, r.ErrorCode, r.ErrorMessage)) return SOAP_OK;
+	HANDLE_SM_EXCEP_RESP(backEnd_.pause(), r)
+	setBusy(SM::NO_TRANS, r.ErrorCode, r.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::resume(ecc__ResponseText & r)
+{
+	if (not setBusy(SM::RESUMING, r.ErrorCode, r.ErrorMessage)) return SOAP_OK;
+	HANDLE_SM_EXCEP_RESP(backEnd_.resume(), r)
+	setBusy(SM::NO_TRANS, r.ErrorCode, r.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::breakup(ecc__ResponseText & r)
+{
+	if (not setBusy(SM::BREAKING_UP, r.ErrorCode, r.ErrorMessage)) return SOAP_OK;
+	HANDLE_SM_EXCEP_RESP(backEnd_.breakup(), r)
+	setBusy(SM::NO_TRANS, r.ErrorCode, r.ErrorMessage);
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+int EccServer::getConfigIDs(ecc__ResponseText & rt)
+{
+	ecc__Response r;
+	ConfigIdSet configIds;
+	HANDLE_SM_EXCEP_RESP(backEnd_.getConfigIds(configIds), r);
+
+	rt.Text = configIds.toXml();
+	rt.ErrorCode = r.ErrorCode;
+	rt.ErrorMessage = r.ErrorMessage;
+
+	return SOAP_OK;
+}
+//__________________________________________________________________________________________________
+void EccServer::setConfigManager(const std::string & url, const std::string & user, const std::string & pwd)
+{
+	CCfg::Io::Url repoFullUrl(url);
+	if (not repoFullUrl.isFile())
+	{
+		if (not user.empty())
+		{
+			repoFullUrl.setUser(user);
+		}
+		if (not pwd.empty())
+		{
+			repoFullUrl.setPassword(pwd);
+		}
+	}
+	LOG_INFO() << "Configuration repository URL: " << repoFullUrl;
+	backEnd_.setConfigManager(repoFullUrl.format());
+}
+//_________________________________________________________________________________________________
+void EccServer::createAlarmLogger(const ::utl::net::SocketAddress & address)
+{
+	backEnd_.createAlarmLogger(address);
+}
+//__________________________________________________________________________________________________
+void EccServer::setLoggingBackend()
+{
+#ifdef HAVE_LOG4CXX
+	// Initiate default initialization procedure.
+	log4cxx::DefaultConfigurator::configure(log4cxx::LogManager::getLoggerRepository());
+	// Check if GET logger has been defined by log4j property file
+	if (log4cxx::LogManager::getLogger("GET")->getAllAppenders().empty())
+	{
+		// Configure custom console logger
+		log4cxx::LoggerPtr logger = log4cxx::LogManager::getLogger("GET");
+		log4cxx::ConsoleAppenderPtr appender(new log4cxx::ConsoleAppender());
+		log4cxx::LayoutPtr layout(new log4cxx::PatternLayout("%d{(%H:%M:%S - %d/%m/%Y)} %p - %m%n"));
+		appender->setLayout(layout);
+		log4cxx::helpers::Pool pool;
+		appender->activateOptions(pool);
+		log4cxx::Logger::getRootLogger()->addAppender(appender);
+		log4cxx::LogManager::getLoggerRepository()->setConfigured(true);
+	}
+
+	// Setup logging backend
+	utl::BackendLogger::setBackend(utl::LoggingBackendPtr(new mdaq::utl::Log4cxxLoggingBackend("GET.ECC")));
+#endif
+}
+//__________________________________________________________________________________________________
+} /* namespace soap */
+} /* namespace get */

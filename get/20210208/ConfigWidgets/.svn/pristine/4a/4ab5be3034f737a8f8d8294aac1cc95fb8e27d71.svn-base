@@ -1,0 +1,12 @@
+Source: libconfigwidgets
+Section: devel
+Priority: optional
+Maintainer: Frederic Chateau <frederic.chateau@cea.fr>
+Build-Depends: debhelper (>= 7), automake (>= 1.11), libtool (>= 2.2), libcompoundconfig (= 2.1.0-1), libqt4-dev (>= 4.3.0)
+Standards-Version: 3.8.0
+Homepage:
+
+Package: libconfigwidgets
+Architecture: any
+Depends: libcompoundconfig (= 2.1.0-1), libqtcore4 (>= 4.3.0), libqtgui4 (>= 4.3.0)
+Description: This is a Configuration Widget used with the CompoundConfig Library

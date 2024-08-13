@@ -1,0 +1,18 @@
+# Configuring the bottom Music chips and Sleeping for 100 Seconds
+20FFFFFFFF23010000
+120
+# Configuring the top Music chips and Sleeping for 100 Seconds
+20FFFFFFFF23020000
+120
+# Enabling the ADC Run on SIABs and Sleeping for 4 seconds
+20FFFFFFFF18000000
+4
+# Recording the ADC offset and Sleeping for 4 seconds
+20FFFFFFFF1C000000
+4
+# Configure the Trigger Board and Sleeping for 4 seconds
+3005050002000F51C3
+4
+# Initialize the CoBo and Sleeping for 60 seconds
+400300000000000000
+60

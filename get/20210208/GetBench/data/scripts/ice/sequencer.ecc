@@ -1,0 +1,4 @@
+connect device ctrl
+write pipeCtrl SCW 0
+write pipeCtrl SCR 0
+write pipeCtrl ScrScwOverride 1

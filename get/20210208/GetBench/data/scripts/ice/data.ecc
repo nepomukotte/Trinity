@@ -1,0 +1,7 @@
+connect device ctrl
+readReg readPtr_asad0
+readReg writePtr_asad0
+readReg aFullLevel
+readReg aEmptyLevel
+readReg memStart_asad0
+readReg memEnd_asad0

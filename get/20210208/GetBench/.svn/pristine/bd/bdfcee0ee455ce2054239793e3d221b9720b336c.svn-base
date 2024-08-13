@@ -1,0 +1,229 @@
+// $Id: requirements_macosx.dox 1330 2014-06-04 15:13:15Z psizun $
+/**
+@page page_MacOSX Mac OS X Requirements
+@tableofcontents
+
+To install all the external tools and libraries required by the GET software, the easiest solution in a Mac OS X environment is to make use one of two package repositories:
+  - <a href="http://www.macports.org">MacPorts</a>
+  - <a href="http://brew.sh">Homebrew</a>
+
+@section sec_macports MacPorts
+The instructions below assume <a href="http://www.macports.org">MacPorts</a> has already been installed.
+
+@subsection macports_gcc C++ compiler
+Starting from release 10.9 (Mavericks) of OS X, select the native clang compiler:
+@verbatim
+sudo port install gcc_select
+sudo port select --set gcc none
+@endverbatim
+
+Under older releases, check the available compilers first and then select one:
+@verbatim
+sudo port select --list gcc
+sudo port select --set gcc llvm-gcc42
+@endverbatim
+
+@subsection macports_autoconf autoconf
+@verbatim
+sudo port install autoconf
+@endverbatim
+
+@subsection macports_automake automake
+@verbatim
+sudo port install automake
+@endverbatim
+
+@subsection macports_libtool libtool
+@verbatim
+sudo port install libtool
+@endverbatim
+
+@subsection macports_pkgconfig pkgconfig
+@verbatim
+sudo port install pkgconfig
+@endverbatim
+
+@subsection macports_boost Boost
+To install the <a href="http://www.boost.org">Boost</a>  library, just type
+@verbatim
+sudo port install boost
+@endverbatim
+
+@subsection macports_subversion subversion
+@verbatim
+sudo port install subversion
+@endverbatim
+
+@subsection macports_doxygen doxygen
+@verbatim
+sudo port install doxygen
+@endverbatim
+
+@subsection macports_qt4 Qt 4
+@verbatim
+sudo port install qt4-mac
+@endverbatim
+
+@subsection macports_qwt Qwt
+@verbatim
+sudo port install qwt
+@endverbatim
+
+@subsection macports_qwtplot3d QwtPlot3d and OpenGL
+@verbatim
+sudo port install qwtplot3d mesa
+@endverbatim
+
+@subsection macports_ice ICE
+@verbatim
+sudo port install zeroc-ice35
+@endverbatim
+
+@subsection macports_root ROOT and its Qt graphics backend
+@verbatim
+sudo port install root5 +qt_mac
+@endverbatim
+
+@subsection macports_gsoap gSOAP
+@verbatim
+sudo port install gsoap
+@endverbatim
+
+@subsection macports_log4cxx log4cxx
+@verbatim
+sudo port install log4cxx
+@endverbatim
+
+@subsection macports_MySql MySql client library
+Install the @em mysqlx57  MacPorts port:
+@verbatim
+sudo port install mysql57 mysql_select
+sudo port select mysql mysql57
+@endverbatim
+It provides <em>/opt/local/bin/mysql_config</em>.
+
+@subsection macports_PostgreSql PostgreSql client library
+Install the @em postgresql84  MacPorts port:
+@verbatim
+sudo port install postgresql84 postgresql_select
+sudo port select --set postgresql postgresql84
+@endverbatim
+
+@subsection macports_SQLite SQLite client library
+Install the @em sqlite3  MacPorts port:
+@verbatim
+sudo port install sqlite3
+@endverbatim
+
+@subsection macports_Oracle Oracle client library
+Install the @em oracle-instantclient  MacPorts port:
+@verbatim
+sudo port install oracle-instantclient
+@endverbatim
+
+MacPorts may fail to download the necessary files from the Oracle web site by itself.
+
+In that case, you shall :
+    - Delete intermediate files created by the failed building process and create a directory /opt/local/var/macports/distfiles/oracle-instantclient:
+	@verbatim
+sudo port clean --all oracle-instantclient
+sudo mkdir /opt/local/var/macports/distfiles/oracle-instantclient
+@endverbatim
+    - Go to the  Oracle download page, register, download the instantclient-basic-10.2.0.4.0-macosx-x64.zip and instantclient-sdk-10.2.0.4.0-macosx-x64.zip packages manually and place them into the newly created /opt/local/var/macports/distfiles/oracle-instantclient directory.
+    Install the downloaded packages
+	@verbatim
+sudo port install oracle-instantclient
+@endverbatim
+
+@section sec_brew Homebrew
+The instructions below assume <a href="http://brew.sh">Homebrew</a> has already been installed.
+
+@subsection brew_autoconf autoconf
+@verbatim
+brew install autoconf
+@endverbatim
+
+@subsection brew_automake automake
+@verbatim
+brew install automake
+@endverbatim
+
+@subsection brew_libtool libtool
+@verbatim
+brew install libtool
+@endverbatim
+
+@subsection brew_pkgconfig pkgconfig
+@verbatim
+brew install pkgconfig
+@endverbatim
+
+@subsection brew_boost Boost
+@verbatim
+brew install boost
+@endverbatim
+
+@subsection brew_subversion subversion
+@verbatim
+brew install subversion
+@endverbatim
+
+@subsection brew_doxygen doxygen
+@verbatim
+brew install doxygen
+@endverbatim
+
+@subsection brew_qt4 Qt 4
+@verbatim
+brew install qt --with-qt3support
+@endverbatim
+
+@subsection brew_qwt Qwt
+@verbatim
+brew install qwt
+@endverbatim
+
+@subsection brew_qwtplot3d QwtPlot3d
+@verbatim
+brew install https://raw.github.com/gcoco/CI-for-GoldenCheetah/master/qwtplot3d.rb
+@endverbatim
+
+@subsection brew_ice ICE
+@verbatim
+brew install ice
+@endverbatim
+
+@subsection brew_root ROOT and QtRoot
+@verbatim
+brew install qt --with-qt3support
+brew tap homebrew/homebrew-science
+ln -s /usr/local/include/QtCore /usr/include/Qt
+brew install root --with-qt
+@endverbatim
+
+@subsection brew_gsoap gSOAP
+@verbatim
+brew install gsoap
+@endverbatim
+
+@subsection brew_log4cxx log4cxx
+@verbatim
+brew install log4cxx
+@endverbatim
+
+@subsection brew_MySql MySql client library
+@verbatim
+brew install mysql
+@endverbatim
+
+@subsection brew_PostgreSql PostgreSql client library
+TBD
+
+@subsection brew_SQLite SQLite client library
+TBD
+
+@subsection brew_Oracle Oracle client library
+TBD
+
+$LastChangedDate$
+*/

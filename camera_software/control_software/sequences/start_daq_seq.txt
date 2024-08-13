@@ -1,0 +1,3 @@
+# Starting the Global Run in Master Control and sleeping for 30 seconds
+100A00000000000000
+15

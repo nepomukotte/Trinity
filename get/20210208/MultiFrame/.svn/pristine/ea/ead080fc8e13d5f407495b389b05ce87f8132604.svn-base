@@ -1,0 +1,103 @@
+/* =============================================================================
+ * $Id$
+ * @file Header.h
+ * @author sizun
+ * @date 15 déc. 2011
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * =============================================================================
+ */
+
+#ifndef mfm_Header_h_INCLUDED
+#define mfm_Header_h_INCLUDED
+
+#include "mfm/Common.h"
+#include "mfm/PrimaryHeader.h"
+#include <cstdlib>
+#include <vector>
+
+namespace mfm {
+//______________________________________________________________________
+class FrameFormat;
+//______________________________________________________________________
+/**
+ * This class provides the interface common to all kinds of MFM frame headers (without including the possible reserve).
+ *
+ */
+class Header : public mfm::PrimaryHeader
+{
+public:
+    Header(utl::Endianness _byteOrder = utl::BigEndian);
+    Header(PrimaryHeader const & primaryHeader);
+    virtual ~Header() { ; }
+    virtual Header* clone() const = 0;
+
+    ///@name Getters
+    ///@{
+    virtual bool isBasicFrame() const { return false; }
+    virtual bool isLayeredFrame() const { return false; }
+    virtual bool isBlobFrame() const { return false; }
+    virtual FrameKind metaType() const = 0;
+    virtual uint16_t headerSize_blk() const = 0;
+    virtual uint32_t headerSize_B() const = 0;
+    virtual uint16_t itemSize_B() const = 0;
+    virtual uint32_t itemCount()  const = 0;
+    virtual uint32_t headerReserveSize_B() const = 0;
+    virtual uint32_t dataReserveSize_B() const = 0;
+    virtual uint32_t dataSize_blk() const { return frameSize_blk() - headerSize_blk(); }
+    virtual uint64_t dataSize_B() const { return frameSize_B() - headerSize_B(); }
+    ///@}
+
+    ///@name Setters
+    ///@{
+    virtual void set_headerSize_blk(uint16_t) = 0;
+    virtual void set_headerSize_B(uint32_t) = 0;
+    virtual void set_itemSize_B(uint16_t) = 0;
+    virtual void set_itemCount(uint32_t) = 0;
+	virtual void set_dataSize_blk(uint32_t _dataSize_blk) = 0;
+	virtual void set_dataSize_B(uint64_t _dataSize_B) = 0;
+    ///@}
+
+	virtual void addItem();
+	virtual void addItems(size_t const & n = 1);
+	virtual void addItem(uint64_t const itemSize);
+
+    static std::auto_ptr<Header> decodeHeader(std::istream &);
+	static std::auto_ptr<Header> createHeader(FrameFormat const & format);
+	using PrimaryHeader::decode;
+	using PrimaryHeader::encode;
+	using PrimaryHeader::print;
+protected:
+	// Hiding inherited setters of frame size: use set_dataSize and set_headerSize instead.
+	using PrimaryHeader::set_frameSize_B;
+	using PrimaryHeader::set_frameSize_blk;
+};
+//______________________________________________________________________
+} /* namespace mfm */
+#endif /* mfm_Header_h_INCLUDED */

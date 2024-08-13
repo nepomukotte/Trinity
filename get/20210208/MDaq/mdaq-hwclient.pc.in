@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+slicedir=@datarootdir@/slice
+
+Name: mdaq-hwclient
+Description: Mordicus DAQ Hardware Control client: a C++ class library to build
+	a client to access the MDaq Hardware Control server.
+Requires: mdaq-interfaces@DEBUG_SUFFIX@ mdaq-utl@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -lmdaq-hwclient@DEBUG_SUFFIX@
+Cflags: -I${includedir} @PTHREAD_CFLAGS@

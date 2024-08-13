@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Setup id="Hardware">
+	<Node id="*">
+		<Instance id="*">
+			<isActive>true</isActive>
+			<HardwareConfigId>fullCoBoStandAlone</HardwareConfigId>
+			<Endpoint>
+				<addressField id="*" range="[0, 255]">255</addressField>
+				<addressField id="0">192</addressField>
+				<addressField id="1">168</addressField>
+				<addressField id="2">40</addressField>
+				<addressField id="3">1</addressField>
+				<port range="[0, 65535]">46001</port>
+			</Endpoint>
+			<batchProcessing>false</batchProcessing>
+		</Instance>
+	</Node>
+	<Node id="CoBo">
+		<Instance id="Crate00_Slot00">
+			<Endpoint>
+				<addressField id="3">2</addressField>
+			</Endpoint>
+		</Instance>
+	</Node>
+	<Node id="Mutant">
+		<Instance id="*">
+			<HardwareConfigId>Mutant</HardwareConfigId>
+		</Instance>
+	</Node>
+	<Node id="BEAST">
+		<Instance id="*">
+			<HardwareConfigId>BEAST</HardwareConfigId>
+		</Instance>
+	</Node>
+</Setup>

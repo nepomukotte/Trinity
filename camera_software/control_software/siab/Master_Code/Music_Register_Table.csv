@@ -1,0 +1,32 @@
+Address,Value (DEC),enCh,disIn,DVoffset,X,X,X,X,X,X,Value (HEX)
+0,1279,1,0,255,X,X,X,X,X,X,4FF
+1,1279,1,0,255,X,X,X,X,X,X,4FF
+2,1279,1,0,255,X,X,X,X,X,X,4FF
+3,1279,1,0,255,X,X,X,X,X,X,4FF
+4,1279,1,0,255,X,X,X,X,X,X,4FF
+5,1279,1,0,255,X,X,X,X,X,X,4FF
+6,1279,1,0,255,X,X,X,X,X,X,4FF
+7,1279,1,0,255,X,X,X,X,X,X,4FF
+Address,Value (DEC),HLAna,enChSW,enPZ,enDrvSE,DVth,pHLComp,pEnCompSW,pEnPZComp,X,Value (HEX)
+8,62647,1,1,1,1,120,1,1,1,X,F3C7
+9,62647,1,1,1,1,120,1,1,1,X,F3C7
+10,62647,1,1,1,1,120,1,1,1,X,F3C7
+11,62647,1,1,1,1,120,1,1,1,X,F3C7
+12,62647,1,1,1,1,120,1,1,1,X,F3C7
+13,62647,1,1,1,1,120,1,1,1,X,F3C7
+14,62647,1,1,1,1,120,1,1,1,X,F3C7
+15,62647,1,1,1,1,120,1,1,1,X,F3C7
+Address,Value (DEC),V_dcLG,V_dcHG,X,X,X,X,X,X,X,Value (HEX)
+32,37008,144,144,X,X,X,X,X,X,X,9090
+Address,Value (DEC),V_dcCh,V_cm,X,X,X,X,X,X,X,Value (HEX)
+33,28545,111,129,X,X,X,X,X,X,X,6F81
+Address,Value (DEC),I_bComp,V_BG_adj,I_bOP_SE,I_bAB_SE,X,X,X,X,X,Value (HEX)
+34,30110,3,6,3,15,X,X,X,X,X,799E
+Address,Value (DEC),HLSUM_HG,HLSUM_LG,EnDiffDrv_HG,EnDiffDrv_LG,enBypass_HG,enBypass_LG,enPZ_HG,enPZ_LG,enChSUM,Value (HEX)
+35,0,1,1,1,1,0,0,1,1,255,F3FF
+Address,Value (DEC),V_lim,Cap_PZ,R_lad,LowAtLad_PZ,X,X,X,X,X,Value (HEX)
+36,39906,38,12,5,1,X,X,X,X,X,9996
+Address,Value (DEC),I_bAB_Diff,I_bOP_Diff,I_bPair,X,X,X,X,X,X,Value (HEX)
+37,988,15,3,4,X,X,X,X,X,X,3DC
+Address,Value (DEC),I_bAB_PZ,I_bIN,I_bPZ_Buf,X,X,X,X,X,X,Value (HEX)
+38,2251,4,25,3,X,X,X,X,X,X,8CB

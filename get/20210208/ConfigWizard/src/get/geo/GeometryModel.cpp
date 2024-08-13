@@ -1,0 +1,301 @@
+/**
+ * @file GeometryModel.cpp
+ * @date Jan 24, 2014
+ * @author sizun
+ * 
+ * @note SVN tag: $Id: GeometryModel.cpp 1309 2014-05-20 14:06:33Z psizun $
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the ConfigWizard software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "GeometryModel.h"
+#include "get/cfg/ChannelConfigModel.h"
+#include "utl/Logging.h"
+#include <TH2F.h>
+#include <algorithm>
+#include <boost/bind.hpp>
+using boost::bind;
+
+namespace get
+{
+namespace geo
+{
+//_________________________________________________________________________________________________
+const std::string GeometryModel::columnNames[COLUMN_COUNT] = { "CoBo", "AsAd", "AGET", "Channel", "X", "Y" };
+//_________________________________________________________________________________________________
+GeometryModel::GeometryModel(QObject* parentWidget) : QAbstractTableModel(parentWidget)
+{
+}
+//_________________________________________________________________________________________________
+int GeometryModel::rowCount(const QModelIndex & /* parent */) const
+{
+	return mapping_.size();
+}
+//_________________________________________________________________________________________________
+int GeometryModel::columnCount(const QModelIndex & /* parent */) const
+{
+	return COLUMN_COUNT;
+}
+//_________________________________________________________________________________________________
+Qt::ItemFlags GeometryModel::flags(const QModelIndex & index) const
+{
+    if (!index.isValid())
+        return 0;
+
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable;
+	return flags;
+}
+//_________________________________________________________________________________________________
+const PadChannel & GeometryModel::mapping(const int row) const
+{
+	return mapping_[row];
+}
+//_________________________________________________________________________________________________
+QVariant GeometryModel::data(const QModelIndex & index, int role) const
+{
+	if (not index.isValid())
+		return QVariant();
+	if (role == Qt::DisplayRole)
+	{
+		const PadChannel & padChannel = mapping_[index.row()];
+		switch(index.column())
+		{
+		case ChannelColumn:
+			return (uint) padChannel.channel.channelId;
+			break;
+		case AGETColumn:
+			return (uint) padChannel.channel.agetId;
+			break;
+		case AsAdColumn:
+			return (uint) padChannel.channel.asadId;
+			break;
+		case CoBoColumn:
+			return QString::fromStdString(padChannel.channel.coboId);
+			break;
+		case XColumn:
+			return padChannel.pad.first;
+			break;
+		case YColumn:
+			return padChannel.pad.second;
+			break;
+		default:
+			return QVariant();
+			break;
+		}
+	}
+	else if (Qt::TextAlignmentRole == role)
+	{
+		return QVariant(Qt::AlignRight | Qt::AlignVCenter);
+	}
+	return QVariant();
+}
+//__________________________________________________________
+bool GeometryModel::setData(const QModelIndex & index, const QVariant &value, int role)
+{
+	if (role != Qt::EditRole or not index.isValid() or index.row() >= rowCount()) return false;
+
+	const int row = index.row();
+	bool ok = false;
+	switch (index.column())
+	{
+	case CoBoColumn:
+		mapping_[row].channel.coboId = value.toString().toStdString();
+		ok = true;
+		break;
+	case AsAdColumn:
+		mapping_[row].channel.asadId = value.toUInt();
+		ok = true;
+		break;
+	case AGETColumn:
+		mapping_[row].channel.agetId = value.toUInt();
+		ok = true;
+		break;
+	case ChannelColumn:
+		mapping_[row].channel.channelId = value.toUInt();
+		ok = true;
+		break;
+	case XColumn:
+		mapping_[row].pad.first = value.toUInt();
+		ok = true;
+		break;
+	case YColumn:
+		mapping_[row].pad.second = value.toUInt();
+		ok = true;
+		break;
+	default:
+		break;
+	}
+
+	if (ok) emit dataChanged(index, index);
+
+	return ok;
+}
+//_________________________________________________________________________________________________
+QVariant GeometryModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	QVariant data;
+	if(orientation == Qt::Horizontal)
+	{
+		switch (role)
+		{
+		case Qt::DisplayRole:
+			data = QString::fromStdString(columnNames[section]);
+			break;
+		default:
+			data = QAbstractTableModel::headerData(section, orientation, role);
+			break;
+		}
+	}
+	else
+	{
+		data = QAbstractTableModel::headerData(section, orientation, role);
+	}
+	return data;
+}
+//_________________________________________________________________________________________________
+void GeometryModel::addChannel(const PadChannel & padChannel)
+{
+	int newRowIndex = rowCount();
+	beginInsertRows(QModelIndex(), newRowIndex, newRowIndex);
+	mapping_.push_back(padChannel);
+	endInsertRows();
+}
+//_________________________________________________________________________________________________
+void GeometryModel::removeLastChannel()
+{
+	if (rowCount() <= 0) return;
+
+	int oldCount = rowCount();
+	beginRemoveRows(QModelIndex(), oldCount, oldCount);
+	mapping_.resize(oldCount-1);
+	endRemoveRows();
+}
+//_________________________________________________________________________________________________
+void GeometryModel::clear()
+{
+	beginRemoveRows(QModelIndex(), 0, rowCount()-1);
+	mapping_.clear();
+	endRemoveRows();
+}
+//_________________________________________________________________________________________________
+float GeometryModel::xMin() const
+{
+	if (mapping_.empty()) return 0;
+	Mapping::const_iterator iterMin = std::min_element(mapping_.begin(), mapping_.end(),
+			bind(&PadChannel::x, _1) < bind(&PadChannel::x, _2));
+	return iterMin->x();
+}
+//_________________________________________________________________________________________________
+float GeometryModel::xMax() const
+{
+	if (mapping_.empty()) return 0;
+	Mapping::const_iterator iterMax = std::max_element(mapping_.begin(), mapping_.end(),
+			bind(&PadChannel::x, _1) < bind(&PadChannel::x, _2));
+	return iterMax->x();
+}
+//_________________________________________________________________________________________________
+float GeometryModel::yMin() const
+{
+	if (mapping_.empty()) return 0;
+	Mapping::const_iterator iterMin = std::min_element(mapping_.begin(), mapping_.end(),
+			bind(&PadChannel::x, _1) < bind(&PadChannel::y, _2));
+	return iterMin->y();
+}
+//_________________________________________________________________________________________________
+float GeometryModel::yMax() const
+{
+	if (mapping_.empty()) return 0;
+	Mapping::const_iterator iterMax = std::max_element(mapping_.begin(), mapping_.end(),
+			bind(&PadChannel::y, _1) < bind(&PadChannel::y, _2));
+	return iterMax->y();
+}
+//_________________________________________________________________________________________________
+TH2F* GeometryModel::createHistogram()
+{
+	Int_t rowMin = xMin(), rowMax = xMax(), colMin = yMin(), colMax = yMax();
+	Int_t numRow = rowMax - rowMin + 1;
+	Int_t numCol = colMax - colMin + 1;
+	TH2F* hist = new TH2F("hMapping", "", numRow, rowMin, rowMin+numRow, numCol, colMin, colMin+numCol);
+
+	hist->GetXaxis()->SetTitle("X");
+	hist->GetYaxis()->SetTitle("Y");
+	hist->GetXaxis()->CenterTitle();
+	hist->GetYaxis()->CenterTitle();
+	hist->GetZaxis()->CenterTitle();
+	hist->GetXaxis()->SetTitleOffset(1.5);
+	hist->GetYaxis()->SetTitleOffset(1.5);
+	return hist;
+}
+//_________________________________________________________________________________________________
+TH2F* GeometryModel::createThresholdHistogram(cfg::ChannelConfigModel* config)
+{
+	TH2F* hist = createHistogram();
+	hist->SetName("hThreshold");
+
+	// Loop over pads
+	const int numPads = rowCount();
+	float rowStep = hist->GetXaxis()->GetBinWidth(1);
+	float colStep = hist->GetYaxis()->GetBinWidth(1);
+	for (int i=0; i < numPads; ++i)
+	{
+		// Get bin
+		utl::PadUID pad = mapping(i).pad;
+		Int_t bin = hist->FindBin(pad.first+0.5*rowStep, pad.second+0.5*colStep);
+		// Get value
+		QModelIndex idx = config->findChannel(mapping(i).channel);
+		float value = config->threshold(idx);
+		// Fill hist
+		hist->SetBinContent(bin, value);
+	}
+	hist->GetZaxis()->SetTitle("DAC threshold");
+	return hist;
+}
+//_________________________________________________________________________________________________
+TH2F* GeometryModel::createLsbThresholdHistogram(cfg::ChannelConfigModel* config)
+{
+	TH2F* hist = createHistogram();
+	hist->SetName("hLsbThreshold");
+
+	// Loop over pads
+	const int numPads = rowCount();
+	float rowStep = hist->GetXaxis()->GetBinWidth(1);
+	float colStep = hist->GetYaxis()->GetBinWidth(1);
+	for (int i=0; i < numPads; ++i)
+	{
+		// Get bin
+		utl::PadUID pad = mapping(i).pad;
+		Int_t bin = hist->FindBin(pad.first+0.5*rowStep, pad.second+0.5*colStep);
+		// Get value
+		QModelIndex idx = config->findChannel(mapping(i).channel);
+		float value = config->lsbThreshold(idx);
+		// Fill hist
+		hist->SetBinContent(bin, value);
+	}
+	hist->GetZaxis()->SetTitle("DAC LSB threshold");
+	return hist;
+}
+//_________________________________________________________________________________________________
+} /* namespace geo */
+} /* namespace get */

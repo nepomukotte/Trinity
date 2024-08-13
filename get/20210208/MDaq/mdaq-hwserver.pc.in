@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: mdaq-hwserver
+Description: Mordicus DAQ Hardware Control server: a C++ class library to build
+	a server providing remote access to hardware devices (through register and
+	memory interface).
+Requires: mdaq-hwclient@DEBUG_SUFFIX@ mdaq-utl@DEBUG_SUFFIX@ CompoundConfig@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -lmdaq-hwserver@DEBUG_SUFFIX@
+Cflags: -I${includedir}

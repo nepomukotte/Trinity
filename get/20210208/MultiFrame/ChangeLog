@@ -1,0 +1,12 @@
+2013-02-13 sizun  <patrick.sizun@cea.fr>
+	* Implemented ItemIterator.
+	* Optimized BitField constructor (so that decoding of CoBo frames takes 450 ms instead of 750 ms).
+	* Fixed bug preventing use of old revision format to decode new revision data.
+
+2012-06-08  sizun  <patrick.sizun@cea.fr>
+	* Added iterators (to be completed).
+	* Fixed slow method Frame::itemSize_B(size_t).
+
+2011-12-16  sizun  <patrick.sizun@cea.fr>
+	* Added classes PrimaryHeader, Header, BlobHeader, Reserve, StandardHeader.
+	* Aded unit tests. 

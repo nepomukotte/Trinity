@@ -1,0 +1,67 @@
+digraph G {
+rankdir="TB"
+splines=false
+
+subgraph clusterEmbedded {
+	label = "Embedded server(s)"
+	hwdummy1 [ style = "invis" ]
+	hwdummy2 [ style = "invis" ]
+	hwdummy3 [ style = "invis" ]
+	getHwServer [ label="getHwServer" ]
+	hwdummy4 [ style = "invis" ]
+	hwdummy5 [ style = "invis" ]
+//	hwdummy6 [ style = "invis" ]
+}
+
+subgraph clusterDummy {
+	rankdir="LR"
+
+	subgraph clusterEccServer {
+		label = "Electronics Control Core"
+		dummy7 [ style = "invis" ]
+		getEccServer;
+		dummy8 [ style = "invis" ]
+		getEccSoapServer;
+	}
+
+	subgraph clusterDataRouters {
+		label = "Data Routers"
+		GetControllerRouter [ label = "GetController" ]
+		dataRouter;
+		Narval;
+	}
+	style = "invis"
+}
+
+subgraph clusterClients {
+	label = "Configuration Clients"
+	getEccClient;
+	dummy9 [ style = "invis" ]
+	GetController;
+	dummy10 [ style = "invis" ]
+	getEccSoapClient;
+	dummy11 [ style = "invis" ]
+	GRCC;
+}
+
+// Constraints
+{
+	getHwServer -> getEccSoapServer [ style = "invis"]
+	getEccSoapServer -> dummy10 [ style = "invis" ]
+	//hwdummy1 -> Narval -> GRCC [ style = "invis" ]
+}
+
+getEccClient -> getEccServer [color = "red" style = "dashed"  constraint = false ];
+GetController -> getEccServer [color = "red" style = "dashed"  constraint = false];
+getEccSoapClient -> getEccSoapServer [color = "red" style = "dashed"  constraint = false];
+GRCC -> getEccSoapServer [color = "red" style = "dashed"  constraint = false];
+
+getEccServer -> getHwServer [color = "red" style = "dashed"  constraint = false];
+getEccSoapServer -> getHwServer [color = "red" style = "dashed"  constraint = false];
+
+getHwServer -> GetControllerRouter [color = "red" style = "dashed"  constraint = false];
+getHwServer -> dataRouter [color = "red" style = "dashed"  constraint = false];
+getHwServer -> Narval [color = "red" style = "dashed"  constraint = false];
+
+GRCC -> Narval [color = "red" style = "dashed"  constraint = false];
+}

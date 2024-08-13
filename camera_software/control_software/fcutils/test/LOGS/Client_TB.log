@@ -1,0 +1,3548 @@
+Notify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400000000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 100ns
+Adress to write: 0x1028
+Data supposed to write: 10
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F01C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 0
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 1
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 2209860222
+Event: 22
+Bifocal: 4
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 22
+Bifocal Live: 4
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 22
+TB Busy: 3164131
+CoBo Busy: 3163867
+Transit Busy: 220
+Buffer Busy: 242
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 220
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 22
+Attempts To Read No. of Events: 1
+Number of Words to read: 110
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000100000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4452117100
+Event: 44
+Bifocal: 9
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 44
+Bifocal Live: 9
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 44
+TB Busy: 6328284
+CoBo Busy: 6327756
+Transit Busy: 440
+Buffer Busy: 484
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 440
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00001.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00010000000000	
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 44
+Attempts To Read No. of Events: 1
+Number of Words to read: 220
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000200000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5351342800
+Event: 589
+Bifocal: 546
+Disc Test: 1
+Internal: 0
+External: 0
+GPS: 0
+HLED: 54
+Bifocal Live: 546
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 54
+TB Busy: 84568503
+CoBo Busy: 84561435
+Transit Busy: 5890
+Buffer Busy: 6479
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 5890
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00002.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00020000000000"
+msg size: 18
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 589
+Attempts To Read No. of Events: 1
+Number of Words to read: 2945
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000300000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499556918
+Event: 605
+Bifocal: 561
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 561
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 86869670
+CoBo Busy: 86862410
+Transit Busy: 6050
+Buffer Busy: 6655
+Memory Full: 0
+Memory RNotify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400000000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 100ns
+Adress to write: 0x1028
+Data supposed to write: 10
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F01C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 0
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 1
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1953986942
+Event: 38
+Bifocal: 23
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 19
+Bifocal Live: 23
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 19
+TB Busy: 5465399
+CoBo Busy: 5464943
+Transit Busy: 380
+Buffer Busy: 418
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 380
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 38
+Attempts To Read No. of Events: 1
+Number of Words to read: 190
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000100000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499519950
+Event: 110
+Bifocal: 66
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 66
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 15820854
+CoBo Busy: 15819534
+Transit Busy: 1100
+Buffer Busy: 1210
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1100
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00001.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00010000000000B
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 110
+Attempts To Read No. of Events: 1
+Number of Words to read: 550
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000200000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499531932
+Event: 110
+Bifocal: 66
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 66
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 15820947
+CoBo Busy: 15819627
+Transit Busy: 1100
+Buffer Busy: 1210
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1100
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00002.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00020000000000B
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 110
+Attempts To Read No. of Events: 1
+Number of Words to read: 550
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000300000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499546648
+Event: 110
+Bifocal: 66
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 66
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 15820771
+CoBo Busy: 15819451
+Transit Busy: 1100
+Buffer Busy: 1210
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1100
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00003.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00030000000000B
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 110
+Attempts To Read No. of Events: 1
+Number of Words to read: 550
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000400000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499538692
+Event: 110
+Bifocal: 66
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 66
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 15820749
+CoBo Busy: 15819429
+Transit Busy: 1100
+Buffer Busy: 1210
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1100
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00004.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00040000000000B
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 110
+Attempts To Read No. of Events: 1
+Number of Words to read: 550
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000500000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 3077434839
+Event: 62
+Bifocal: 37
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 31
+Bifocal Live: 37
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 31
+TB Busy: 8917180
+CoBo Busy: 8916436
+Transit Busy: 620
+Buffer Busy: 682
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 620
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00005.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00050000000000%
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 62
+Attempts To Read No. of Events: 1
+Number of Words to read: 310
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000600000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 3441198538
+Event: 34
+Bifocal: 7
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 34
+Bifocal Live: 7
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 34
+TB Busy: 4890081
+CoBo Busy: 4889673
+Transit Busy: 340
+Buffer Busy: 374
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 340
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00006.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00060000000000
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 34
+Attempts To Read No. of Events: 1
+Number of Words to read: 170
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:MMMM
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000700000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499529878
+Event: 55
+Bifocal: 11
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 11
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 7910364
+CoBo Busy: 7909704
+Transit Busy: 550
+Buffer Busy: 605
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 550
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00007.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00070000000000
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 55
+Attempts To Read No. of Events: 1
+Number of Words to read: 275
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000800000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499540304
+Event: 55
+Bifocal: 11
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 11
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 7910396
+CoBo Busy: 7909736
+Transit Busy: 550
+Buffer Busy: 605
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 550
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00008.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00080000000000
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 55
+Attempts To Read No. of Events: 1
+Number of Words to read: 275
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000900000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499527915
+Event: 55
+Bifocal: 11
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 11
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 7910490
+CoBo Busy: 7909830
+Transit Busy: 550
+Buffer Busy: 605
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 550
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00009.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00090000000000
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 55
+Attempts To Read No. of Events: 1
+Number of Words to read: 275
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000a00000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5650503376
+Event: 57
+Bifocal: 6
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 57
+Bifocal Live: 6
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 57
+TB Busy: 8198043
+CoBo Busy: 8197359
+Transit Busy: 570
+Buffer Busy: 627
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 570
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00010.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C000a0000000000
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 57
+Attempts To Read No. of Events: 1
+Number of Words to read: 285
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000b00000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1825526701
+Event: 200
+Bifocal: 186
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 18
+Bifocal Live: 186
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 18
+TB Busy: 28621354
+CoBo Busy: 28618954
+Transit Busy: 2000
+Buffer Busy: 2200
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 2000
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00011.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C000b0000000000º
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 200
+Attempts To Read No. of Events: 1
+Number of Words to read: 1000
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000c00000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5499535459
+Event: 605
+Bifocal: 561
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 561
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 86870766
+CoBo Busy: 86863506
+Transit Busy: 6050
+Buffer Busy: 6655
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 6050
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00012.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C000c00000000001
+msg size: 18
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 605
+Attempts To Read No. of Events: 1
+Number of Words to read: 3025Notify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:04FFFF0000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 100ns
+Adress to write: 0x1028
+Data supposed to write: 10
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F51C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 80
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 0
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 529429665
+Event: 58
+Bifocal: 54
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 5
+Bifocal Live: 54
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 5
+TB Busy: 8197972
+CoBo Busy: 8197276
+Transit Busy: 580
+Buffer Busy: 638
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 580
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 58
+Attempts To Read No. of Events: 1
+Number of Words to read: 290
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to wNotify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400640000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 100ns
+Adress to write: 0x1028
+Data supposed to write: 10
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F51C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 80
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 0
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 2320789300
+Event: 256
+Bifocal: 237
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 24
+Bifocal Live: 237
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 24
+TB Busy: 36531648
+CoBo Busy: 36528576
+Transit Busy: 2560
+Buffer Busy: 2816
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 2560
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 256
+Attempts To Read No. of Events: 1
+Number of Words to read: 1280
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000100000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5498640240
+Event: 605
+Bifocal: 561
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 561
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 86870657
+CoBo Busy: 86863397
+Transit Busy: 6050
+Buffer Busy: 6655
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 6050
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00001.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C000100000000001
+msg size: 18
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 605
+Attempts To Read No. of Events: 1
+Number of Words to read: 3025
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000200000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 931285860
+Event: 102
+Bifocal: 95
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 9
+Bifocal Live: 95
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 9
+TB Busy: 14526388
+CoBo Busy: 14525164
+Transit Busy: 1020
+Buffer Busy: 1122
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1020
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00002.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00020000000000_
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 102
+Attempts To Read No. of Events: 1
+Number of Words to read: 510
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000300000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1699051508
+Event: 187
+Bifocal: 174
+Disc Test: 1
+Internal: 0
+External: 0
+GPS: 0
+HLED: 17
+Bifocal Live: 174
+Disc Test Live: 1
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 17
+TB Busy: 26751551
+CoBo Busy: 26749307
+Transit Busy: 1870
+Buffer Busy: 2057
+MemoNotify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400640000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 1000ns
+Adress to write: 0x1028
+Data supposed to write: 100
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F51C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 80
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 0
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4698290491
+Event: 47
+Bifocal: 0
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 47
+Bifocal Live: 0
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 47
+TB Busy: 6620048
+CoBo Busy: 6615348
+Transit Busy: 4700
+Buffer Busy: 517
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 470
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 47
+Attempts To Read No. of Events: 1
+Number of Words to read: 235
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000100000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5498752075
+Event: 55
+Bifocal: 0
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 0
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 7771313
+CoBo Busy: 7765813
+Transit Busy: 5500
+Buffer Busy: 605
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 550
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00001.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00010000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 55
+Attempts To Read No. of Events: 1
+Number of Words to read: 275
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000200000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5498809327
+Event: 55
+Bifocal: 0
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 0
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 7771346
+CoBo Busy: 7765846
+Transit Busy: 5500
+Buffer Busy: 605
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 550
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00002.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00020000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 55
+Attempts To Read No. of Events: 1
+Number of Words to read: 275
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000300000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 5498742559
+Event: 55
+Bifocal: 0
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 55
+Bifocal Live: 0
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 55
+TB Busy: 7771349
+CoBo Busy: 7765849
+Transit Busy: 5500
+Buffer Busy: 605
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 550
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00003.bin
+---------- Finished Recording theNotify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400640000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 1000ns
+Adress to write: 0x1028
+Data supposed to write: 100
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F51C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 80
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 0
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1200106373
+Event: 132
+Bifocal: 122
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 12
+Bifocal Live: 122
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 12
+TB Busy: 18996043
+CoBo Busy: 18982843
+Transit Busy: 13200
+Buffer Busy: 1452
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1320
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 132
+Attempts To Read No. of Events: 1
+Number of Words to read: 660
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000100000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1207442767
+Event: 133
+Bifocal: 123
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 12
+Bifocal Live: 123
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 12
+TB Busy: 19140064
+CoBo Busy: 19126764
+Transit Busy: 13300
+Buffer Busy: 1463
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1330
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00001.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00010000000000{
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 133
+Attempts To Read No. of Events: 1
+Number of Words to read: 665
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000200000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 6181654373
+Event: 680
+Bifocal: 630
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 62
+Bifocal Live: 630
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 62
+TB Busy: 97858808
+CoBo Busy: 97790808
+Transit Busy: 68000
+Buffer Busy: 7480
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 6800
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00002.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00020000000000v
+msg size: 18
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 680
+Attempts To Read No. of Events: 1
+Number of Words to read: 3400
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000ì]¯M
+msg size: 21
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:MMMM
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000300000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4999661357
+Event: 550
+Bifocal: 510
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 50
+Bifocal Live: 510
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 50
+TB Busy: 79150328
+CoBo Busy: 79095328
+Transit Busy: 55000
+Buffer Busy: 6050
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 5500
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00003.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00030000000000þ
+msg size: 18
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 550
+Attempts To Read No. of Events: 1
+Number of Words to read: 2750
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000400000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 916748575
+Event: 101
+Bifocal: 94
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 9
+Bifocal Live: 94
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 9
+TB Busy: 14534828
+CoBo Busy: 14524728
+Transit Busy: 10100
+Buffer Busy: 1111
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 1010
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00004.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00040000000000^
+msg size: 17
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 101
+Attempts To Read No. of Events: 1
+Number of Words to read: 505
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000500000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4490442227
+Event: 494
+Bifocal: 458
+Disc Test: 0
+Internal: 0
+External: 0
+GPS: 0
+HLED: 45
+Bifocal Live: 458
+Disc Test Live: 0
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 45
+TB Busy: 71091119
+CoBo Busy: 71041719
+Transit Busy: 49400
+Buffer Busy: 5434
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 4940
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00005.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00050000000000Ê
+msg size: 18
+Message Length Mismatch: Please enter correct message size.
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 494
+AttemNotify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400640000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 1000ns
+Adress to write: 0x1028
+Data supposed to write: 100
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F51C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 80
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 0
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4148635294
+Event: 41
+Bifocal: 0
+Disc Test: 63303
+Internal: 0
+External: 0
+GPS: 0
+HLED: 41
+Bifocal Live: 0
+Disc Test Live: 63214
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 41
+TB Busy: 5900415
+CoBo Busy: 5896315
+Transit Busy: 4100
+Buffer Busy: 451
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 410
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 41
+Attempts To Read No. of Events: 1
+Number of Words to read: 205
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------Notify for message queue reception /writetoTB
+Message Received:0200000000000000
+Command ID is: 2
+---------- Starting to Initialize TB ------------
+---------- Finished Initializing TB -----------
+
+response:3030
+Message Received:0400640000000000
+Command ID is: 4
+---------- Starting to Prepare TB -------------
+  Clearing the Busy Registers
+Adress to write: 0x1030
+Data supposed to write: 1
+
+  Enabling the Block Memory
+Adress to write: 0x3000
+Data supposed to write: 1
+
+  Setting the Block Memory Address to zero
+Adress to write: 0x3004
+Data supposed to write: 0
+
+  Resetting the Block Memory
+Adress to write: 0x3014
+Data supposed to write: 1
+
+  Setting the Transit Busy length to 1000ns
+Adress to write: 0x1028
+Data supposed to write: 100
+---------- Finished Preparing TB --------------
+
+response:3030
+Message Received:05050002000F51C3
+Command ID is: 5
+---------- Starting to Configure TB -----------
+Trigger type: 5
+Bifocal Trigger Flag: 1
+Disc Test Trigger Flag: 0
+Internal Trigger Flag: 1
+External Trigger Flag: 0
+GPS Trigger Flag: 0
+Channel Counter Integration Period Code: 0
+Disc Test Trigger Prescale Value: 0
+Discriminator Strech Length Code: 2
+HLED_Delay: 150 ns
+Disc_Dt_code: 80
+Int_Trig_rate_code: 1
+Int_Trig_led_mode: 1
+Ext_Trig_led_mode: 0
+GPS_Trig_led_mode: 0
+Enable Busy mode: 3
+Adress to write: 0x2008
+Data supposed to write: 100000000
+Adress to write: 0x2000
+Data supposed to write: 1
+Adress to write: 0x1044
+Data supposed to write: 0
+Adress to write: 0x1000
+Data supposed to write: 4294967295
+Adress to write: 0x1004
+Data supposed to write: 4294967295
+Adress to write: 0x1008
+Data supposed to write: 30
+Adress to write: 0x1010
+Data supposed to write: 0
+Adress to write: 0x1014
+Data supposed to write: 100000000
+Adress to write: 0x1018
+Data supposed to write: 1
+Adress to write: 0x101c
+Data supposed to write: 0
+Adress to write: 0x1020
+Data supposed to write: 0
+Adress to write: 0x102c
+Data supposed to write: 3
+Adress to write: 0x1024
+Data supposed to write: 15
+Adress to write: 0x103c
+Data supposed to write: 5
+---------- Finished Configuring TB ------------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000000000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 2369848414
+Event: 23
+Bifocal: 0
+Disc Test: 36161
+Internal: 0
+External: 0
+GPS: 0
+HLED: 23
+Bifocal Live: 0
+Disc Test Live: 36109
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 23
+TB Busy: 3309911
+CoBo Busy: 3307611
+Transit Busy: 2300
+Buffer Busy: 253
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 230
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00000.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00000000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 23
+Attempts To Read No. of Events: 1
+Number of Words to read: 115
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000100000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4999646706
+Event: 50
+Bifocal: 0
+Disc Test: 76288
+Internal: 0
+External: 0
+GPS: 0
+HLED: 50
+Bifocal Live: 0
+Disc Test Live: 76178
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 50
+TB Busy: 7195439
+CoBo Busy: 7190439
+Transit Busy: 5000
+Buffer Busy: 550
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 500
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00001.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00010000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 50
+Attempts To Read No. of Events: 1
+Number of Words to read: 250
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000200000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4999654116
+Event: 50
+Bifocal: 0
+Disc Test: 76288
+Internal: 0
+External: 0
+GPS: 0
+HLED: 50
+Bifocal Live: 0
+Disc Test Live: 76178
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 50
+TB Busy: 7195468
+CoBo Busy: 7190468
+Transit Busy: 5000
+Buffer Busy: 550
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 500
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00002.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00020000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 50
+Attempts To Read No. of Events: 1
+Number of Words to read: 250
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000300000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4999646134
+Event: 50
+Bifocal: 0
+Disc Test: 76289
+Internal: 0
+External: 0
+GPS: 0
+HLED: 50
+Bifocal Live: 0
+Disc Test Live: 76180
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 50
+TB Busy: 7195440
+CoBo Busy: 7190440
+Transit Busy: 5000
+Buffer Busy: 550
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 500
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00003.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00030000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 50
+Attempts To Read No. of Events: 1
+Number of Words to read: 250
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000400000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1071216499
+Event: 11
+Bifocal: 0
+Disc Test: 16345
+Internal: 0
+External: 0
+GPS: 0
+HLED: 11
+Bifocal Live: 0
+Disc Test Live: 16322
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 11
+TB Busy: 1582991
+CoBo Busy: 1581891
+Transit Busy: 1100
+Buffer Busy: 121
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 110
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00004.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00040000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 11
+Attempts To Read No. of Events: 1
+Number of Words to read: 55
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000500000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 6082916747
+Event: 60
+Bifocal: 0
+Disc Test: 92818
+Internal: 0
+External: 0
+GPS: 0
+HLED: 60
+Bifocal Live: 0
+Disc Test Live: 92687
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 60
+TB Busy: 8634510
+CoBo Busy: 8628510
+Transit Busy: 6000
+Buffer Busy: 660
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 600
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00005.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00050000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 60
+Attempts To Read No. of Events: 1
+Number of Words to read: 300
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000600000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4999654337
+Event: 50
+Bifocal: 0
+Disc Test: 76288
+Internal: 0
+External: 0
+GPS: 0
+HLED: 50
+Bifocal Live: 0
+Disc Test Live: 76179
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 50
+TB Busy: 7195435
+CoBo Busy: 7190435
+Transit Busy: 5000
+Buffer Busy: 550
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 500
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00006.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00060000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 50
+Attempts To Read No. of Events: 1
+Number of Words to read: 250
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000700000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 4999667714
+Event: 50
+Bifocal: 0
+Disc Test: 76289
+Internal: 0
+External: 0
+GPS: 0
+HLED: 50
+Bifocal Live: 0
+Disc Test Live: 76180
+Internal Live: 0
+External Live: 0
+GPS Live: 0
+HLED Live: 50
+TB Busy: 7195472
+CoBo Busy: 7190472
+Transit Busy: 5000
+Buffer Busy: 550
+Memory Full: 0
+Memory Reading: 0
+Memory Writing: 500
+Global Counters Filename: /home/cherenkov/Programs/control_software/tb/mesaflash/G_Ctrs_0_00007.bin
+---------- Finished Recording the GC ----------
+
+response:3030
+Message Received:0C00070000000000
+Command ID is: 12
+---------- Saving Events to the Disk ----------
+Adress to write: 0x300c
+Data supposed to write: 1
+No. Events at Loop 0: 50
+Attempts To Read No. of Events: 1
+Number of Words to read: 250
+Adress to write: 0x3010
+Data supposed to write: 0
+Adress to write: 0x3014
+Data supposed to write: 1
+---------- Finished Saving the Events ---------
+
+response:3030
+Message Received:0D00000000000000
+Command ID is: 13
+---------- Starting to Clear TB Counters ------
+Adress to write: 0x2000
+Data supposed to write: 1
+---------- Finished Clearing TB Counters ------
+
+response:3030
+Message Received:0800000000000000
+Command ID is: 8
+---------- Starting the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 1
+-----------------------------------------------
+
+response:3030
+Message Received:0900000000000000
+Command ID is: 9
+---------- Stopping the Trigger ---------------
+Adress to write: 0x1040
+Data supposed to write: 0
+-----------------------------------------------
+
+response:3030
+Message Received:0A00000800000000
+Command ID is: 10
+---------- Starting to Record the GC ----------
+Adress to write: 0x2004
+Data supposed to write: 1
+
+Here are the counters:
+Clock: 1625088818
+Event: 17
+Bifocal: 0
+Disc Test: 24797
+Internal: 0
+External: 0
+GPS: 0
+HLED: 17
+Bifocal Live: 0
+Disc Test Live: 24759
+Internal 

@@ -1,0 +1,159 @@
+======== Chrono State Machine Test
+
+>>>> BEGIN STEPPING 5
+start
+LOG: count = 0; miss = 0
+launch
+incrCount
+LOG: count = 1; miss = 0
+launch
+incrCount
+LOG: count = 2; miss = 0
+launch
+incrCount
+LOG: count = 3; miss = 0
+launch
+incrCount
+LOG: count = 4; miss = 0
+launch
+>>>> END STEPPING 5
+
+>>>> BEGIN STEPPING 3
+incrCount
+LOG: count = 5; miss = 0
+launch
+incrMiss
+LOG: count = 5; miss = 1
+launch
+incrMiss
+LOG: count = 5; miss = 2
+launch
+>>>> END STEPPING 3
+
+>>>> BEGIN STEPPING 4
+incrMiss
+LOG: count = 5; miss = 3
+launch
+incrCount
+LOG: count = 6; miss = 3
+launch
+incrCount
+LOG: count = 7; miss = 3
+launch
+incrCount
+LOG: count = 8; miss = 3
+launch
+>>>> END STEPPING 4
+
+>>>> StepAll to the end
+incrCount
+stop
+======== Cruise Control State Machine Test
+engine initiated
+engine turned off
+>>>> start engine
+engine turned on
+cruise control initiated
+cruise control turned off
+>>>> start cruise
+starting cruise control
+cruise control turned on
+new cruise initiated
+cruise control disabled
+>>>> set speed
+setting speed at 70 km/h
+speed set at 70 km/h
+building cruise data
+cruise control enabled
+speed locked at 70 km/h
+>>>> accelerate
+destroying cruise data
+cruise control disabled
+>>>> resume cruise
+resuming at speed 70 km/h
+building cruise data
+cruise control enabled
+speed locked at 70 km/h
+>>>> brake
+destroying cruise data
+cruise control disabled
+>>>> accelerate
+>>>> resume cruise
+resuming at speed 70 km/h
+building cruise data
+cruise control enabled
+speed locked at 70 km/h
+>>>> stop cruise
+destroying cruise data
+active cruise reset!
+cruise control turned off
+>>>> resume cruise
+>>>> brake
+>>>> start cruise
+starting cruise control
+cruise control turned on
+cruise control ERROR
+cruise control reset!
+cruise control initiated
+cruise control turned off
+>>>> start cruise
+starting cruise control
+cruise control turned on
+new cruise initiated
+cruise control disabled
+>>>> set speed
+setting speed at 90 km/h
+speed set at 90 km/h
+building cruise data
+cruise control enabled
+speed locked at 90 km/h
+>>>> stop engine
+destroying cruise data
+active cruise reset!
+cruise control reset!
+engine turned off
+>>>> Cruise control test finished
+engine reset!
+======== Camera State Machine Test
+>>>> Initiating camera
+entering NotShooting state
+entering Idle state
+>>>> Pressed shutter half
+leaving Idle state
+leaving NotShooting state
+entering Shooting state
+entering Focusing state
+Focusing...
+leaving Focusing state
+Displaying picture...
+entering Focused state
+>>>> Released shutter
+leaving Focused state
+leaving Shooting state
+entering NotShooting state
+entering Idle state
+>>>> Pressed configure button
+leaving Idle state
+entering Configuring state
+>>>> Pressed shutter half
+leaving Configuring state
+leaving NotShooting state
+entering Shooting state
+entering Focusing state
+Focusing...
+leaving Focusing state
+Displaying picture...
+entering Focused state
+>>>> Pressed configure button
+>>>> Pressed shutter half
+>>>> Pressed shutter full
+leaving Focused state
+entering Storing state
+>>>> Released shutter
+leaving Storing state
+leaving Shooting state
+entering NotShooting state
+entering Idle state
+>>>> Camera test finished
+leaving Idle state
+leaving NotShooting state

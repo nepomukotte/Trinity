@@ -1,0 +1,14 @@
+Source: libtinyxml
+Section: devel
+Priority: optional
+Maintainer: Frederic Chateau <frederic.chateau@cea.fr>
+Build-Depends: debhelper, cdbs, automake (>= 1.11), libtool (>= 2.2)
+Standards-Version: 3.9.2
+Homepage: http://www.grinninglizard.com/tinyxml
+
+Package: libtinyxml
+Architecture: any
+Depends: libstdc++6 (>= 4.2.0), ${shlibs:Depends}, ${misc:Depends}
+Description: TinyXml is a simple and small C++ XML parser.
+ It reads XML and creates C++ objects representing the XML document.
+ The objects can be manipulated, changed, and saved again as XML.

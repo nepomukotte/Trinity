@@ -1,0 +1,62 @@
+#############
+# deb & rpm #
+#############
+
+#Init Inno Setup Compiler
+WIN_BUILD_DIR=$(PWD)/_pkgbuild
+WIN_INSTALL_DIR=$(PWD)/_pkginst
+
+#The Needed Files for the Packages Creation
+DEB_FOLDER=$(srcdir)/packages/debian
+#RPM_FOLDER=$(srcdir)/packages/rpm/$(PACKAGE_TARNAME).spec
+#WIN_FOLDER=$(srcdir)/packages/win/$(PACKAGE_TARNAME).iss
+
+#The location of the Packages after their creation
+DEB_CREATE_DIR=$(builddir)/pkg
+#RPM_CREATE_DIR=$(builddir)/pkg
+#WIN_CREATE_DIR=$(builddir)/pkg
+
+# DEB #
+deb:
+	mkdir -p $(DEB_CREATE_DIR);
+	$(MAKE) dist;
+	tar -xvzf $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz;
+	cp -R $(DEB_FOLDER) $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)/;
+	cd $(PACKAGE_TARNAME)-$(PACKAGE_VERSION); \
+	chmod 755 debian/rules; \
+	dpkg-buildpackage -rfakeroot -us -uc -B;
+	mv $(PACKAGE_TARNAME)_$(PACKAGE_VERSION)-*.deb $(DEB_CREATE_DIR)/$(PACKAGE_TARNAME)_$(PACKAGE_VERSION)_$(host_cpu).deb;
+	rm -rf $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) $(PACKAGE_TARNAME)*.changes
+
+#
+## RPM # - The second line set the .rpmmacros file to point to the 'rpm build dir'. 
+#rpm:
+#	RPM_BUILD_DIR=$$PWD/rpm_build; \
+#	echo '%_topdir' $$RPM_BUILD_DIR > ~/.rpmmacros; \
+#	mkdir -p $$RPM_BUILD_DIR/SOURCES $$RPM_BUILD_DIR/BUILD; \
+#	mkdir -p $$RPM_BUILD_DIR/RPMS/i386 $$RPM_BUILD_DIR/SPECS $$RPM_BUILD_DIR/SRPMS; \
+#	$(MAKE) distdir ; \
+#	mv $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) $(PACKAGE_TARNAME)-$(PACKAGE_VERSION) ; \
+#	tar cvzf $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_TARNAME)-$(PACKAGE_VERSION); \
+#	$(RM) -rf $(PACKAGE_TARNAME)-$(PACKAGE_VERSION); \
+#	cp $(RPM_FOLDER) $$RPM_BUILD_DIR/SPECS ; \
+#	cp $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz  $$RPM_BUILD_DIR/SOURCES/ ; \
+#	rpmbuild -ba --clean --rmsource  $$RPM_BUILD_DIR/SPECS/$(PACKAGE_TARNAME).spec ; \
+#	mkdir -p $(RPM_CREATE_DIR); \
+#	mv  $$RPM_BUILD_DIR/RPMS/i386/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)*.rpm $(RPM_CREATE_DIR)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)_$(host_cpu).rpm; \
+#	rm -rf $$RPM_BUILD_DIR  $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz;
+#
+#
+## Windows # - Cross compile and create the Windows installer using InnoSetupCompiler
+#win:
+#	mkdir -p $(WIN_BUILD_DIR)
+#	mkdir -p $(WIN_INSTALL_DIR)
+#	cd $(WIN_BUILD_DIR); \
+#	$(top_srcdir)/configure --prefix=$(WIN_INSTALL_DIR) $(DISTCHECK_CONFIGURE_FLAGS); \
+#	make install
+#	cp $(WIN_FOLDER) .
+#	$(SETUP_EXE) /Q /O$(WIN_CREATE_DIR) $(PACKAGE_TARNAME).iss
+#	mv $(WIN_CREATE_DIR)/setup.exe $(WIN_CREATE_DIR)/$(PACKAGE_TARNAME)-$(PACKAGE_VERSION)_$(host_cpu).exe
+#	rm -rf $(PACKAGE_TARNAME).iss $(WIN_INSTALL_DIR) $(WIN_BUILD_DIR)
+#
+

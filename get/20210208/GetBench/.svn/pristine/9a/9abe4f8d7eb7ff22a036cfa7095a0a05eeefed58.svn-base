@@ -1,0 +1,139 @@
+/**
+ * @file LedManagerI.h
+ * @date Mar 6, 2014
+ * @author sizun
+ * 
+ * @note SVN tag: $Id$
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the GetBench software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#ifndef get_cobo_LedManagerI_h_INCLUDED
+#define get_cobo_LedManagerI_h_INCLUDED
+
+#include "get/cobo/LedManager.h" // for LedType
+#include "get/utl/PeriodicTask.h"
+#include ICEUTIL_HEADER(Thread.h)
+#include <cstddef>
+#ifdef HAVE_XGPIO
+#include "xgpio.h"
+#endif
+
+// Forward declarations
+namespace mdaq
+{
+namespace hw
+{
+namespace server
+{
+class HwNodeImpl;
+}
+}
+}
+
+namespace get
+{
+namespace cobo
+{
+//__________________________________________________________________________________________________
+/**
+ * A class for interacting with CoBo's Light-Emitting Diode device.
+ *
+ * Parameters:
+ *   - XPAR_LEDS_BASEADDR
+ *   - XPAR_LEDS_HIGHADDR
+ *   - XPAR_LEDS_DEVICE_ID
+ *   - XPAR_LEDS_INTERRUPT_PRESENT
+ *   - XPAR_LEDS_IS_DUAL
+ *
+ * Each AsAd cable has four LEDs: P,B,U,D.
+ * P,U,D are green and B is red.
+ * P stands for Plugged, B for Bad, U for Uplink, D for Downlink
+ *
+ * From top to bottom of the CoBo front panel, LEDs are D0 U0 B0 P0 D1 U1 B1 P1 ...
+ *  and their respective bits are 3 2 1 0 7 6 5 4 11 10 9 8 15 14 13 12.
+ *
+ * @see blinkLEDs.c
+ * @see xparameters.h
+ * @see Xilinx Device Drivers Documentation (http://www.xilinx.com/ise/embedded/xilinx_drivers.pdf)
+ * @see Email from F. A.-N. on February 14th, 2014.
+ */
+class LedManagerI
+{
+public:
+	LedManagerI(mdaq::hw::server::HwNodeImpl & node);
+
+	static inline size_t ledBit(const LedType & type, const size_t asadId);
+	/// @name Individual LED
+	/// @{
+	void blinkLed(const size_t & ledId);
+	void setLedEnabled(const size_t & ledId, bool enabled=true);
+	void setLedEnabled(const LedType & type, const size_t asadId, bool enabled);
+	void flipLed(const size_t & ledId);
+	void flipLed(const LedType & type, const size_t asadId);
+	void pulseLed(const size_t & ledId, const size_t period_ms=1000u);
+	void pulseLed(const LedType & type, const size_t asadId, const size_t period_ms);
+	void modifyLED(const LedType ledType, const size_t & asadId, const LedState newState);
+	/// @}
+	/// @name All LEDs
+	/// @{
+	void setAllLedsEnabled(bool enabled=true);
+	void clearAllLeds() { setAllLedsEnabled(false); }
+	void blinkAllLeds();
+	void flipAllLeds();
+	void stopAllLedPulsers();
+	/// @}
+protected:
+	bool isInitOk() { return checkHardwareType() and initializeXgpioDevice(); }
+	bool checkHardwareType();
+	bool initializeXgpioDevice();
+	class LedPulser;
+	typedef IceUtil::Handle<LedPulser> LedPulserPtr;
+protected:
+	mdaq::hw::server::HwNodeImpl & node_; ///< Reference to CoBo control node for access to CoBo and AsAd registers.
+#ifdef HAVE_XGPIO
+	XGpio GpioOutput; ///< The driver instance for GPIO Device configured as O/P.
+#endif
+	std::map< size_t, LedPulserPtr > pulsers;///< Tasks for blinking LEDs periodically, indexed by LED identifier
+	static const unsigned LED_CHANNEL = 1; ///< GPIO channel used if there are 2 channels supported in the GPIO.
+	static const size_t LED_MAX_BLINK = 2;///< Number of times the LED blinks
+	static const size_t GPIO_BITWIDTH = 16;	///< Width of the GPIO
+	static const size_t LED_DELAY_s = 2u;
+};
+//__________________________________________________________________________________________________
+class LedManagerI::LedPulser : public utl::PeriodicTask,  public IceUtil::Shared
+{
+public:
+	LedPulser(LedManagerI & mgr, const size_t & ledId, size_t period_ms = 1000);
+	~LedPulser();
+	virtual void doTask();
+private:
+	LedManagerI & mgr_;
+	const size_t ledId_;
+};
+//__________________________________________________________________________________________________
+} /* namespace cobo */
+} /* namespace get */
+#endif /* get_cobo_LedManagerI_h_INCLUDED */

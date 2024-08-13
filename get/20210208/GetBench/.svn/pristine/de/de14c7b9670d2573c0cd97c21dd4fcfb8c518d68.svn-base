@@ -1,0 +1,301 @@
+/**
+ * @file MutantConfigParser.cpp
+ * @date Feb 26, 2014
+ * @author sizun
+ * 
+ * @note SVN tag: $Id$
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the GetBench software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "MutantConfigParser.h"
+#include <mdaq/hw/Control.h>
+#include <utl/BitFieldHelper.hpp>
+#include <utl/Logging.h>
+#include <algorithm>
+#include <cmath>
+#include <string>
+
+using mdaq::utl::CmdException;
+using namespace get::mutant;
+
+namespace get
+{
+namespace rc
+{
+//_________________________________________________________________________________________________
+MutantConfigParser::MutantConfigParser()
+	: isSlave(false), isSlavePortA(true), slaveId(0),
+	  vhdciPortAEnabled(true), vhdciPortBEnabled(true),
+	  timestamp_10ns(0), eventNumber(0),
+	  preLoadTimestamp(false), preLoadEventNumber(false),
+	  l0l1(false),
+	  level0Enabled(true), level0GateDelay_10ns(0), level0GateDuration_10ns(0),
+	  level1Enabled(true), level1Selection(0),
+	  level1aLowThreshold(0), level1aHighThreshold(65535u), level1bLowThreshold(0), level1bHighThreshold(65535u),
+	  level1aLowNumBuckets(511u), level1aHighNumBuckets(511u), level1bLowNumBuckets(511u), level1bHighNumBuckets(511u),
+	  level1bTimeout_2560ns(1u),
+	  level1PostTrigDelay_10ns(0),
+	  level2Enabled(true),
+	  hitPatternModified(true),
+	  tpdModeEnabled(false), halfEventReadoutEnabled(false),
+	  csMode(CsDisabled), testModeEnabled(false), readoutModeEnabled(false),
+	  clearScalersEnabled(true), clearCountersEnabled(true),
+	  vcxoControl(0x80),
+	  sourceId(0), frameType(0),
+	  externalGmcClockEnabled(false), externalGmcClockSelection(0),
+	  frontPanelInsp1(0), frontPanelInsp2(0), rearPanelInsp1(0), rearPanelInsp2(0)
+{
+}
+//_________________________________________________________________________________________________
+/**
+ * Parses a configuration for a Mutant module.
+ * @param cfg Configuration to parse.
+ */
+void MutantConfigParser::parseConfig(CCfg::CConfig cfg)
+{
+	isSlave = cfg("isSlave").getBoolValue();
+	if (not isSlave)
+	{
+		slaveId = 0;
+		isSlavePortA = true;
+		vhdciPortAEnabled = cfg("Master")("enablePortA").getBoolValue();
+		vhdciPortBEnabled = cfg("Master")("enablePortB").getBoolValue();
+	}
+	else
+	{
+		slaveId = cfg("Slave")("slaveId").getIntValue();
+		isSlavePortA = (cfg("Slave")("slavePort").getStringValue() == "A");
+		vhdciPortAEnabled = isSlavePortA;
+		vhdciPortBEnabled = not isSlavePortA;
+	}
+
+	// Timestamp and event number
+	timestamp_10ns = 0;
+	// Users provides timestamp in 3 chunks of 16 bits as CompoundConfig integer types are limited to 32 bits
+	utl::BitFieldHelper< uint64_t>::setField(timestamp_10ns,  0u, 16u, cfg("preLoadedTimestamp")("low").getHexValue());
+	utl::BitFieldHelper< uint64_t>::setField(timestamp_10ns, 16u, 16u, cfg("preLoadedTimestamp")("mid").getHexValue());
+	utl::BitFieldHelper< uint64_t>::setField(timestamp_10ns, 32u, 16u, cfg("preLoadedTimestamp")("high").getHexValue());
+	try
+	{
+		preLoadTimestamp = cfg("preLoadTimestamp").getBoolValue();
+	}
+	catch (const CCfg::CConfig::NotFound &)
+	{
+		preLoadTimestamp = true;
+	}
+	eventNumber = cfg("preLoadedEventNumber").getHexValue();
+	try
+	{
+		preLoadEventNumber = cfg("preLoadEventNumber").getBoolValue();
+	}
+	catch (const CCfg::CConfig::NotFound &)
+	{
+		preLoadEventNumber = true;
+	}
+
+	// 2 proton decay mode
+	tpdModeEnabled = cfg("TwoProtonDecayMode")("isEnabled").getBoolValue();
+	halfEventReadoutEnabled = false;
+	if (tpdModeEnabled)
+	{
+		halfEventReadoutEnabled = cfg("TwoProtonDecayMode")("halfEventReadout").getBoolValue();
+	}
+
+	// Level priority
+	l0l1 = ("L1L0" == cfg("levelPriority").getStringValue());
+
+	// Level 0
+	level0Enabled = cfg("Level", 0)("isEnabled").getBoolValue();
+	float gateDelay_us =  cfg("Level", 0)("gateDelay").getRealValue();
+	gateDelay_us = std::min(gateDelay_us, 655.35f);
+	gateDelay_us = std::max(gateDelay_us, 0.0f);
+	level0GateDelay_10ns = std::floor(100.0f*gateDelay_us);
+	float gateDuration_us =  cfg("Level", 0)("gateDuration").getRealValue();
+	gateDuration_us = std::min(gateDuration_us, 655.35f);
+	gateDuration_us = std::max(gateDuration_us, 0.01f); // gate duration >= 10 ns
+	level0GateDuration_10ns = std::floor(100.0f*gateDuration_us);
+
+	// Level 1
+	level1Enabled = cfg("Level", 1)("isEnabled").getBoolValue();
+	//static const std::string l1Sels[4] = {"OR", "LOW", "HIGH", "AND"}; // v1.4 version
+	static const std::string l1Sels[4] = {"LOW", "HIGH", "OR", "AND"}; // v1.5
+	level1Selection = 0;
+	level1aLowThreshold = 0;
+	level1aHighThreshold = 65535u;
+	level1bLowThreshold = 0;
+	level1bHighThreshold = 65535u;
+	level1aLowNumBuckets = 511u;
+	level1aHighNumBuckets = 511u;
+	level1bLowNumBuckets = 511u;
+	level1bHighNumBuckets = 511u;
+
+	// September 28, 2017: L1 trigger level should be configured even if disabled for inspection purposes
+	const std::string* l1SelMatch = std::find(l1Sels, l1Sels+4, cfg("Level", 1)("selection").getStringValue());
+	level1Selection = (l1SelMatch == l1Sels+4)?0:(l1SelMatch-l1Sels);
+
+	level1aLowThreshold  = cfg("Level", 1)("L1A")("lowMultThreshold").getIntValue();
+	level1aHighThreshold = cfg("Level", 1)("L1A")("highMultThreshold").getIntValue();
+	level1aLowNumBuckets = cfg("Level", 1)("L1A")("lowNumBuckets").getIntValue();
+	level1aHighNumBuckets = cfg("Level", 1)("L1A")("highNumBuckets").getIntValue();
+	if (tpdModeEnabled)
+	{
+		level1bLowThreshold  = cfg("Level", 1)("L1B")("lowMultThreshold").getIntValue();
+		level1bHighThreshold = cfg("Level", 1)("L1B")("highMultThreshold").getIntValue();
+		level1bLowNumBuckets = cfg("Level", 1)("L1B")("lowNumBuckets").getIntValue();
+		level1bHighNumBuckets = cfg("Level", 1)("L1B")("highNumBuckets").getIntValue();
+		// Since v1.5 of MUTanT register mapping, L1B_TIMEOUT lsb resolution is 2.56 μs
+		float timeout_us = cfg("Level", 1)("L1B")("timeout").getRealValue();
+		level1bTimeout_2560ns = std::floor(timeout_us/2.56 + 0.5);
+		uint16_t min_timeout(0), max_timeout(65535u);
+		level1bTimeout_2560ns = std::min(level1bTimeout_2560ns, max_timeout);
+		level1bTimeout_2560ns = std::max(min_timeout, level1bTimeout_2560ns);
+	}
+	float postTrigDelay_us = cfg("Level", 1)("postTriggerDelay").getRealValue();
+	postTrigDelay_us = std::min(postTrigDelay_us, 655.35f);
+	postTrigDelay_us = std::max(postTrigDelay_us, 0.0f);
+	level1PostTrigDelay_10ns = std::floor(100.0f*postTrigDelay_us);
+
+	// Level 2
+	level2Enabled = cfg("Level", 2)("isEnabled").getBoolValue();
+	hitPatternModified = cfg("Level", 2)("hitPatternModified").getBoolValue();
+
+	// Check no trigger mode is selected in slave modules
+	if (isSlave and (level0Enabled or level1Enabled or level2Enabled))
+		throw CmdException("No trigger mode can be enabled in MuTanT slave modules.");
+
+	// CENTRUM/Scalers interface
+	static const std::string csModes[3] = {"Disabled", "CENTRUM", "Scalers"};
+	const std::string* csMatch = std::find(csModes, csModes+3, cfg("centrumScalerInterface").getStringValue());
+	csMode = static_cast< CentrumScalerMode >((csMatch == csModes+3)?0:(csMatch-csModes));
+	if (CENTRUM == csMode and isSlave)
+		throw CmdException("Coupling with CENTRUM is allowed only for master MuTanT module");
+
+	// Test mode
+	testModeEnabled = cfg("testModeEnabled").getBoolValue();
+
+	// Scalers
+	try
+	{
+		clearScalersEnabled = cfg("Scalers")("clearScalers").getBoolValue();
+	}
+	catch (const CCfg::CConfig::NotFound &)
+	{
+		// April 22, 2016: renamed Scalers.clearCounters into Scalers.clearScalers and added clearCounters
+		clearScalersEnabled = cfg("Scalers")("clearCounters").getBoolValue();
+	}
+
+	for (size_t i=1; i<=5; ++i)
+	{
+		enableScalers[i] = cfg("Scalers")("enableScaler", i).getBoolValue();
+	}
+
+	// Event counters
+	try
+	{
+		clearCountersEnabled = cfg("clearCounters").getBoolValue();
+	}
+	catch (const CCfg::CConfig::NotFound &)
+	{
+		clearCountersEnabled = clearScalersEnabled;
+	}
+
+	// VCXO control
+	vcxoControl = cfg("vcxoControl").getHexValue(0x80);
+
+	// Source ID
+	sourceId = cfg("sourceId").getIntValue();
+
+	// Frame type
+	frameType = cfg("frameType").getIntValue();
+
+	// Global Master Clock
+	externalGmcClockEnabled = true;
+	if (not isSlave)
+	{
+		externalGmcClockEnabled = cfg("GlobalMasterClock")("externalClockEnabled").getBoolValue();
+	}
+	static const std::string gmcSels[4] = {"FireWire1", "FireWire2", "VHDCI", "Optical"}; // v1.5
+	const std::string gmcSel = cfg("GlobalMasterClock")("externalClockSelection").getStringValue();
+	const std::string* gmcSelMatch = std::find(gmcSels, gmcSels+4, gmcSel);
+	// G.W., 14/3/2016: default external clock source is VHDCI
+	externalGmcClockSelection = 0x2;
+	if (gmcSelMatch != gmcSels+4)
+	{
+		externalGmcClockSelection = gmcSelMatch - gmcSels;
+	}
+	else
+	{
+		// Mapping v2.0 FireWire1/2 renamed to FireWireA/B
+		static const std::string gmcSels2[4] = {"FireWireA", "FireWireB", "VHDCI", "Optical"}; // v2.0
+		const std::string* gmcSelMatch2 = std::find(gmcSels2, gmcSels2+4, gmcSel);
+		if (gmcSelMatch2 != gmcSels2+4)
+		{
+			externalGmcClockSelection = gmcSelMatch2 - gmcSels2;
+		}
+		else
+		{
+			LOG_WARN() << "Invalid external clock source '" << gmcSel << "'. Selecting VHDCI source instead.";
+		}
+	}
+
+	// AMC Tag Only
+	amcTagOnly = 0;
+	for (size_t slot=0; slot<12; slot++)
+	{
+		bool ato = cfg("AmcTagOnly")("ATO", slot+1).getBoolValue(0);
+		utl::BitFieldHelper< uint16_t >::setField(amcTagOnly, slot, 1u, ato);
+	}
+
+	// User register
+	userReg = cfg("UserRegister").getIntValue(0);
+
+	// Inspection
+	try
+	{
+		frontPanelInsp1 = cfg("Inspection")("frontPanelInsp1").getIntValue();
+		frontPanelInsp2 = cfg("Inspection")("frontPanelInsp2").getIntValue();
+		rearPanelInsp1  = cfg("Inspection")("rearPanelInsp1").getIntValue();
+		rearPanelInsp2  = cfg("Inspection")("rearPanelInsp2").getIntValue();
+	}
+	catch (const CCfg::CConfig::NotFound & e)
+	{
+		LOG_WARN() << e.what();
+	}
+
+	// Readout mode
+	try
+	{
+		readoutModeEnabled = cfg("readoutModeEnabled").getBoolValue();
+	}
+	catch (const CCfg::CConfig::NotFound & e)
+	{
+		readoutModeEnabled = true; // by default, Mutant readout enabled
+		LOG_WARN() << e.what() << " Enabling Mutant readout by default.";
+	}
+}
+//_________________________________________________________________________________________________
+} /* namespace rc */
+} /* namespace get */

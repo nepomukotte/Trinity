@@ -1,0 +1,139 @@
+// $Id: install.dox 1208 2014-03-31 11:54:37Z psizun $
+/**
+@page page_Installation Software Installation
+@tableofcontents
+
+@section sec_components Software components
+The GET software is divided into a number of packages : TinyXml, CompoundConfig, Utilities, ConfigWidgets, MDaq, StateMachine, MultiFrame, GetBench, CoBoFrameViewer, GetController.
+
+@htmlonly
+<div align="center">
+<embed src="get_software_packages.svg" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" />
+</div>
+<div align="center" class="caption">Dependencies between the packages the GET test bench software is made of.</div>
+@endhtmlonly
+@image latex get_software_packages.eps "Dependencies between the packages the GET test bench software is made of." width=0.8\textwidth
+	These packages need to be downloaded, configured, built and installed in the right order.
+
+@section sec_requirements Third-party requirements
+
+Building the GET software requires to install a few third-party tools and libraries they depend on.
+- Mandatory requirements:
+	- subversion - Version Control System used for the GET project.
+	- C++ compiler
+	- Standard GNU tools used to configure and build packages: autoconf, automake, libtool, pkg-config, sed.
+	- Qt - A cross-platform application framework. Required by ConfigWidgets, DatabaseWidgets, GetController, CoBoFrameViewer.
+	- Qwt - A library of GUI components completing Qt. Required by GetController, CoBoFrameViewer.
+	- Boost Libraries - Cross-platform STL-like general purpose libraries. Required by most of our packages.
+(Both headers and libraries (at least Program_options, System and Filesystem libraries) need to be installed, except for VxWorks where only the headers are needed.)
+	- Ice - The Internet Communications Engine, an object-oriented middleware by ZeroC.
+	- readline
+	- ncurses
+		     	
+- Optional tools:
+	- doxygen - A documentation generation tool.
+	- ROOT - CERN data analysis framework. Needed by the CoBoFrameViewer package to convert raw MFM frames to ROOT trees and by the ConfigWizard package to display histograms.
+	- gSOAP - C++ toolkit for SOAP/WML web services. Needed by the GetBench package for building the SOAP version of the ECC server.
+	- Oracle instant client - The Oracle Database client & SDK. Required for SOCI Oracle support.
+	- MySql client - The MySql client libraries & SDK. Required for SOCI MySql support.
+	- PostgreSql client - The PostgreSql client libraries & SDK. Required for SOCI PostgreSql support.
+	- Eclipse CDT - The development environment for C++ developers.
+	- Subclipse - An Eclipse plugin, required to use subversion under Eclipse.
+	- <a href="http://qwtplot3d.sourceforge.net/">QwtPlot3d</a> - A C++ library providing 3D OpenGL widgets for Qt. Needed for 3D features of CoBoFrameViewer.
+	- <a href="http://logging.apache.org/log4cxx/">log4cxx</a> - A C++ port of the log4j logging framework.
+
+How to install these required dependencies depends on your OS:
+		- @subpage page_Debian
+		
+		- @subpage page_Redhat
+		
+		- @subpage page_MacOSX
+
+		- VxWorks TBC
+
+@section sec_download How to download the source
+		@subsection subsec_softwareVersion Find out which software release to install
+		@warning The GET software source packages are available from subversion repositories.\n
+		We strongly recommend that you <b>do not download the development version</b> of the code, stored in the <i>trunk</i> sub-directories.
+		Please refer to <a href="https://dsm-trac.cea.fr/get/wiki/Releases">Trac</a> to find out which is the recommended release tag.
+	
+		
+		@subsection subsec_DownloadSVN Using the subversion command-line tool
+		To download the tag <i>release-YYYYMMDD</i> :
+\verbatim
+
+svn checkout https://dsm-trac.cea.fr/svn/mordicus/Utilities/tags/Utilities-release-YYYYMMDD Utilities
+
+svn checkout https://dsm-trac.cea.fr/svn/cconfig/TinyXml/tags/TinyXml-release-YYYYMMDD TinyXml
+svn checkout https://dsm-trac.cea.fr/svn/cconfig/CompoundConfig/tags/CompoundConfig-release-YYYYMMDD CompoundConfig
+svn checkout https://dsm-trac.cea.fr/svn/cconfig/ConfigWidgets/tags/ConfigWidgets-release-YYYYMMDD ConfigWidgets
+
+# The 3 following packages are only needed for database features
+svn checkout https://dsm-trac.cea.fr/svn/cconfig/soci/tags/soci-release-YYYYMMDD soci
+svn checkout https://dsm-trac.cea.fr/svn/cconfig/ConfigDatabase/tags/ConfigDatabase-release-YYYYMMDD ConfigDatabase
+svn checkout https://dsm-trac.cea.fr/svn/cconfig/DatabaseWidgets/tags/DatabaseWidgets-release-YYYYMMDD DatabaseWidgets
+
+svn checkout https://dsm-trac.cea.fr/svn/mordicus/StateMachine/tags/StateMachine-release-YYYYMMDD StateMachine
+svn checkout https://dsm-trac.cea.fr/svn/mordicus/MultiFrame/tags/MultiFrame-release-YYYYMMDD MultiFrame
+svn checkout https://dsm-trac.cea.fr/svn/mordicus/MDaq/tags/MDaq-release-YYYYMMDD MDaq
+
+svn checkout https://dsm-trac.cea.fr/svn/get/GetBench/tags/GetBench-software-release-YYYYMMDD GetBench
+svn checkout https://dsm-trac.cea.fr/svn/get/GetController/tags/GetController-release-YYYYMMDD GetController
+svn checkout https://dsm-trac.cea.fr/svn/get/CoBoFrameViewer/tags/CoBoFrameViewer-release-YYYYMMDD CoBoFrameViewer
+svn checkout https://dsm-trac.cea.fr/svn/get/ConfigWizard/tags/ConfigWizard-release-YYYYMMDD ConfigWizard
+\endverbatim
+
+When building for a VxWorks or an embedded Linux target, you also need to download our <a href="https://dsm-trac.cea.fr/mordicus/wiki/IceEonVxWorks">port of IceE to VxWorks</a>:
+@verbatim
+svn checkout https://dsm-trac.cea.fr/svn/mordicus/IceEirfu/tags/IceEirfu-release-YYYYMMDD IceE
+@endverbatim
+
+
+@subsection subsec_DownloadEclipse Using Eclipse
+
+If you have installed the Eclipse IDE and one of its subversion plugins (<em>subversive</em> or <em>subclipse</em>), you can proceed by adding the 3 repositories (<em>https://dsm-trac.cea.fr/svn/cconfig</em>, <em>https://dsm-trac.cea.fr/svn/mordicus</em> and <em>https://dsm-trac.cea.fr/svn/get</em>),
+ and checking out the desired tag of each of the packages successively. This method makes it easier to then build the projects.
+
+@section sec_build Build instructions
+You can build the packages either from a terminal or using the Eclipse IDE.
+
+@subsection subsec_BuildCmdLine Using command-line tools
+Basically, each package uses the autotools and can be configured, built and installed using the shell commands:
+@verbatim
+./autogen.sh
+mkdir build && cd build
+../configure
+make install
+@endverbatim
+
+The options passed to the <em>configure</em> script enable you to fine tune the installation directory (<em>--prefix=PREFIX</em>) and the build properties, and to help the system find where the required libraries are located on your system.
+
+Since the projects are dependent upon each other, if your installation path <em>PREFIX</em> is not a standard system path, you need to append <em>PREFIX/lib/pkgconfig</em> to the <em>PKG_CONFIG_PATH</em> environment variable.
+
+@subpage page_BuildDetails
+
+
+@subsection subsec_BuildEclipse Using Eclipse
+
+In the Eclipse preferences (<em>Window / Preferences</em>), go to the section <em> C++ / Build / Environment </em>, and define the variables MORDICUS_INSTALL_ROOT and PKG_CONFIG_PATH.
+<table>
+<tr><td>Variable</td><td>Value</td></tr>
+<tr><td>MORDICUS_INSTALL_ROOT</td><td>${workspace_loc}/../usr/local</td></tr>
+<tr><td>PKG_CONFIG_PATH</td><td>${MORDICUS_INSTALL}/lib/pkgconfig</td></tr>
+</table>
+
+For each package (assuming you have installed the Eclipse Autotools plugins):
+	-# Select the build configuration appropriate for your target host and the desired build mode (e.g. <em>pentium-linux-debug</em> or <em>apple-darwin-release</em>, ...) in <em>Project > Build Configurations > Set Active</em>.
+	-# Right click on the Eclipse project in the <em>Project Explorer</em> and select <em>Reconfigure Project</em>.
+	-# Click on the <em>install</em> target in the <em>Make Target</em> view.
+
+@section sec_SetupEnvironment Setting up your environment
+If you have not installed the software into a system directory, you need, before using them, to modify the PATH and LD_LIBARRY_PATH environment variables (you may do that in your shell login script).
+\n Example (for <i>bash</i>), with <i>${PREFIX}</i> as the installation directory:
+@verbatim
+export PATH=${PREFIX}/bin:${PATH}
+export LD_LIBRARY_PATH=${PREFIX}/lib
+@endverbatim
+
+$LastChangedDate$
+*/

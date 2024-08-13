@@ -1,0 +1,10 @@
+2010-09-28  Patrick Sizun  <patrick.sizun@cea.fr>
+	* Added SQLite3 backend.
+
+2010-09-23  Patrick Sizun  <patrick.sizun@cea.fr>
+	* Added PostgreSQL backend.
+	* Added option to disable Oracle backend.
+
+2010-09-14  Patrick Sizun  <patrick.sizun@cea.fr>
+	* Added notions of Site, Run and RunCondition.
+	* Fixed Oracle-specific bug (use of reserved identifiers).

@@ -1,0 +1,7 @@
+connect device ctrl
+write ckwDivider d 0
+write ckrDivider d 2
+connect device asad
+writeReg LCM1 0x48900001020000CF
+writeReg LCM2 0x20400001220000C7
+sleep 1

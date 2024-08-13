@@ -1,0 +1,5 @@
+connect device ctrl
+writeReg agetChipSelect 0
+exec agetCal.ecc
+connect device ctrl
+writeReg initSCAReadOutAfterPowerOnNow 1

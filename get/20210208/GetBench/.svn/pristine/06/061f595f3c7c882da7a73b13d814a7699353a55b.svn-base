@@ -1,0 +1,53 @@
+connect device ctrl
+write ckpFastDivider d 0
+write agetController reset 1
+write agetController reset 0
+write aget_sc_configuration SC_En 0x000F
+write aget_sc_configuration pulseEnable 0x000F
+write agetController hitRegister 0
+write agetController calibration 0
+writeReg aget_sc_rw 1
+sleep 1
+write agetController reset 1
+write agetController reset 0
+write aget_sc_configuration pulseEnable 0x0000
+write agetController calibration 1
+writeReg dataToAget3 0xA0000000
+writeReg dataToAget2 0x00000005
+writeReg aget_sc_rw 0
+sleep 1
+readReg agetHitReadDelayAuto
+readReg agetControllerStatus
+write agetController reset 1
+write agetController reset 0
+write agetController reset 1
+write agetController reset 0
+write agetController calibration 0
+write aget_sc_configuration pulseEnable 0x000F
+write agetController hitRegister 1
+writeReg aget_sc_rw 1
+sleep 1
+write agetController reset 1
+write agetController reset 0
+write agetController calibration 1
+write aget_sc_configuration pulseEnable 0x0000
+writeReg aget_sc_rw 1
+sleep 1
+readReg agetSlowReadDelayAuto
+readReg agetControllerStatus
+write agetController reset 1
+write agetController reset 0
+write agetController calibration 0
+write aget_sc_configuration pulseEnable 0x000F
+write agetController hitRegister 0
+writeReg aget_sc_rw 1
+sleep 1
+write agetController reset 1
+write agetController reset 0
+write aget_sc_configuration pulseEnable 0x0000
+connect device aget
+readReg reg5
+connect device ctrl
+write agetController reset 1
+write agetController reset 0
+readReg agetControllerStatus

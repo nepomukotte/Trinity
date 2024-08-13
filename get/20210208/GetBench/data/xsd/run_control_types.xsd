@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+	<xs:annotation>
+		<xs:documentation>This schema defines XML types used by the interface between the GANIL Run Control and the GET Electronics Control Core.</xs:documentation>
+	</xs:annotation>
+	
+	<xs:simpleType name="SubConfigType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="describe"/>
+			<xs:enumeration value="prepare"/>
+			<xs:enumeration value="configure"/>
+			<xs:enumeration value="hardware"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="SubConfigId">
+  		<xs:complexType>
+    		<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="type" type="SubConfigType" use="required"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="ConfigId">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="SubConfigId"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:element name="ConfigIdSet">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="ConfigId"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DataSender">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DataSenderSet">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="DataSender"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="FlowType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Ice"/>
+			<xs:enumeration value="TCP"/>
+			<xs:enumeration value="ZBuf"/>
+			<xs:enumeration value="FDT"/>
+			<xs:enumeration value="Dummy"/>
+		</xs:restriction>
+	</xs:simpleType> 
+
+	<xs:element name="DataRouter">
+		<xs:complexType>
+			<xs:attribute name="name" type="xs:string" use="optional"/>
+			<xs:attribute name="ipAddress" type="xs:string" use="required"/>
+			<xs:attribute name="port" type="xs:string" use="required"/>
+			<xs:attribute name="type" type="FlowType" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DataLink">
+		<xs:complexType>
+			<xs:all minOccurs="1" maxOccurs="1">
+				<xs:element ref="DataSender"/>
+				<xs:element ref="DataRouter"/>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="DataLinkSet">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="DataLink"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="File">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any processContents="skip" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="filename" type="xs:string" use="required"/>
+			<xs:attribute name="format" type="xs:string" use="required"/>
+			<xs:attribute name="subConfigType" type="SubConfigType" use="required"/>
+			<xs:attribute name="subConfigId" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="ConfigSet">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="File"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

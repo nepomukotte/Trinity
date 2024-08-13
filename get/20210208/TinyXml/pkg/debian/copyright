@@ -1,0 +1,21 @@
+This package was debianized by Frederic Chateau <frederic.chateau@cea.fr> on
+Fri, 2 Mar 2012 10:31:21 +0100.
+
+It was downloaded from http://http://sourceforge.net/projects/tinyxml
+
+Upstream Author(s):
+
+	Lee Thomason, Yves Berquin, Andrew Ellerton
+
+Copyright:
+
+    Copyright (C) 2011 Lee Thomason
+    Copyright (C) 2011 Yves Berquin
+    Copyright (C) 2011 Andrew Ellerton
+
+License:
+
+    This program is released under the terms and conditions of the GNU
+    General Public License (GPL).  On Debian GNU/Linux systems, the complete
+    text of the GNU General Public License may be found in
+    `/usr/share/common-licenses/GPL'.

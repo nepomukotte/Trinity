@@ -1,0 +1,5 @@
+2012-06-13  sizun  <patrick.sizun@cea.fr>
+	* Added constructor to class SocketAddress.
+
+2012-05-15  sizun  <patrick.sizun@cea.fr>
+	* Added classes IpAdress and SocketAddress.

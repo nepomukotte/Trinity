@@ -1,0 +1,471 @@
+/**
+ * @file cobo-frame-root2disp.cpp
+ * @date Apr 8, 2013
+ * @author sizun
+ * 
+ * @note SVN tag: $Id$
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the CoBoFrameViewer software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "utl/Logging.h"
+#include "GDataSample.h"
+#include "GDataChannel.h"
+#include "GDataFrame.h"
+#include "CoBoFrameBrowser.h"
+
+#include <TAxis.h>
+#include <TCanvas.h>
+#include <TFile.h>
+#include <TGraph.h>
+#include <TH1F.h>
+#include <TMath.h>
+#include <TMultiGraph.h>
+#include <TPaveStats.h>
+#include <TROOT.h>
+#include <TString.h>
+#include <TSystem.h>
+#include <TTree.h>
+#include <TStyle.h>
+#include <TRint.h>
+#include <RVersion.h> // ROOT_VERSION_CODE
+
+#include <boost/program_options.hpp>
+namespace po = boost::program_options;
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <iterator>
+
+void draw_timestamp(const std::string & filename, Float_t xMin=0., Float_t xMax=0., Float_t ticksPerSecond=1.e8);
+void draw_frequency(const std::string & filename, Float_t xMin=0., Float_t xMax=0., Float_t ticksPerSecond = 1.e8);
+void draw_period(const std::string & filename, Float_t xMin=0., Float_t xMax=0., Float_t ticksPerSecond = 1.e8);
+void draw_frame(const std::string & filename, const Long64_t & frameId=0);
+void draw_buckets(const std::string & filename);
+void draw_channel_count(const std::string & filename);
+
+#if ROOT_VERSION_CODE > 393216
+using namespace GET; // ROOT 6
+#else
+using namespace get;
+#endif
+
+//___________________________________________________________________________________________________
+int main(int argc, char* argv[])
+{
+	int status = EXIT_SUCCESS;
+	std::string input_filename;
+	std::string field;
+	size_t const numFields = 6;
+	std::string fields[numFields] = {"time", "freq", "period", "bucket", "data", "nchannels"};
+	std::ostringstream oss;
+	oss << "field to display: ";
+	std::copy(fields, fields + numFields, std::ostream_iterator< std::string >(oss, " "));
+	std::string fieldsHelp = oss.str();
+
+	try
+	{
+		// Declare the supported options.
+		po::options_description desc("Allowed options");
+		desc.add_options()
+			("help,h", "produces this help message")
+			("input-file,i",   po::value<std::string>(&input_filename), "input ROOT frame filename")
+			("field,f", po::value<std::string>(&field)->default_value("data"), fieldsHelp.c_str())
+		;
+		po::positional_options_description p;
+		p.add("input-file", 1);
+
+		// Parse options
+		po::variables_map vm;
+		po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
+		po::notify(vm);
+
+		if (not vm.count("input-file"))
+		{
+			LOG_FATAL() << "No input file specified.\n";
+			status = EXIT_FAILURE;
+		}
+
+
+		if (not vm.count("field"))
+		{
+			LOG_FATAL() << "Field to display not specified.\n";
+			status = EXIT_FAILURE;
+		}
+		else if (find(fields, fields + numFields, field) == fields + numFields)
+		{
+			LOG_FATAL() << "Invalid field '" << field << "'.\n";
+			status = EXIT_FAILURE;
+		}
+
+		if (vm.count("help") or EXIT_SUCCESS != status)
+		{
+			LOG_INFO() << "Usage: " << argv[0] << " frames.root [OPTIONS...]";
+			LOG_INFO() << desc;
+			return EXIT_FAILURE;
+		}
+
+		std::cout << "Displaying field '" << field << "' for file '" << input_filename << "'..." << std::endl;
+
+		TRint *app = new TRint(argv[0], &argc, argv);
+		//gROOT->SetStyle("Plain");
+		//gROOT->SetStyle("Pub"); // no stats
+		gStyle->SetTitleBorderSize(0);
+		/*gStyle->SetTitleSize(0.02, "XYZ");
+		gStyle->SetTitleFont(132, "XYZ");// 132
+		gStyle->SetTitleSize(0.02, "*");
+		gStyle->SetTitleFont(132, "*");
+		gStyle->SetLabelSize(0.02, "XYZ");
+		gStyle->SetLabelFont(132, "XYZ");
+		gStyle->SetTitleYOffset(1.3);
+		gStyle->SetTitleXOffset(1.3);
+		gStyle->SetLineWidth(1);*/
+		gStyle->SetOptStat(111111);
+		gStyle->SetOptTitle(1);
+
+		if ("time" == field)
+		{
+			draw_timestamp(input_filename);
+		}
+		else if ("freq" == field)
+		{
+			draw_frequency(input_filename);
+		}
+		else if ("period" == field)
+		{
+			draw_period(input_filename);
+		}
+		else if ("bucket" == field)
+		{
+			draw_buckets(input_filename);
+		}
+		else if ("nchannels" == field)
+		{
+			draw_channel_count(input_filename);
+		}
+		else
+		{
+			//draw_frame(input_filename, 0);
+			CoBoFrameBrowser* browser = new CoBoFrameBrowser(gClient->GetRoot());
+			browser->LoadFile(input_filename);
+		}
+
+		// Init Intrinsics, build all windows, and enter event loop
+		app->Run();
+	}
+	catch(const std::exception & e)
+    {
+		LOG_FATAL() << e.what();
+		status = EXIT_FAILURE;
+    }
+	return status;
+}
+//___________________________________________________________________________________________________
+void draw_timestamp(const std::string & filename, Float_t xMin, Float_t xMax, Float_t ticksPerSecond)
+{
+	TFile* file = new TFile(filename.c_str());
+	TTree *tree = (TTree*) file->Get("tree");
+	if (! tree) return;
+
+	gROOT->cd(); //Make sure that the new objects are memory resident
+
+	TCanvas* canvas = new TCanvas("cEventTime", "Event time", 1);
+	canvas->SetTopMargin(1.25);
+	canvas->cd();
+	gStyle->SetOptStat("1111");
+
+	const char *fieldName = "fHeader.fEventTime";
+	if (xMin <= 0)
+	{
+		xMin = 0.9*tree->GetMinimum(fieldName)/ticksPerSecond;
+	}
+	if (xMax <= 0)
+	{
+		xMax = 1.1*tree->GetMaximum(fieldName)/ticksPerSecond;
+	}
+	if (std::fabs(xMax-xMin) <= 0)
+	{
+		xMax = xMin + 1;
+	}
+	TH1F* hist = new TH1F("hEventTime", filename.c_str(), 10000, xMin, xMax);
+	TString formula = TString::Format("%s/%f >> hEventTime", "fHeader.fEventTime", ticksPerSecond);
+	tree->Draw(formula.Data());
+	hist->Draw("H");
+	hist->GetXaxis()->SetTitle("Event Time [s]");
+	hist->GetXaxis()->CenterTitle();
+	canvas->Modified();
+	canvas->Update();
+}
+//___________________________________________________________________________________________________
+void draw_frequency(const std::string & filename, Float_t xMin, Float_t xMax, Float_t ticksPerSecond)
+{
+	TFile file(filename.c_str());
+	TTree *tree = (TTree*) file.Get("tree");
+	if (! tree) return;
+	//tree->Print();
+
+	// Create a pointer to a frame object for reading the branch values.
+	GDataFrame *frame = new GDataFrame();
+	// Get two branches and set the branch address
+	TBranch *eventTimeBranch = tree->GetBranch("fHeader.fEventTime");
+	tree->SetBranchAddress("GDataFrame", &frame);
+
+	const Long64_t numEvents = tree->GetEntries();
+	std::cout << "File '" << filename << "' contains " << numEvents << " frame(s)" << std::endl;
+
+	gROOT->cd(); //Make sure that the new tree is memory resident
+	TTree* stats = new TTree("tStats", "");
+	UInt_t timeDelta_ticks;
+	Float_t freq_Hz;
+	stats->Branch("timeDelta_ticks", &timeDelta_ticks);
+	stats->Branch("eventFreq_Hz", &freq_Hz);
+
+
+	printf("Looping over events...\n");
+	ULong_t previousTimestamp;
+	eventTimeBranch->GetEntry(0);
+	previousTimestamp = frame->fHeader.fEventTime;
+	for (Long64_t entryId = 1; entryId < numEvents; entryId++)
+	{
+		eventTimeBranch->GetEntry(entryId);
+		timeDelta_ticks = frame->fHeader.fEventTime - previousTimestamp;
+		freq_Hz = (timeDelta_ticks > 0)?(ticksPerSecond/timeDelta_ticks):0.;
+		stats->Fill();
+
+		previousTimestamp = frame->fHeader.fEventTime;
+	}
+	stats->Print();
+
+	TCanvas* canvas = new TCanvas("cEventFreq", "Timestamp difference between consecutive frames", 1);
+	canvas->SetTopMargin(1.25);
+	canvas->cd();
+	gStyle->SetOptStat("1111");
+
+	const char *fieldName = "eventFreq_Hz";
+	if (xMin <= 0)
+	{
+		xMin = 0.9*stats->GetMinimum(fieldName);
+	}
+	if (xMax <= 0)
+	{
+		xMax = 1.1*stats->GetMaximum(fieldName);
+	}
+	if (std::fabs(xMax-xMin) <= 0)
+	{
+		xMax = xMin + 1;
+	}
+	TH1F* hist = new TH1F("hFreq", filename.c_str(), 100000, xMin, xMax);
+	stats->Draw(TString::Format("%s >> hFreq", fieldName).Data(), "", " ");
+	hist->Draw(); //"H"
+	hist->GetXaxis()->SetTitle("Event frequency [Hz]");
+	gPad->SetLogx(1);
+	gPad->SetLogy(1);
+	//hist->GetXaxis()->SetMoreLogLabels(kTRUE);
+	//hist->GetXaxis()->SetNoExponent(kTRUE);
+	canvas->Modified();
+	canvas->Update();
+}
+//___________________________________________________________________________________________________
+void draw_period(const std::string & filename, Float_t xMin, Float_t xMax, Float_t ticksPerSecond)
+{
+	TFile file(filename.c_str());
+	TTree *tree = (TTree*) file.Get("tree");
+	if (! tree) return;
+	//tree->Print();
+
+	// Create a pointer to a frame object for reading the branch values.
+	GDataFrame *frame = new GDataFrame();
+	// Get two branches and set the branch address
+	TBranch *eventTimeBranch = tree->GetBranch("fHeader.fEventTime");
+	tree->SetBranchAddress("GDataFrame", &frame);
+
+	const Long64_t numEvents = tree->GetEntries();
+	std::cout << "File '" << filename << "' contains " << numEvents << " frame(s)" << std::endl;
+
+	gROOT->cd(); //Make sure that the new tree is memory resident
+	TTree* stats = new TTree("tStats", "");
+	UInt_t timeDelta_ticks;
+	Float_t eventPeriod_ms;
+	stats->Branch("timeDelta_ticks", &timeDelta_ticks);
+	stats->Branch("eventPeriod_ms", &eventPeriod_ms);
+
+
+	printf("Looping over events...\n");
+	ULong_t previousTimestamp;
+	eventTimeBranch->GetEntry(0);
+	previousTimestamp = frame->fHeader.fEventTime;
+	for (Long64_t entryId = 1; entryId < numEvents; entryId++)
+	{
+		eventTimeBranch->GetEntry(entryId);
+		timeDelta_ticks = frame->fHeader.fEventTime - previousTimestamp;
+		eventPeriod_ms = timeDelta_ticks/ticksPerSecond*1000.;
+		stats->Fill();
+
+		previousTimestamp = frame->fHeader.fEventTime;
+	}
+	stats->Print();
+
+	TCanvas* canvas = new TCanvas("cEventPeriod", "Timestamp difference between consecutive frames", 1);
+	canvas->SetTopMargin(1.25);
+	canvas->cd();
+	gStyle->SetOptStat("1111");
+
+	const char *fieldName = "eventPeriod_ms";
+	if (xMin <= 0)
+	{
+		xMin = 0.9*stats->GetMinimum(fieldName);
+	}
+	if (xMax <= 0)
+	{
+		xMax = 1.1*stats->GetMaximum(fieldName);
+	}
+	if (std::fabs(xMax-xMin) <= 0)
+	{
+		xMax = xMin + 1;
+	}
+	TH1F* hist = new TH1F("hPeriod", filename.c_str(), 10000, xMin, xMax);
+	hist->StatOverflows(kTRUE); // include underflow and overflow bins in stats
+	stats->Draw(TString::Format("%s >> hPeriod", fieldName).Data(), "", " ");
+	hist->Draw(); //"H"
+	hist->GetXaxis()->SetTitle("Delay between events [ms]");
+	hist->GetXaxis()->CenterTitle();
+	gPad->SetLogx(1);
+	gPad->SetLogy(1);
+	//hist->GetXaxis()->SetMoreLogLabels(kTRUE);
+	//hist->GetXaxis()->SetNoExponent(kTRUE);
+	canvas->Modified();
+	canvas->Update();
+	LOG_INFO() << "Average delay between events: " << hist->GetMean() << " +/- " << hist->GetRMS() << " ms";
+}
+//___________________________________________________________________________________________________
+void draw_buckets(const std::string & filename)
+{
+	TFile file(filename.c_str());
+	TTree *tree = (TTree*) file.Get("tree");
+	if (! tree) return;
+
+	TCanvas* canvas = new TCanvas("cBuckIdx", "Distribution of bucket indices", 1);
+	canvas->SetTopMargin(1.25);
+	canvas->cd();
+	gStyle->SetOptStat("1111");
+
+	gROOT->cd();
+	TH1F* hist = new TH1F("hBuckIdx", "fSamples.fBuckIdx", 512,-0.5, 511.5);
+	tree->Draw("fSamples.fBuckIdx >> hBuckIdx", "", "H");
+	hist->GetXaxis()->SetTitle("Bucket Index");
+	hist->GetXaxis()->CenterTitle();
+
+	canvas->Modified();
+	canvas->Update();
+}
+//___________________________________________________________________________________________________
+void draw_frame(const std::string & filename, const Long64_t & frameId)
+{
+	TFile file(filename.c_str());
+	TTree *tree = (TTree*) file.Get("tree");
+	if (!tree) return;
+
+	gROOT->cd(); //Make sure that the new objects are memory resident
+
+	GDataFrame *frame = 0;
+	tree->SetBranchAddress("GDataFrame", &frame);
+
+	TCanvas* canvas = new TCanvas("canvas", "", 1280, 1024);
+	TMultiGraph* multiGraph[4] = { 0, 0, 0, 0 };
+
+	std::cout << "Drawing frame #" << frameId << "..." << std::endl;
+	tree->GetEntry(frameId);
+
+	canvas->Clear();
+	canvas->Divide(2, 2);
+	for (Int_t agetId = 0; agetId < 4; ++agetId)
+	{
+		canvas->cd(1 + agetId);
+		if (multiGraph[agetId]) delete multiGraph[agetId];
+		multiGraph[agetId] = new TMultiGraph(TString::Format("mgAget%d", agetId),
+				TString::Format("AGET %d", agetId).Data());
+		for (Int_t chanId = 0; chanId < 68; ++chanId)
+		{
+			GDataChannel* channel = frame->SearchChannel(agetId, chanId);
+			if (!channel) continue;
+
+			TGraph *graph = new TGraph(channel->fNsamples);
+			graph->SetName(TString::Format("gAget%dChan%d", agetId, chanId).Data());
+			for (Int_t i = 0; i < channel->fNsamples; ++i)
+			{
+				GDataSample* sample = (GDataSample*) channel->fSamples.At(i);
+				graph->SetPoint(i, sample->fBuckIdx, sample->fValue);
+			}
+			Int_t colorIndex = chanId+1; // 2*chanId+60;
+			graph->SetLineColor(colorIndex);
+			graph->SetMarkerColor(colorIndex);
+			multiGraph[agetId]->Add(graph, "CP");
+		}
+		multiGraph[agetId]->Draw("A");
+		multiGraph[agetId]->SetTitle(TString::Format("AGET %d", agetId).Data());
+		multiGraph[agetId]->GetHistogram()->GetXaxis()->SetTitle("Time bucket index");
+		multiGraph[agetId]->GetHistogram()->GetYaxis()->SetTitle("Value");
+		multiGraph[agetId]->GetHistogram()->GetXaxis()->CenterTitle();
+		multiGraph[agetId]->GetHistogram()->GetYaxis()->CenterTitle();
+		gPad->Modified();
+		gPad->Update();
+	}
+	canvas->cd();
+	canvas->Modified();
+	canvas->Update();
+}
+//___________________________________________________________________________________________________
+void draw_channel_count(const std::string & filename)
+{
+	TFile file(filename.c_str());
+	TTree *tree = (TTree*) file.Get("tree");
+	if (! tree) return;
+
+	TCanvas* canvas = new TCanvas("cEventChannelCount", "Read Channel Count", 1);
+	canvas->SetTopMargin(1.25);
+	canvas->cd();
+
+	gROOT->cd();
+	TH1F* hist = new TH1F("hChannelCount", "fNchannels", 273,-0.5, 272.5);
+	tree->Draw("fNchannels >> hChannelCount", "", " ");
+	hist->Draw("H");
+	hist->GetXaxis()->SetTitle("fNchannels");
+	hist->GetXaxis()->CenterTitle();
+	hist->GetXaxis()->SetMoreLogLabels(kTRUE);
+	hist->GetXaxis()->SetNoExponent(kTRUE);
+	gPad->SetLogx(kTRUE);
+	gPad->SetLogy(kTRUE);
+
+	canvas->Modified();
+	canvas->Update();
+}
+
+

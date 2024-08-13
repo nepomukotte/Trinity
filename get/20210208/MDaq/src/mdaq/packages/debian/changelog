@@ -1,0 +1,5 @@
+mdaq (1.1.0-1) unstable; urgency=low
+
+  * Initial release : First deb package
+
+ -- Joël Chavas <joel.chavas@cea.fr>  Fri, 25 Sep 2009 15:27:07 +0200

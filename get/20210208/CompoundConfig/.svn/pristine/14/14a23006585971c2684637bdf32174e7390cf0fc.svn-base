@@ -1,0 +1,13 @@
+Source: libcompoundconfig
+Section: devel
+Priority: optional
+Maintainer: Frederic Chateau <frederic.chateau@cea.fr>
+Build-Depends: debhelper, cdbs, automake (>= 1.11), libtool (>= 2.2), libtinyxml (>= 2.5.2), libboost-dev (>= 1.33.1)
+Standards-Version: 3.8.0
+Homepage:
+
+Package: libcompoundconfig
+Architecture: any
+Depends: libtinyxml (>= 2.5.2), ${shlibs:Depends}, ${misc:Depends}
+Recommends: libboost-dev (>= 1.33.1)
+Description: The CompoundConfig library defines API to manipulate tree-like configurations.

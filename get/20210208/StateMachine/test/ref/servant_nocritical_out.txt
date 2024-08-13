@@ -1,0 +1,6 @@
+Turned off
+Turned on
+Idling
+Activated
+Running
+Shutting down

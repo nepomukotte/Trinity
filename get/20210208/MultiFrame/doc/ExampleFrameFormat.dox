@@ -1,0 +1,310 @@
+/**
+@page page_example_formats Example of a frame format description
+
+The following XML code describes some frame formats using the CompoundConfig framework.
+@see https://dsm-trac.cea.fr/cconfig/doxygen
+
+@code
+<?xml version="1.0" encoding="UTF-8"?>
+<MFM>
+	<Frame id="*">
+		<typeCode range="[0, 16777215]">0</typeCode>
+		<Revision id="*">
+			<Header>
+				<Field id="*">
+					<offset unit="Bytes">0</offset>
+					<size unit="Bytes">1</size>
+					<BitField id="*">
+						<width unit="bit">1</width>
+						<offset unit="bit">0</offset>
+					</BitField>
+				</Field>
+				<Field id="metaType">
+					<BitField id="ISLEND">
+						<offset>7</offset>
+						<value>0</value>
+					</BitField>
+					<BitField id="ISBLOB">
+						<offset>6</offset>
+						<value>0</value>
+					</BitField>
+					<BitField id="P2BLCK">
+						<width>4</width>
+						<value>0</value>
+					</BitField>
+				</Field>
+				<Field id="frameSize">
+					<offset>1</offset>
+					<size>3</size>
+				</Field>
+				<Field id="dataSource">
+					<offset>4</offset>
+				</Field>
+				<Field id="frameType">
+					<offset>5</offset>
+					<size>2</size>
+				</Field>
+				<Field id="revision">
+					<offset>7</offset>
+				</Field>
+			</Header>
+			<Item id="*">
+				<Field id="*">
+					<offset unit="Bytes">0</offset>
+					<size unit="Byte">1</size>
+					<BitField id="*">
+						<width unit="bit">1</width>
+						<offset unit="bit">0</offset>
+					</BitField>
+				</Field>
+			</Item>
+		</Revision>
+	</Frame>
+	<Frame id="CoBo">
+		<typeCode>1</typeCode>
+		<Revision id="0">
+			<Header>
+				<Field id="metaType">
+					<BitField id="P2BLCK">
+						<value>6</value>
+					</BitField>
+				</Field>
+				<Field id="headerSize">
+					<value unit="blocks">2</value>
+					<offset>8</offset>
+					<size>2</size>
+				</Field>
+				<Field id="itemSize">
+					<value>4</value>
+					<offset>10</offset>
+					<size>2</size>
+				</Field>
+				<Field id="itemCount">
+					<offset>12</offset>
+					<size>4</size>
+				</Field>
+				<Field id="eventTime">
+					<offset>16</offset>
+					<size>6</size>
+				</Field>
+				<Field id="eventIdx">
+					<offset>22</offset>
+					<size>4</size>
+				</Field>
+				<Field id="coboIdx">
+					<offset>26</offset>
+				</Field>
+				<Field id="asadIdx">
+					<offset>27</offset>
+				</Field>
+				<Field id="readOffset">
+					<offset>28</offset>
+					<size>2</size>
+				</Field>
+				<Field id="status">
+					<offset>30</offset>
+				</Field>
+				<Field id="hitPat_0">
+					<offset>31</offset>
+					<size>9</size>
+				</Field>
+				<Field id="hitPat_1">
+					<offset>40</offset>
+					<size>9</size>
+				</Field>
+				<Field id="hitPat_2">
+					<offset>49</offset>
+					<size>9</size>
+				</Field>
+				<Field id="hitPat_3">
+					<offset>58</offset>
+					<size>9</size>
+				</Field>
+				<Field id="multip_0">
+					<offset>67</offset>
+					<size>2</size>
+				</Field>
+				<Field id="multip_1">
+					<offset>69</offset>
+					<size>2</size>
+				</Field>
+				<Field id="multip_2">
+					<offset>71</offset>
+					<size>2</size>
+				</Field>
+				<Field id="multip_3">
+					<offset>73</offset>
+					<size>2</size>
+				</Field>
+			</Header>
+			<Item id="*">
+				<Field>
+					<BitField id="agetIdx">
+						<offset>30</offset>
+						<width>2</width>
+					</BitField>
+					<BitField id="chanIdx">
+						<offset>23</offset>
+						<width>7</width>
+					</BitField>
+					<BitField id="buckIdx">
+						<width>9</width>
+						<offset>14</offset>
+					</BitField>
+					<BitField id="sample">
+						<offset>0</offset>
+						<width>12</width>
+					</BitField>
+					<size>4</size>
+				</Field>
+			</Item>
+		</Revision>
+		<Revision id="1">
+			<Header>
+				<Field id="metaType">
+					<BitField id="P2BLCK">
+						<value>6</value>
+					</BitField>
+				</Field>
+				<Field id="headerSize">
+					<value>2</value>
+					<offset>8</offset>
+					<size>2</size>
+				</Field>
+				<Field id="itemSize">
+					<value>4</value>
+					<offset>10</offset>
+					<size>2</size>
+				</Field>
+				<Field id="itemCount">
+					<offset>12</offset>
+					<size>4</size>
+				</Field>
+				<Field id="eventTime">
+					<offset>16</offset>
+					<size>6</size>
+				</Field>
+				<Field id="eventIdx">
+					<offset>22</offset>
+					<size>4</size>
+				</Field>
+				<Field id="coboIdx">
+					<offset>26</offset>
+				</Field>
+				<Field id="asadIdx">
+					<offset>27</offset>
+				</Field>
+				<Field id="readOffset">
+					<offset>28</offset>
+					<size>2</size>
+				</Field>
+				<Field id="status">
+					<offset>30</offset>
+				</Field>
+				<Field id="hitPat_0">
+					<offset>31</offset>
+					<size>9</size>
+				</Field>
+				<Field id="hitPat_1">
+					<offset>40</offset>
+					<size>9</size>
+				</Field>
+				<Field id="hitPat_2">
+					<offset>49</offset>
+					<size>9</size>
+				</Field>
+				<Field id="hitPat_3">
+					<offset>58</offset>
+					<size>9</size>
+				</Field>
+				<Field id="multip_0">
+					<offset>67</offset>
+					<size>2</size>
+				</Field>
+				<Field id="multip_1">
+					<offset>69</offset>
+					<size>2</size>
+				</Field>
+				<Field id="multip_2">
+					<offset>71</offset>
+					<size>2</size>
+				</Field>
+				<Field id="multip_3">
+					<offset>73</offset>
+					<size>2</size>
+				</Field>
+			</Header>
+			<Item id="*">
+				<Field>
+					<BitField id="agetIdx">
+						<offset>30</offset>
+						<width>2</width>
+					</BitField>
+					<BitField id="chanIdx">
+						<offset>23</offset>
+						<width>7</width>
+					</BitField>
+					<BitField id="buckIdx">
+						<width>9</width>
+						<offset>14</offset>
+					</BitField>
+					<BitField id="sample">
+						<offset>0</offset>
+						<width>12</width>
+					</BitField>
+					<size>4</size>
+				</Field>
+			</Item>
+		</Revision>
+	</Frame>
+	<Frame id="BlobSample">
+		<Revision id="0">
+			<Header>
+				<Field id="frameSize">
+					<value>64</value>
+				</Field>
+				<Field id="metaType">
+					<BitField id="ISBLOB">
+						<value>1</value>
+					</BitField>
+				</Field>
+			</Header>
+			<Item>
+				<Field id="field1" />
+				<Field id="field2">
+					<offset>1</offset>
+					<size>53</size>
+				</Field>
+				<Field id="field3">
+					<offset>54</offset>
+					<size>2</size>
+				</Field>
+			</Item>
+		</Revision>
+	</Frame>
+	<Frame id="LayeredSample">
+		<Revision id="0">
+			<Header>
+				<Field id="headerSize">
+					<value>16</value>
+					<offset>8</offset>
+					<size>2</size>
+				</Field>
+				<Field id="itemSize">
+					<value>0</value>
+					<offset>10</offset>
+					<size>2</size>
+				</Field>
+				<Field id="itemCount">
+					<offset>12</offset>
+					<size>4</size>
+				</Field>
+			</Header>
+		</Revision>
+		<typeCode>5</typeCode>
+	</Frame>
+</MFM>
+
+
+@endcode
+*/

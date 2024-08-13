@@ -1,0 +1,15 @@
+getEccSoapClient prepare hardwareConfigID
+getEccSoapClient describe hardwareConfigID
+getEccSoapClient status
+getEccSoapClient configure hardwareConfigID
+getEccSoapClient status
+getEccSoapClient start
+getEccSoapClient special connect device ctrl
+getEccSoapClient special writeReg triggerDelay 650
+getEccSoapClient special write triggerMask slowControl 1
+getEccSoapClient special asad-inject -1000
+getEccSoapClient special asad-inject 0
+getEccSoapClient status
+getEccSoapClient stop
+getEccSoapClient breakup
+getEccSoapClient status

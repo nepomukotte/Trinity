@@ -1,0 +1,565 @@
+/**
+\page page_Concepts CompoundConfig Concepts
+In this chapter, we introduce the terminology and concepts used throughout the
+library.
+\section sec_Concepts_Structure Configuration Structure
+First, the most important concept to understand is the configuration
+structure. Configurations have a tree-like structure. It means that variables
+and values we want to declare must be nested in an <em>object</em> block.
+In fact the purpose of this structure is to describe <em>object oriented</em>
+configurations.</p>
+<p>
+There are 2 kinds of entities in configurations:</p>
+<ul>
+   <li><em>Scalar properties</em>: they are like variables initialized with a
+scalar value. <em>Scalar properties</em> can hold 5 types
+of data:</li>
+   <ul>
+      <li><em>Integers</em>: signed 32 bits integers whose range i
+ \f$[-2^{31};2^{31}-1]\f$ and must be written in base 10.</li>
+      <li><em>Hexadecimals</em>: unsigned 32 bits integers whose range is
+\f$[0;2^{32}-1]\f$ and must be written in base 16.</li>
+      <li><em>Real numbers</em>: double precision floatting point numbers
+whose maximum is \f$\pm2^{1024}\f$ and minimum is \f$\pm2^{-1022}\f$, with 15
+digits precision.</li>
+     <li><em>Boolean</em>: true or false.</li>
+     <li><em>Strings</em>: any string of characters</li>
+  </ul>
+<li><em>Objects</em>: an <em>object</em> contains several <em>attributes</em>:
+they may be either <em>scalars</em> or other <em>objects</em> (therefore
+achieving a
+tree-like/recursive structure). As a consequence, in the library, we refer to
+a configuration entity (object or scalar) as a <em>configuration attribute</em>
+or simply as an <em>attribute</em> for short.</li>
+</ul>
+<p>
+
+\section sec_Concepts_Indexes Indexes
+<p>
+Both <em>objects</em> and <em>scalars</em> can have an optional index. It allows
+either to deal with several instances of the same \ref sec_Concepts_Class "class"
+having different roles, or simply to create arrays.
+Indexes are treated as strings, but there are also helper methods using
+integers. As a consequence, indexes can be numeric or litteral, it does not
+make much of a difference to handle them.</p>
+\verbatim
+A {
+   x[0] = 10
+   x[1] = 9
+   x[2] = 8
+}
+\endverbatim
+<p>
+<em>Attributes</em> without indexes are equivalent to <em>attributes</em> with
+an empty index.</p>
+\verbatim
+A {
+   x = 0
+}
+// is equivalent to
+A[] {
+   x = 0
+}
+\endverbatim
+
+\section sec_Concepts_Path Configuration Path
+<p>
+As you already know, <em>attributes</em> have a name, an index, and can be nested
+to create a tree structure. These characteristics lead us to define the
+notion of <em>path</em> to reference a precise <em>attribute</em> in a configuration
+tree.</p>
+<p>
+For example, in the following configuration, we have 3 objects:</p>
+- A
+- A.B[0]
+- A.B[1]
+<p>
+and 4 scalars:</p>
+- A.B[0].x[0]
+- A.B[0].x[1]
+- A.B[1].x[0]
+- A.B[1].x[1]
+
+\verbatim
+A {
+   B[0] {
+      x[0] = 10.2
+      x[1] = 5.7
+   }
+   B[1] {
+      x[0] = -1.0
+      x[1] = 2.5
+   }
+}
+\endverbatim
+<p>
+The API contains a Path class and many functions returning Paths or using them
+as parameter, so this is an important concept.</p>
+<p>
+Paths can also be considered relative or absolute, and can also describe a whole
+\ref sec_Concepts_Class "class" of attributes.</p>
+<p>
+For example A[*].B[*].x[*] describes the set of all x attributes belonging to
+any B object in any A object.
+These class paths can also be abridged into a short form, without star indexes,
+for example: A.B.x.</p>
+
+
+
+\section sec_Concepts_Default Default objects
+<p>
+You may have noticed in the introduction example that some indexes uses the
+star(*) symbol.
+These indexes expresses one of the main feature of our configuration system:
+the notion of <em>default object</em>.
+</p>
+<p>
+A <em>default object</em> is an object whose <em>attributes</em> are inherited
+by other objects of the same \ref sec_Concepts_Class "class".
+</p>
+Example:
+\verbatim
+MyConfig {
+   A[*] {
+      x = 5 m
+      t = 1.5 s
+      B {
+         name = foo
+         address = 0xABC
+      }
+   }
+   A {
+   }
+   A[FOO] {
+   }
+}
+\endverbatim
+is equivalent to:
+\verbatim
+MyConfig {
+   A {
+      x = 5 m
+      t = 1.5 s
+      B {
+         name = foo
+         address = 0xABC
+      }
+   }
+   A[FOO] {
+      x = 5 m
+      t = 1.5 s
+      B {
+         name = foo
+         address = 0xABC
+      }
+   }
+}
+\endverbatim
+\section sec_Concepts_Instances Instances
+<p>
+There is a fundamental difference between default objects, indexed by star and
+other objects.
+The first are virtual, whereas the others are concrete <em>instances</em>.
+A default object transmit its values to <em>instances</em> but it never
+substitues to a missing instance.</p>
+<p>
+For example, if a program looks for MyConfig.A[FOO].x, it's ok because at
+each level, there is an instance:
+</p>
+- MyConfig is an instance;
+- A[FOO] is an instance in MyConfig;
+- and x is an instance in A[*].
+<p>
+But if a program looks for MyConfig.A[0].x, it won't find it because A[0]
+is not declared and A[*] cannot take its place.</p>
+<p>
+Of course, if a default object is explicitly required (eg: MyConfig.A[*].x),
+the fact that it is not an instance will be overlooked.</p>
+
+\section sec_Concepts_Overriding Overriding
+<p>
+Default objects provide other objects with default values, but what is
+interesting about this feature is that one can override some <em>attributes</em>
+or all of them to describe the specificities of a particular instance.</p>
+Example:
+\verbatim
+MyConfig {
+   A[*] {
+      x = 5 m
+      t = 1.5 s
+   }
+   A[0] {
+      x = 10 m
+   }
+   A[1] {
+      t = 2 s
+   }
+}
+\endverbatim
+
+<p>
+Even if they do not carry any information in them, <em>objects</em> can also
+be overriden.
+In fact, overriding an object is necessary in order to override the content of
+an inherited object.</p>
+\verbatim
+MyConfig {
+   A[*] {
+      x = 5 m
+      t = 1.5 s
+      B {
+         name = unnamed
+         address = 0xABC
+      }
+   }
+   A[FOO] {
+      B {
+         name = hello
+      }
+   }
+}
+\endverbatim
+
+\section sec_Concepts_Inheritance Inheritance Rules
+<h4>The fundamental rule of inheritance is:</h4>
+<p>
+For each object O having a sibling default object (ie: an object with the same name 
+but a star index in the same parent), all the content of the default object is
+inherited by O.
+This inherited tree is merged with the subtree of O. Any scalar in the
+subtree of O that exists in the inherited subtree overrides the inherited one.</p>
+<p>
+Here is an example of a configuration where the object MyConfig.A[0] has a default
+object MyConfig.A[*].</p>
+\verbatim
+MyConfig {
+   A[*] {
+      x = 0
+      y = 0
+      B {
+         t = 0
+      }
+   }
+   A[0] {
+      x = -10
+      B {
+         w = 50
+      }
+   }
+}
+\endverbatim
+<p>
+The subtree of A[0] is merged with the subtree of A[*], giving priority to the
+scalars of A[0]. Here is the equivalent configuration without the default object
+feature.</p>
+\verbatim
+MyConfig {
+   A[0] {
+      x = -10
+      y = 0
+      B {
+         t = 0
+         w = 50
+      }
+   }
+}
+\endverbatim
+
+<h4>There are also additionnal rules that clarify some implications</h4>
+<h5>Extension is not limited to overriding</h5>
+<p>
+If you define a default object, you do not have to declare all possible
+attributes of concrete instances. In other words, you are not limited to the
+attributes you declare in the default object: you can also create new ones.</p>
+\verbatim
+MyConfig {
+   A[*] {
+      x = 0
+      y = 0
+   }
+   A[0] {
+      z = 1
+   }
+}
+\endverbatim
+<p>
+As you can see, declaring a "z" scalar in A[0] that doesn't exist in A[*] is
+perfectly valid.</p>
+
+
+<h5>Default objects can be declared in any order</h5>
+<p>
+All the examples of this documentation put the default object at the beginning
+the parent's block, but it is just a matter of convention. It can be declared
+anywhere, even at the end of the block, after all instances !</p>
+\verbatim
+MyConfig {
+   A[0] {
+      z = 1
+   }
+   A[*] {
+      x = 0
+      y = 0
+   }
+}
+\endverbatim
+
+
+<h5>Inheritance & sequential order</h5>
+<p>
+When inheriting from default objects, you may wonder in which order will the
+attributes appears if you ask the API to enumerate them ?
+A simplified answer is to say that attributes are enumerated in the order
+they appear in the file. And if they appears more than once (overrides), their
+original order prevails.
+In fact it is only true if you declare your instances before their default
+object, but it should be a pretty common convention.</p>
+
+
+<h5>Nothing prevents default objects to be nested</h5>
+<p>
+It leads to the concept of distance between an object and its default object.
+There can be a global default object, and several local default objects according
+to the context. Local default objects just add some overrides in the context
+of their parent object, and then can be instanciated many times, with few or no
+alterations.</p>
+\verbatim
+MyConfig {
+   A[*] {
+      B[*] {
+         x = 0
+         y = 0
+      }
+      B[1] {
+         y = 1
+      }
+      B[2] {
+         y = 2
+      }
+   }
+   A[0] {
+
+   }
+
+   A[1] {
+      B[0] {
+         x = 50
+      }
+   }
+}
+\endverbatim
+<p>
+In the previous example, we define a global default object for the class
+MyConfig.A.B, having 2 attributes: x and y, initialized to 0 by default.
+We also define that the class MyConfig.A has 2 objects: B[1] and B[2]. They
+override the attribute y. One level upper, we define the object MyConfig: it
+contains 2 objects: A[0] and A[1]. A[0] just uses the default definition, while
+A[1] changes the value of x in B[0].</p>
+
+<h5>Nested default objects are inherited</h5>
+<p>
+When an object O inherits a subtree, it also inherits from the default objects it
+contains. It means that if this default object will also apply to the objects of
+the same class in O.
+\verbatim
+MyConfig {
+   A[*] {
+      B[*] {
+         x = 0
+         y = 0
+      }
+   }
+   A[0] {
+      B[0] {
+         x = 10
+      }
+   }
+}
+\endverbatim
+<p>
+In this example A[0] inherits the B[*] subtree from A[*], as a consequence B[0]
+get the "y" value from B[*].</p>
+
+
+<h5>Local default values only applies to local instances, but not on more global instances</h5>
+<p>Here is a counter-example:</p>
+\verbatim
+MyConfig {
+   A[*] {
+      B[*] {
+         x = 0
+         y = 0
+      }
+      B[1] {
+         y = 1
+      }
+      B[2] {
+         y = 2
+      }
+   }
+
+   A[0] {
+      B[*] {
+         x = 100
+      }
+   }
+}
+\endverbatim
+<p>
+In this configuration, the user intented to override the x value for
+the inherited MyConfig.A[0].B[1].x and MyConfig.A[0].B[2].x.
+<strong>Unfortunately it does not work</strong>. Indeed,
+the fundamental rule states that each object can get default values from a sibling
+having the star index. But MyConfig.A[0].B[*] does not have any sibling, so
+its values do not propagate directly to any object.</p>
+<p>
+To implement the intented purpose, you have to declare empty instances of B[0]
+and B[1] like this:</p>
+\verbatim
+MyConfig {
+   A[*] {
+      B[*] {
+         x = 0
+         y = 0
+      }
+      B[1] {
+         y = 1
+      }
+      B[2] {
+         y = 2
+      }
+   }
+
+   A[0] {
+      B[*] {
+         x = 100
+      }
+      B[1] {}
+      B[2] {}
+   }
+}
+\endverbatim
+<p>
+This rule, that may appear as a limitation, was decided for a few reasons:
+<ul>
+	<li>it was logical with respect to the original idea that was to propagate
+		values to siblings (in this case, there is no siblings).</li>
+	<li>it was a consequence of requiring instances to exist (see \ref sec_Concepts_Instances "instances").
+		For example when searching for MyConfig.A[0].B[1].x it would not be
+		logical to consider MyConfig.A[0].B[*].x as a valid value, before finding
+		MyConfig.A[*].B[1].x, because it would mean we authorize default objects
+		to substitute missing instances.
+		But if we ignore this default scalar and find the instance MyConfig.A[*].B[1].x,
+		the default object is no longer accessible.</li>
+	<li>technically, it would have made the algorithm to find default values
+		much more complex, to ensure instance existance at the same time.</li>
+</ul>
+
+
+
+\section sec_Concepts_Class The notion of "class"
+<p>
+Indexes allow to define many configuration attributes with the same name, but
+different indexes and sharing the same default values. Consequently these
+attributes are related and should describe different instances of the same
+concept. Therefore, we can define a "class" that encompass all configuration
+attributes that differs only by the indexes of their path.</p>
+<p>
+We can define a "class path", which is basically like the standard attribute
+path except that indexes are not mentionned. For example the class path of
+MyConfig.A[*].B[1].y is MyConfig.A.B.y</p>
+
+
+
+\section sec_Concepts_ClassInfo Class informations
+<p>
+Some informations are inherently global to a class of attributes:</p>
+<ul>
+	<li>the range of autorized values for the class</li>
+	<li>the physical unit of the values (if applicable)</li>
+</ul>
+<p>
+Our configuration framework implements a mechanism that enable all instances of
+the same class to automatically share these informations. So if you define, for
+example, the range of an attribute, all the attributes of its class are affected
+by this change and can access this range.</p>
+
+
+
+\subsection subsec_Concepts_ClassInfo_Units Physical unit
+<p>
+It is possible to assign a physical unit to an attribute, and all the other
+instances will use this unit. Nevertheless setting the unit has no impact on the
+way our framework handle the attributes. Its exact role and interpretation is
+purely user defined.</p>
+\verbatim
+MyConfig {
+   computer[*] {
+      cpuFreq = 0 GHz
+   }
+   computer[0] {
+      cpuFreq = 2.4
+   }
+   computer[1] {
+      cpuFreq = 1.8
+   }
+}
+\endverbatim
+<p>
+In the above example, we set the unit of the class MyConfig.computer.cpuFreq in
+the default object, and then we declare 2 instances. It is not necessary to
+redeclare the unit in these instances. Setting it in just one place is enough.
+It does not need to be defined in the default object either, any place will do,
+as long as it is the same class.</p>
+\verbatim
+MyConfig {
+   computer[0] {
+      cpuFreq = 2.0
+   }
+   computer[1] {
+      cpuFreq = 2.4
+   }
+   computer[2] {
+      cpuFreq = 1.8 GHz // yes, the unit will also be transmitted to previous instances
+   }
+}
+\endverbatim
+
+\subsection subsec_Concepts_ClassInfo_Ranges Ranges
+<p>
+Our framework enables the user the put a range constraint on all values of the
+same class. Nevertheless, the enforcement of the range is left to the user. We
+do not report any error if the value if out of range.</p>
+There are 2 types of ranges:
+<ul>
+	<li>intervals</li>
+	<li>enumerations</li>
+</ul>
+<p>
+Intervals are characterized by an upper and a lower bound, the bounds can be 
+inclusive or exclusive. Intervals are implemented for any type, although the
+interest is questionnable for strings and booleans. Anyway we can define a
+lexicographic interval for strings, or create a pretty useless boolean interval.</p>
+Here are a few example of the syntax
+\verbatim
+[0, 10] // integer, 0 to 10, included
+[0, 2.5] // invalid: 0 is integer, 2.5 is real
+[0.0, 2.5] // valid 
+[0.0, 1.0[ // real, 0 inclusive to 1 exclusive
+[0x0, 0xFFFF]
+["a", "b"[ // all strings beginning by "a", the quotes are optional if there is not ambiguity with other types
+\endverbatim
+Here is a configuration example:
+\verbatim
+MyConfig {
+   computer[0] {
+      cpuFreq = 2400 MHz [33, 4000]
+   }
+   computer[1] {
+      cpuFreq = 1800
+   }
+}
+\endverbatim
+
+
+*/

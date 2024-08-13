@@ -1,0 +1,37 @@
+START: (SmRunControl)
+INIT: (SmRunControl)/(SmRunControl)
+TRANS: [#__INIT__#:(__OFF__)->(Off)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Off)]}
+EXEC: {[*]:[onEntr(Off)]}
+EXEC: {}
+Turned off
+STEP BEGIN: EvTurnOn on (SmRunControl)
+TRANS: [#EvTurnOn#:(Off)->(On)]
+EXEC: {[*]:[onExit(Off)]}
+EXEC: {[*]:[#EvTurnOn#:(Off)->(On)]}
+EXEC: {[*]:[onEntr(On)]}
+EXEC: {}
+Turned on
+INIT: (SmRunControl)/(SmOn)
+TRANS: [#__INIT__#:(__OFF__)->(Idle)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Idle)]}
+EXEC: {[*]:[onEntr(Idle)]}
+EXEC: {}
+Idling
+STEP END: EvTurnOn result: 0
+STEP BEGIN: EvStart on (SmRunControl)
+TRANS: [#EvStart#:(Idle)->(Active)]
+EXEC: {[*]:[onExit(Idle)]}
+EXEC: {[*]:[#EvStart#:(Idle)->(Active)]}
+EXEC: {[*]:[onEntr(Active)]}
+EXEC: {}
+Activated
+INIT: (SmRunControl)/(SmActive)
+TRANS: [#__INIT__#:(__OFF__)->(Running)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Running)]}
+EXEC: {[*]:[onEntr(Running)]}
+EXEC: {}
+Critical failure. Leaving...

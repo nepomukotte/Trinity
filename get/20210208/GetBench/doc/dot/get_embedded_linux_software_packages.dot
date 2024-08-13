@@ -1,0 +1,20 @@
+digraph {
+node [shape=box, style=rounded];
+subgraph clusterMain {
+"CompoundConfig" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/CompoundConfig-ppc440/"];
+"IceEirfu" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/IceE-ppc440/"];
+"MDaq" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/MDaq-ppc440/"];
+"MutantAlignmentServer" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/MutantAlignmentServer-ppc440/"];
+"MutantHwServer" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/MutantHwServer-ppc440/"];
+"TinyXml" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/TinyXml-ppc440/"];
+"Utilities" [href="http://dappce159.extra.cea.fr:8480/jenkins/job/Utilities-ppc440/"];
+color=invis;}
+subgraph clusterStandalone {
+color=invis;}
+"TinyXml" -> "CompoundConfig" [ color=black  ] ;
+"CompoundConfig" -> "MDaq" [ color=black  ] ;
+"IceEirfu" -> "MDaq" [ color=black  ] ;
+"Utilities" -> "MDaq" [ color=black  ] ;
+"MDaq" -> "MutantAlignmentServer" [ color=black  ] ;
+"MDaq" -> "MutantHwServer" [ color=black  ] ;
+}

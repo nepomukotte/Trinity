@@ -1,0 +1,105 @@
+/*
+ * $Id$
+ * @file IpAddress.cpp
+ * @created 11 mai 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors: Shebli Anvar, Patrick Sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of the Utilities package of the Mordicus Real-Time
+ * Software Development Framework.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#include "IpAddress.h"
+#include <sstream>
+
+namespace utl {
+namespace net {
+//__________________________________________________________________________________________________
+IpAddress & IpAddress::fromOctets(uint8_t field0, uint8_t field1, uint8_t field2, uint8_t field3)
+{
+	at(0) = field0;
+	at(1) = field1;
+	at(2) = field2;
+	at(3) = field3;
+	return *this;
+}
+//__________________________________________________________________________________________________
+/**
+ * Builds the address from a string in the standard IPv4 dotted decimal notation.
+ * The string can also consist of the dotted decimal IP address followed by a colon and a port number.
+ */
+IpAddress& IpAddress::fromString(const std::string & decimalString, const bool allowPort)
+{
+	std::string ipString = decimalString;
+	if (allowPort)
+	{
+		size_t colonPos = decimalString.find(':');
+		if (colonPos != std::string::npos)
+		{
+			ipString = decimalString.substr(0, colonPos);
+		}
+	}
+	if (ipString.size() > 0u)
+	{
+		address_ = inet_addr(const_cast<char*>(ipString.c_str()));
+	}
+	return *this;
+}
+//__________________________________________________________________________________________________
+std::string IpAddress::toString() const
+{
+	std::ostringstream oss;
+	oss << *this;
+	return oss.str();
+}
+//__________________________________________________________________________________________________
+/**
+ * Outputs the IP address on a stream in dot decimal notation.
+ * @param stream the stream where the address will be appended.
+ * @param address the address to write.
+ * @return Returns the altered stream.
+ */
+std::ostream& operator<<(std::ostream& stream, const ::utl::net::IpAddress& address)
+{
+	stream << std::dec <<
+			(int) address.at(0) << '.' <<
+			(int) address.at(1) << '.' <<
+			(int) address.at(2) << '.' <<
+			(int) address.at(3);
+	return stream;
+}
+//__________________________________________________________________________________________________
+/**
+ * @fn const in_addr_t& IpAddress::address() const
+ * @deprecated Kept for backward compatibility. Use const in_addr_t& IpAddress::in_addr() const instead.
+ */
+//__________________________________________________________________________________________________
+/**
+ * @fn in_addr_t& IpAddress::address()
+ * @deprecated Kept for backward compatibility. Use in_addr_t& IpAddress::in_addr() instead.
+ */
+//__________________________________________________________________________________________________
+} /* namespace net */
+} /* namespace utl */

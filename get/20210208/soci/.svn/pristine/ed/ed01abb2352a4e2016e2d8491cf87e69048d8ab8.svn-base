@@ -1,0 +1,699 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"  http-equiv="content-type" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>SOCI - exchanging data</title>
+</head>
+
+<body>
+<p class="banner">SOCI - The C++ Database Access Library</p>
+
+<h2>Exchanging data</h2>
+
+<div class="navigation">
+<a href="#bind_local">Binding local data</a><br />
+<div class="navigation-indented">
+  <a href="#bind_output">Binding output data</a><br />
+  <a href="#bind_input">Binding input data</a><br />
+  <a href="#bind_position">Binding by position</a><br />
+  <a href="#bind_name">Binding by name</a><br />
+</div>
+<a href="exchange.html#indicators">Indicators</a><br />
+<a href="#types">Types</a><br />
+<div class="navigation-indented">
+  <a href="#static">Static binding</a><br />
+  <a href="#static_bulk">Static binding for bulk operations</a><br />
+  <a href="#dynamic">Dynamic resultset binding</a><br />
+  <a href="#custom_types">Extending with user-provided datatypes</a><br />
+  <a href="#object_relational">Object-relational mapping</a><br />
+</div>
+<a href="#blob">Large objects (BLOBs)</a><br />
+</div>
+
+<h3 id="bind_local">Binding local data</h3>
+
+<div class="note">
+<p><span class="note">Note:</span>
+The Oracle documentation uses two terms: <i>defining</i> (for
+instructing the library where the <i>output</i> data should go) and <i>binding</i>
+(for the <i>input</i> data and <i>input/output</i> PL/SQL
+parameters). For the sake of simplicity, SOCI uses the term <i>binding</i>
+for both of these.</p>
+</div>
+
+<h4 id="bind_output">Binding output data</h4>
+
+<p>The <code>into</code> expression is used to add binding information to
+the statement:</p>
+
+<pre class="example">
+int count;
+sql &lt;&lt; "select count(*) from person", into(count);
+
+string name;
+sql &lt;&lt; "select name from person where id = 7", into(name);
+</pre>
+
+<p>In the above examples, some data is retrieved from the database and
+transmitted <i>into</i> the given local variable.</p>
+
+<p>There should be as many <code>into</code> elements as there are
+expected columns in the result (see <a href="#dynamic">dynamic
+resultset binding</a> for the exception to this rule).</p>
+
+<h4 id="bind_input">Binding input data</h4>
+
+<p>The <code>use</code> expression is used (no pun intended) to
+associate the SQL placeholder (written with colon) with the local data:</p>
+
+<pre class="example">
+int val = 7;
+sql &lt;&lt; "insert into numbers(val) values(:val)", use(val);
+</pre>
+
+<p>In the above statement, the first "val" is a column name (assuming
+that
+there is appropriate table <code>numbers</code> with this column), the
+second "val" (with colon) is a
+placeholder and its name is ignored here, and the third "val" is a name
+of local variable.</p>
+
+<p>To better understand the meaning of each "val" above, consider also:</p>
+
+<pre class="example">
+int number = 7;
+sql &lt;&lt; "insert into numbers(val) values(:blabla)", use(number);
+</pre>
+
+<p>Both examples above will insert the value of some local variable into
+the table <code>numbers</code> - we say that the local variable is <i>used</i> in the SQL statement.</p>
+
+<p>There should be as many <code>use</code> elements as there are
+parameters used in the SQL query.</p>
+
+<div class="note">
+<p><span class="note">Portability note:</span></p>
+<p>Older versions of the PostgreSQL client API do not allow to use input
+parameters at all. In order to compile SOCI with those old client
+libraries, define the <code>SOCI_PGSQL_NOPARAMS</code> preprocessor
+name.</p>
+</div>
+
+<h4 id="bind_position">Binding by position</h4>
+
+<p>If there is more output or input "holes" in the single statement, it
+is possible to use many <code>into</code> and <code>use</code>
+expressions, separated by commas, where each expression will be
+responsible for the consecutive "hole" in the statement:</p>
+
+<pre class="example">
+string firstName = "John", lastName = "Smith";
+int personId = 7;
+
+sql &lt;&lt; "insert into person(id, firstname, lastname) values(:id, :fn, :ln)",
+    use(personId), use(firstName), use(lastName);
+
+sql &lt;&lt; "select firstname, lastname from person where id = :id",
+    into(firstName), into(lastName), use(personId);
+</pre>
+
+<p>In the code above, the order of "holes" in the SQL statement and the
+order of <code>into</code> and <code>use</code> expression should
+match.</p>
+
+<h4 id="bind_name">Binding by name</h4>
+
+<p>The SQL placeholders that have their names (with colon) can be bound
+by name.
+This allows to use different order:</p>
+
+<pre class="example">
+string firstName = "John", lastName = "Smith";
+int personId = 7;
+sql &lt;&lt; "insert into person(id, firstname, lastname) values(:id, :fn, :ln)",
+    use(firstName, "fn"), use(lastName, "ln"), use(personId, "id");
+</pre>
+
+<p>or bind the same local data to many "holes" at the same time:</p>
+
+<pre class="example">
+string addr = "...";
+sql &lt;&lt; "update person"
+       " set mainaddress = :addr, contactaddress = :addr"
+       " where id = 7",
+       use(addr, "addr);
+</pre>
+
+<div class="note">
+<p><span class="note">Portability notes:</span></p>
+<p>The PostgreSQL backend allows to use the "native" PostgreSQL way of
+naming parameters in the query, which is by numbers like <code>$1</code>,
+<code>$2</code>, <code>$3</code>, etc. In fact, the backend <i>rewrites</i>
+the given query to the native form. For portability reasons, it is
+recommended to use named parameters, as shown in the examples above.<br />
+The query rewriting can be switched off by compiling the backend with
+the <code>SOCI_PGSQL_NOBINDBYNAME</code> name defined. Note that in this case
+it is also necessary to define <code>SOCI_PGSQL_NOPREPARE</code>, because
+statement preparation relies on successful query rewriting.
+In practice, both macros will be needed for PostgreSQL server older than 8.0.</p>
+</div>
+
+<h3 id="indicators">Indicators</h3>
+
+<p>In order to support null values and other conditions which are not
+real errors, the concept of <i>indicator</i> is provided.</p>
+
+<p>For example, when the following SQL query is executed:</p>
+<pre class="example">
+select name from person where id = 7
+</pre>
+
+<p>there are three possible outcomes:</p>
+<ol>
+  <li>there is a person with id = 7 and his name is returned</li>
+  <li>there is a person with id = 7, but he has no name (his name is
+null)</li>
+  <li>there is no such person</li>
+</ol>
+
+<p>Whereas the first alternative is easy, the other two are more
+complex. Moreover, they are not necessarily errors from the
+application's point of view and what's more interesting, they are <i>different</i>
+and the application may wish to detect which is the case.<br />
+The following example does this:</p>
+
+<pre class="example">
+string name;
+eIndicator ind;
+
+sql &lt;&lt; "select name from person where id = 7", into(name, ind);
+
+switch (ind)
+{
+case eOK:
+    // the data was returned without problems
+    break;
+case eNoData:
+    // no such person
+    break;
+case eNull:
+    // there is a person, but he has no name (his name is null)
+    break;
+case eTruncated:
+    // the name was returned only in part,
+    // because the provided buffer was too short
+    // (not possible with std::string, but possible with char* and char[])
+    break;
+}
+</pre>
+
+<p>The use of indicator variable is optional, but if it is not used and
+the result would be either <code>eNoData</code> or <code>eNull</code>,
+then the exception is thrown. This means that you should use indicator
+variables everywhere where the application logic (and database schema)
+allow "no such object" or "attribute not set" conditions.</p>
+
+<p>Indicator variables can be also used when binding input data, to
+control whether the data is to be used as provided, or explicitly
+overrided to be null:</p>
+
+<pre class="example">
+int id = 7;
+string name;
+eIndicator ind = eNull;
+sql &lt;&lt; "insert into person(id, name) values(:id, :name)",
+    use(id), use(name, ind);
+</pre>
+
+<p>In the above example, the row is inserted with <code>name</code>
+attribute set to null.</p>
+
+<p>Indicator variables can also be used in conjunction with vector
+based insert, update, and select statements:</p>
+
+<pre class="example">
+vector&lt;string&gt; names(100);
+vector&lt;eIndicator&gt; inds;
+sql &lt;&lt; "select name from person where id = 7", into(names, inds);
+</pre>
+
+<p>The above example retrieves first 100 rows of data (or less). The
+initial size of <code>names</code> vector provides the (maximum)
+number of rows that should be read. Both vectors will be
+automatically resized according to the number of rows that were
+actually read.</p>
+
+<p>The following example inserts null for each value of name:</p>
+
+<pre class="example">
+vector&lt;int&gt; ids;
+vector&lt;string&gt; names;
+vector&lt;eIndicator&gt; nameIndicators;
+
+for (int i = 0; i != 10; ++i)
+{
+    ids.push_back(i);
+    names.push_back("");
+    nameIndicators.push_back(eNull);
+}
+
+sql &lt;&lt; "insert into person(id, name) values(:id, :name)",
+    use(ids), use(name, nameIndicators);
+</pre>
+
+<h3 id="types">Types</h3>
+
+<h4 id="static">Static type binding</h4>
+
+<p>The static binding for types is most useful when the types used in
+the database are known at compile time - this was already presented
+above with the help of <code>into</code> and <code>use</code>
+functions.</p>
+
+<p>The following types are currently supported for use with <code>into</code>
+and <code>use</code> expressions:</p>
+<ul>
+  <li><code>char</code> (for character values)</li>
+  <li><code>short</code>, <code>int</code>, <code>unsigned
+long</code>, <code>double</code> (for numeric values)</li>
+  <li><code>char*</code>, <code>char[]</code>, <code>std::string</code>
+(for string values)</li>
+  <li><code>std::tm</code><code></code> (for datetime
+values)</li>
+  <li><code>SOCI::Statement</code> (for nested statements and PL/SQL
+cursors)</li>
+  <li><code>SOCI::BLOB</code> (for Binary Large OBjects)</li>
+  <li><code>SOCI::RowID</code> (for row identifiers)</li>
+</ul>
+
+<p>See the test code that accompanies the library to see how each of
+these types is used.</p>
+
+<h4 id="static_bulk">Static type binding for bulk operations</h4>
+
+<p>Bulk inserts, updates, and selects are supported through the
+following <code>std::vector</code> based into and use types:
+</p>
+<ul>
+  <li><code>std::vector&lt;char&gt;</code></li>
+  <li><code>std::vector&lt;short&gt;</code></li>
+  <li><code>std::vector&lt;int&gt;</code></li>
+  <li><code>std::vector&lt;unsigned long&gt;</code></li>
+  <li><code>std::vector&lt;double&gt;</code></li>
+  <li><code>std::vector&lt;std::string&gt;</code></li>
+  <li><code>std::vector&lt;std::tm&gt;</code></li>
+</ul>
+
+<p>Use of the vector based types mirrors that of the standard types, with
+the size of the vector used to specify the number of records to process
+at a time. See below for examples.</p>
+
+<h4 id="dynamic">Dynamic resultset binding</h4>
+
+<p>For certain applications it is desirable to be able to select data from
+arbitrarily
+structured tables (e.g. via "<code>select * </code>") and format the
+resulting data based upon its type.
+SOCI supports this through the <code>SOCI::Row</code> and <code>SOCI::ColumnProperties</code>
+classes.</p>
+
+<p>Data is selected into a <code>Row</code> object, which holds <code>ColumnProperties</code>
+objects describing
+the type of data contained in each column. Once the data type for each
+column is known, the data can be formatted appropriately.</p>
+
+<p>For example, the code below creates an XML document from a selected row
+of data from an arbitrary table:</p>
+
+<pre class="example">
+Session sql("oracle", "service=db1", "user=scott", "password=tiger");
+
+sql &lt;&lt; "create table ex(num NUMBER, str VARCHAR2(20), dt DATE)";
+
+int num = 123;
+std::string str("my name");
+std::time_t dt = time(0);
+
+sql &lt;&lt; "insert into ex values(:num, :str, :dt)",
+    use(num), use(str), use(dt);
+
+Row r;
+sql &lt;&lt; "select * from ex", into(r);
+
+std::ostringstream doc;
+doc &lt;&lt; "&lt;row&gt;" &lt;&lt; std::endl;
+for(int i=0; i&lt;r.size(); ++i)
+{
+    const ColumnProperties&amp; props = r.getProperties(i);
+    doc &lt;&lt; '&lt;' &lt;&lt; props.getName() &lt;&lt; '&gt;';
+    switch(props.getDataType())
+    {
+    case eString:
+        doc &lt;&lt; r.get&lt;std::string&gt;(i);
+        break;
+    case eDouble:
+        doc &lt;&lt; r.get&lt;double&gt;(i);
+        break;
+    case eInteger:
+        doc &lt;&lt; r.get&lt;int&gt;(i);
+        break;
+    case eUnsignedLong:
+        doc &lt;&lt; r.get&lt;unsigned long&gt;(i);
+        break;
+    case eDate:
+        std::tm when = r.get&lt;std::tm&gt;(i);
+        doc &lt;&lt; asctime(&amp;when);
+        break;
+    }
+    doc &lt;&lt; "&lt;/" &lt;&lt; props.getName() &lt;&lt; '&gt;' &lt;&lt; std::endl;
+}
+doc &lt;&lt; "&lt;/row&gt;";
+</pre>
+
+<p>The type <code>T</code> parameter that should be passed to
+<code>Row::get&lt;T&gt;()</code> depends on the SOCI Data Type that
+is returned from    
+<code>ColumnProperties::getDataType()</code>.</p>
+<p><code>Row::get&lt;T&gt;()</code>
+throws an exception of type
+<code>std::bad_cast</code> if an incorrect type <code>T</code> is
+used.</p>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <tbody>
+    <tr>
+      <th>SOCI Data Type</th>
+      <th><code>Row::get&lt;T&gt;</code> specialization</th>
+    </tr>
+    <tr>
+      <td><code>eDouble</code></td>
+      <td><code>double</code></td>
+    </tr>
+    <tr>
+      <td><code>eInteger</code></td>
+      <td><code>int</code></td>
+    </tr>
+    <tr>
+      <td><code>eUnsignedLong</code></td>
+      <td><code>unsigned long</code></td>
+    </tr>
+    <tr>
+      <td><code>eString</code></td>
+      <td><code>std::string</code></td>
+    </tr>
+    <tr>
+      <td><code>eDate</code></td>
+      <td><code>std::tm</code><code></code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The mapping of underlying database column types to SOCI datatypes is database specific.
+See the <a href="backends/index.html">backend documentation</a> for details.</p>
+
+<p>It is also possible to extract data from the <code>Row</code> object using its stream-like
+interface:</p>
+
+<pre class="example">
+Row r;
+sql &lt;&lt; "select name, address, age from persons where id = 123", into(r);
+
+string name, address;
+int age;
+
+r >> name >> address >> age;
+</pre>
+
+<p>Note, however, that this interface is <i>not</i> compatible with the standard
+<code>std::istream</code> class and that it is only possible to extract a single row at a time
+- for "safety" reasons the row boundary is preserved and it is necessary to perform the
+<code>fetch</code> operation explicitly for each consecutive row
+(see <a href="statements.html">next page</a>).</p>
+
+<h4 id="custom_types">Extending SOCI to support custom (user-defined) C++ types</h4>
+
+<p>SOCI can be easily extended through user code so that custom types can
+be used transparently to insert into, update, and select from the
+database.</p>
+
+<p>To do so, provide an appropriate specialization of the <code>TypeConversion</code>
+struct that converts to and from one of the following SOCI Base Types:</p>
+
+<ul>
+  <li><code>double</code></li>
+  <li><code>int</code></li>
+  <li><code>unsigned long</code></li>
+  <li><code>std::string</code></li>
+  <li><code>char</code></li>
+  <li><code>std::tm</code></li>
+</ul>
+
+<p>There are three required class members for a valid <code>TypeConversion</code>
+specialization:</p>
+<ul>
+  <li>the <code>base_type</code> trait, defining the base type</li>
+  <li>the <code>from()</code> static member function, converting from
+the base type</li>
+  <li>the <code>to()</code> static member function, converting to the
+base type</li>
+</ul>
+
+<p>(Note that no database-specific code is required.)</p>
+
+<p>The following example shows how application code could extend SOCI to
+transparently support <code>boost::gregorian::date</code>:</p>
+
+<pre class="example">
+#include "boost/date_time/gregorian/gregorian.hpp"
+namespace SOCI
+{
+template&lt;&gt;
+struct TypeConversion&lt;boost::gregorian::date&gt;
+{
+    typedef std::tm base_type;
+    static boost::gregorian::date from(std::tm&amp; t)
+    {
+        boost::gregorian::months_of_year month = 
+            static_cast&lt;boost::gregorian::months_of_year&gt;(t.tm_mon + 1);
+
+        boost::gregorian::date d(t.tm_year + 1900, month, t.tm_mday);
+        return d;
+    }
+    static std::tm to(boost::gregorian::date&amp; d)
+    {
+        std::tm t;
+
+        t.tm_isdst = -1;
+        t.tm_year = d.year() - 1900;
+        t.tm_mon = d.month() - 1;
+        t.tm_mday = d.day();
+        t.tm_hour = 0;
+        t.tm_min = 0;
+        t.tm_sec = 0;
+        std::mktime(&amp;t); //normalize and compute remaining fields
+
+        return t;
+    }
+};
+}
+</pre>
+
+<p>With the above <code>TypeConversion</code> specialization in place, it
+is possible to
+use <code>boost::gregorian::date</code> directly with SOCI, binding
+input or output, either statically or via a dynamic resultset:</p>
+
+<pre class="example">
+using boost::gregorian::date;
+
+Session sql("oracle", "service=db1", "user=scott", "password=tiger");
+
+sql &lt;&lt; "create table test_boost(when DATE)";
+date dIn(1999, boost::gregorian::Feb, 1);
+sql &lt;&lt; "insert into test_boost values(:when)", use(dIn);
+
+date dOut(boost::gregorian::not_a_date_time);
+sql &lt;&lt; "select when from test_boost", into(dOut);
+assert(dIn == dOut);
+
+Row r;
+sql &lt;&lt; "select * from test_boost", into(r);
+assert(r.get&lt;date&gt;(0) == dIn);
+
+std::vector&lt;date&gt; datesIn;
+for (int i = 2; i != 12; ++i)
+{
+    date d(1999, boost::gregorian::Feb, i);
+    datesIn.push_back(d);
+}
+sql &lt;&lt; "insert into test_boost values(:when)", use(datesIn);
+
+std::vector&lt;date&gt; datesOut(10);
+sql &lt;&lt; "select when from test_boost where when &gt; :d", use(dIn), into(datesOut);
+assert(datesIn == datesOut);
+</pre>
+
+<p>The other possibility to extend SOCI with custom data types is to use
+the <code>IntoType&lt;T&gt;</code> and <code>UseType&lt;T&gt;</code>
+class templates, which specializations can be user-provided. These
+specializations need to implement the interface defined by,
+respectively, the <code>IntoTypeBase</code> and <code>UseTypeBase</code>
+classes.</p>
+
+<p>Note that when specializing these template classes for handling your
+own types, you are free to choose the expected parameters for the
+classes' constructors. The template functions <code>into</code> and <code>use</code>
+support up to 5 parameters, which are just forwarded to the constructor
+of appropriate class. The only convention is that when the indicator
+variable is used (see below), it should appear in the second position.
+Please refer to the library source code to see how this is done for the
+standard types.</p>
+
+<h4 id="object_relational">Object-relational mapping</h4>
+
+<p>SOCI provides a class called <code>Values</code> specifically to
+enable object-relational mapping via <code>TypeConversion</code>
+specializations.</p>
+
+<p>For example, the following code maps a <code>Person</code> object to
+and from a
+database table containing columns <code>"ID"</code>, <code>"FIRST_NAME"</code>, <code>"LAST_NAME"</code>, and
+<code>"GENDER"</code>.</p>
+
+<p>Note that the mapping is non-invasive - the <code>Person </code>object
+itself doesn't contain any SOCI-specific code:</p>
+
+<pre class="example">
+struct Person
+{
+    int id;
+    std::string firstName;
+    std::string lastName;
+    std::string gender;
+};
+
+namespace SOCI
+{
+template&lt;&gt; struct TypeConversion&lt;Person&gt;
+{
+    typedef Values base_type;
+    static Person from(Values const &amp;v)
+    {
+        Person p;
+        p.id = v.get&lt;int&gt;("ID");
+        p.firstName = v.get&lt;std::string&gt;("FIRST_NAME");
+        p.lastName = v.get&lt;std::string&gt;("LAST_NAME");
+
+        // p.gender will be set to the default value "unknown"
+        // when the column is null:
+        p.gender = v.get&lt;std::string&gt;("GENDER", "unknown");
+
+        // alternatively, the indicator can be tested directly:
+        // if (v.indicator("GENDER") == eNull)
+        // {
+        //     p.gender = "unknown";
+        // }
+        // else
+        // {
+        //     p.gender = v.get&lt;std::string&gt;("GENDER");
+        // }
+
+        return p;
+    }
+    static Values to(Person &amp;p)
+    {
+        Values v;
+        v.set("ID", p.id);
+        v.set("FIRST_NAME", p.firstName);
+        v.set("LAST_NAME", p.lastName);
+        v.set("GENDER", p.gender, p.gender.empty() ? eNull : eOK);
+        return v;
+    }
+};
+}
+</pre>
+
+<p>With the above <code>TypeConversion</code> specialization in place, it
+is possible to use <code>Person</code> directly with SOCI:</p>
+
+<pre class="example">
+Session sql("oracle", "service=db1", "user=scott", "password=tiger");
+
+Person p;
+p.id = 1;
+p.lastName = "Smith";
+p.firstName = "Pat";
+sql &lt;&lt; "insert into person(id, first_name, last_name) "
+       "values(:ID, :FIRST_NAME, :LAST_NAME)", use(p);
+
+Person p1;
+sql &lt;&lt; "select * from person", into(p1);
+assert(p1.id == 1);
+assert(p1.firstName + p.lastName == "PatSmith");
+assert(p1.gender == "unknown");
+
+p.firstName = "Patricia";
+sql &lt;&lt; "update person set first_name = :FIRST_NAME "
+       "where id = :ID", use(p);
+</pre>
+
+<div class="note">
+<p><span class="note">Note:</span> The <code>Values</code>
+class is currently not suited for use outside of <code>TypeConversion</code>
+specializations.&nbsp; It is specially designed to facilitate
+object-relational mapping when used as shown above.</p>
+</div>
+
+<h3 id="blob">Large objects (BLOBs)</h3>
+
+<p>The SOCI library provides also an interface for basic operations on
+large objects (BLOBs - Binary Large OBjects).</p>
+
+<pre class="example">
+BLOB b(sql); // sql is a Session object
+sql &lt;&lt; "select mp3 from mymusic where id = 123", into(b);
+</pre>
+
+<p>The following functions are provided in the <code>BLOB</code>
+interface, mimicking the file-like operations:</p>
+<ul>
+  <li><code>std::size_t getLen();</code></li>
+  <li><code>std::size_t read(std::size_t offset, char *buf, std::size_t
+toRead);</code></li>
+  <li><code>std::size_t write(std::size_t offset, char const *buf,
+std::size_t toWrite);</code></li>
+  <li><code>std::size_t append(char const *buf, std::size_t toWrite);</code></li>
+  <li><code>void trim(std::size_t newLen);</code></li>
+</ul>
+
+<p>The <code>offset</code> parameter is always counted from the beginning
+of the BLOB's data.</p>
+
+<div class="note">
+<p><span class="note">Portability notes:</span></p>
+<ol>
+  <li>The way to define BLOB table columns and create or destroy BLOB
+objects in the database varies between different database engines.
+Please see the SQL documentation relevant for the given server to learn
+how this is actually done. The test programs provided with the SOCI
+library can be also a simple source of full working examples.</li>
+  <li>The <code>trim</code> function is not currently available for
+the PostgreSQL backend.</li>
+</ol>
+</div>
+
+<table class="foot-links" border="0" cellpadding="2" cellspacing="2">
+  <tr>
+    <td class="foot-link-left">
+      <a href="basics.html">Previous (Connections and simple queries)</a>
+    </td>
+    <td class="foot-link-right">
+      <a href="statements.html">Next (Statements, procedures and transactions)</a>
+    </td>
+  </tr>
+</table>
+
+<p class="copyright">Copyright &copy; 2004-2006 Maciej Sobczak, Stephen Hutton</p>
+</body>
+</html>

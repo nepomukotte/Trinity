@@ -1,0 +1,7 @@
+exec adcTest.ecc
+connect device asad
+writeReg ADC3 0xC3
+connect device ctrl
+write pipeCtrl bitSlipCalibrate 1
+sleep 1
+write pipeCtrl bitSlipCalibrate 0

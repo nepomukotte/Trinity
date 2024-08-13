@@ -1,0 +1,629 @@
+======== Chrono State Machine Test
+START: (SmChrono)
+INIT: (SmChrono)/(SmChrono)
+TRANS: [#__INIT__#:(__OFF__)->(idling)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(idling)]}
+EXEC: {[*]:[onEntr(idling)]}
+BCST: #toggle#
+
+>>>> BEGIN STEPPING 5
+---> Popped: toggle
+STEP BEGIN: toggle on (SmChrono)
+TRANS: [#toggle#:(idling)->(active)]
+EXEC: {[*]:[onExit(idling)]}
+EXEC: {[*]:[#toggle#:(idling)->(active)]}
+EXEC: {}
+start
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 0; miss = 0
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: toggle result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 1; miss = 0
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 2; miss = 0
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 3; miss = 0
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 4; miss = 0
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+>>>> END STEPPING 5
+BCST: #suspnd#
+
+>>>> BEGIN STEPPING 3
+---> Popped: suspnd
+STEP BEGIN: suspnd on (SmChrono)
+TRANS: [#suspnd#:(active)->(paused)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#suspnd#:(active)->(paused)]}
+EXEC: {[*]:[onEntr(paused)]}
+EXEC: {}
+LOG: count = 5; miss = 0
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: suspnd result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(paused)->(paused)]
+EXEC: {[*]:[onExit(paused)]}
+EXEC: {}
+incrMiss
+EXEC: {[*]:[#triggr#:(paused)->(paused)]}
+EXEC: {[*]:[onEntr(paused)]}
+EXEC: {}
+LOG: count = 5; miss = 1
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(paused)->(paused)]
+EXEC: {[*]:[onExit(paused)]}
+EXEC: {}
+incrMiss
+EXEC: {[*]:[#triggr#:(paused)->(paused)]}
+EXEC: {[*]:[onEntr(paused)]}
+EXEC: {}
+LOG: count = 5; miss = 2
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+>>>> END STEPPING 3
+BCST: #resume#
+
+>>>> BEGIN STEPPING 4
+---> Popped: resume
+STEP BEGIN: resume on (SmChrono)
+TRANS: [#resume#:(paused)->(active)]
+EXEC: {[*]:[onExit(paused)]}
+EXEC: {}
+incrMiss
+EXEC: {[*]:[#resume#:(paused)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 5; miss = 3
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: resume result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 6; miss = 3
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 7; miss = 3
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+STEP BEGIN: triggr on (SmChrono)
+TRANS: [#triggr#:(active)->(active)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#triggr#:(active)->(active)]}
+EXEC: {[*]:[onEntr(active)]}
+EXEC: {}
+LOG: count = 8; miss = 3
+EXEC: {}
+launch
+BCST: #triggr#
+STEP END: triggr result: 0
+---> Popped: triggr
+>>>> END STEPPING 4
+BCST: #suspnd#
+BCST: #toggle#
+BCST: #dsable#
+
+>>>> StepAll to the end
+---> Popped: dsable
+STEP BEGIN: dsable on (SmChrono)
+STEP END: dsable result: 1
+---> Popped: toggle
+STEP BEGIN: toggle on (SmChrono)
+TRANS: [#toggle#:(active)->(idling)]
+EXEC: {[*]:[onExit(active)]}
+EXEC: {}
+incrCount
+EXEC: {[*]:[#toggle#:(active)->(idling)]}
+EXEC: {}
+stop
+EXEC: {[*]:[onEntr(idling)]}
+STEP END: toggle result: 0
+---> Popped: suspnd
+STEP BEGIN: suspnd on (SmChrono)
+STEP END: suspnd result: 1
+RESET: (SmChrono)/(SmChrono)
+EXEC: {[*]:[onExit(idling)]}
+EXEC: {[*]:[onReset(SmChrono)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+======== Cruise Control State Machine Test
+START: (SM_ENGINE)
+INIT: (SM_ENGINE)/(SM_ENGINE)
+TRANS: [#__INIT__#:(__OFF__)->(ST_EN_OFF)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(ST_EN_OFF)]}
+EXEC: {}
+engine initiated
+EXEC: {[*]:[onEntr(ST_EN_OFF)]}
+EXEC: {}
+engine turned off
+>>>> start engine
+STEP BEGIN: EV_EN_START on (SM_ENGINE)
+TRANS: [#EV_EN_START#:(ST_EN_OFF)->(ST_EN_ON)]
+EXEC: {[*]:[onExit(ST_EN_OFF)]}
+EXEC: {[*]:[#EV_EN_START#:(ST_EN_OFF)->(ST_EN_ON)]}
+EXEC: {[*]:[onEntr(ST_EN_ON)]}
+EXEC: {}
+engine turned on
+INIT: (SM_ENGINE)/(SM_CCONTROL)
+TRANS: [#__INIT__#:(__OFF__)->(ST_CC_OFF)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(ST_CC_OFF)]}
+EXEC: {}
+cruise control initiated
+EXEC: {[*]:[onEntr(ST_CC_OFF)]}
+EXEC: {}
+cruise control turned off
+STEP END: EV_EN_START result: 0
+>>>> start cruise
+STEP BEGIN: EV_CC_START on (SM_ENGINE)
+TRANS: [#EV_CC_START#:(ST_CC_OFF)->(ST_CC_ON)]
+EXEC: {[*]:[onExit(ST_CC_OFF)]}
+EXEC: {[*]:[#EV_CC_START#:(ST_CC_OFF)->(ST_CC_ON)]}
+EXEC: {[*]:[onEntr(ST_CC_ON)]}
+EXEC: {}
+starting cruise control
+EXEC: {}
+cruise control turned on
+INIT: (SM_ENGINE)/(SM_CRUISE)
+TRANS: [#__INIT__#:(__OFF__)->(ST_CC_DISABLED)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(ST_CC_DISABLED)]}
+EXEC: {}
+new cruise initiated
+EXEC: {[*]:[onEntr(ST_CC_DISABLED)]}
+EXEC: {}
+cruise control disabled
+STEP END: EV_CC_START result: 0
+>>>> set speed
+STEP BEGIN: EV_SET_SPEED on (SM_ENGINE)
+TRANS: [#EV_SET_SPEED#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]
+EXEC: {[*]:[onExit(ST_CC_DISABLED)]}
+EXEC: {[*]:[#EV_SET_SPEED#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]}
+EXEC: {}
+setting speed at 70 km/h
+EXEC: {}
+speed set at 70 km/h
+building cruise data
+EXEC: {[*]:[onEntr(ST_CC_ENABLED)]}
+EXEC: {}
+cruise control enabled
+EXEC: {}
+speed locked at 70 km/h
+STEP END: EV_SET_SPEED result: 0
+>>>> accelerate
+STEP BEGIN: EV_ACCELERATE on (SM_ENGINE)
+TRANS: [#EV_ACCELERATE#:(ST_CC_ENABLED)->(ST_CC_DISABLED)]
+EXEC: {[*]:[onExit(ST_CC_ENABLED)]}
+destroying cruise data
+EXEC: {[*]:[#EV_ACCELERATE#:(ST_CC_ENABLED)->(ST_CC_DISABLED)]}
+EXEC: {[*]:[onEntr(ST_CC_DISABLED)]}
+EXEC: {}
+cruise control disabled
+STEP END: EV_ACCELERATE result: 0
+>>>> resume cruise
+STEP BEGIN: EV_RESUME_CC on (SM_ENGINE)
+TRANS: [#EV_RESUME_CC#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]
+EXEC: {[*]:[onExit(ST_CC_DISABLED)]}
+EXEC: {[*]:[#EV_RESUME_CC#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]}
+EXEC: {}
+resuming at speed 70 km/h
+building cruise data
+EXEC: {[*]:[onEntr(ST_CC_ENABLED)]}
+EXEC: {}
+cruise control enabled
+EXEC: {}
+speed locked at 70 km/h
+STEP END: EV_RESUME_CC result: 0
+>>>> brake
+STEP BEGIN: EV_BRAKE on (SM_ENGINE)
+TRANS: [#EV_BRAKE#:(ST_CC_ENABLED)->(ST_CC_DISABLED)]
+EXEC: {[*]:[onExit(ST_CC_ENABLED)]}
+destroying cruise data
+EXEC: {[*]:[#EV_BRAKE#:(ST_CC_ENABLED)->(ST_CC_DISABLED)]}
+EXEC: {[*]:[onEntr(ST_CC_DISABLED)]}
+EXEC: {}
+cruise control disabled
+STEP END: EV_BRAKE result: 0
+>>>> accelerate
+STEP BEGIN: EV_ACCELERATE on (SM_ENGINE)
+STEP END: EV_ACCELERATE result: 1
+>>>> resume cruise
+STEP BEGIN: EV_RESUME_CC on (SM_ENGINE)
+TRANS: [#EV_RESUME_CC#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]
+EXEC: {[*]:[onExit(ST_CC_DISABLED)]}
+EXEC: {[*]:[#EV_RESUME_CC#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]}
+EXEC: {}
+resuming at speed 70 km/h
+building cruise data
+EXEC: {[*]:[onEntr(ST_CC_ENABLED)]}
+EXEC: {}
+cruise control enabled
+EXEC: {}
+speed locked at 70 km/h
+STEP END: EV_RESUME_CC result: 0
+>>>> stop cruise
+STEP BEGIN: EV_CC_STOP on (SM_ENGINE)
+TRANS: [#EV_CC_STOP#:(ST_CC_ON)->(ST_CC_OFF)]
+RESET: (SM_ENGINE)/(SM_CRUISE)
+EXEC: {[*]:[onExit(ST_CC_ENABLED)]}
+destroying cruise data
+EXEC: {[*]:[onReset(SM_CRUISE)]}
+EXEC: {}
+active cruise reset!
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(ST_CC_ON)]}
+EXEC: {[*]:[#EV_CC_STOP#:(ST_CC_ON)->(ST_CC_OFF)]}
+EXEC: {[*]:[onEntr(ST_CC_OFF)]}
+EXEC: {}
+cruise control turned off
+STEP END: EV_CC_STOP result: 0
+>>>> resume cruise
+STEP BEGIN: EV_RESUME_CC on (SM_ENGINE)
+STEP END: EV_RESUME_CC result: 1
+>>>> brake
+STEP BEGIN: EV_BRAKE on (SM_ENGINE)
+STEP END: EV_BRAKE result: 1
+>>>> start cruise
+STEP BEGIN: EV_CC_START on (SM_ENGINE)
+TRANS: [#EV_CC_START#:(ST_CC_OFF)->(ST_CC_ON)]
+EXEC: {[*]:[onExit(ST_CC_OFF)]}
+EXEC: {[*]:[#EV_CC_START#:(ST_CC_OFF)->(ST_CC_ON)]}
+EXEC: {[*]:[onEntr(ST_CC_ON)]}
+EXEC: {}
+starting cruise control
+EXEC: {}
+cruise control turned on
+INIT: (SM_ENGINE)/(SM_CRUISE)
+TRANS: [#__INIT__#:(__OFF__)->(ST_CC_DISABLED)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(ST_CC_DISABLED)]}
+EXEC: {}
+Exception in state ST_CC_ON: std::exception
+HALT: (SM_ENGINE)/(SM_CCONTROL)
+RESET: (SM_ENGINE)/(SM_CRUISE)
+EXEC: {[*]:[onEntr(__ERR__)]}
+EXEC: {}
+cruise control ERROR
+RESET: (SM_ENGINE)/(SM_CCONTROL)
+EXEC: {[*]:[onExit(__ERR__)]}
+EXEC: {[*]:[onReset(SM_CCONTROL)]}
+EXEC: {}
+cruise control reset!
+EXEC: {[*]:[onEntr(__OFF__)]}
+INIT: (SM_ENGINE)/(SM_CCONTROL)
+TRANS: [#__INIT__#:(__OFF__)->(ST_CC_OFF)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(ST_CC_OFF)]}
+EXEC: {}
+cruise control initiated
+EXEC: {[*]:[onEntr(ST_CC_OFF)]}
+EXEC: {}
+cruise control turned off
+>>>> start cruise
+STEP BEGIN: EV_CC_START on (SM_ENGINE)
+TRANS: [#EV_CC_START#:(ST_CC_OFF)->(ST_CC_ON)]
+EXEC: {[*]:[onExit(ST_CC_OFF)]}
+EXEC: {[*]:[#EV_CC_START#:(ST_CC_OFF)->(ST_CC_ON)]}
+EXEC: {[*]:[onEntr(ST_CC_ON)]}
+EXEC: {}
+starting cruise control
+EXEC: {}
+cruise control turned on
+INIT: (SM_ENGINE)/(SM_CRUISE)
+TRANS: [#__INIT__#:(__OFF__)->(ST_CC_DISABLED)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(ST_CC_DISABLED)]}
+EXEC: {}
+new cruise initiated
+EXEC: {[*]:[onEntr(ST_CC_DISABLED)]}
+EXEC: {}
+cruise control disabled
+STEP END: EV_CC_START result: 0
+>>>> set speed
+STEP BEGIN: EV_SET_SPEED on (SM_ENGINE)
+TRANS: [#EV_SET_SPEED#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]
+EXEC: {[*]:[onExit(ST_CC_DISABLED)]}
+EXEC: {[*]:[#EV_SET_SPEED#:(ST_CC_DISABLED)->(ST_CC_ENABLED)]}
+EXEC: {}
+setting speed at 90 km/h
+EXEC: {}
+speed set at 90 km/h
+building cruise data
+EXEC: {[*]:[onEntr(ST_CC_ENABLED)]}
+EXEC: {}
+cruise control enabled
+EXEC: {}
+speed locked at 90 km/h
+STEP END: EV_SET_SPEED result: 0
+>>>> stop engine
+STEP BEGIN: EV_EN_STOP on (SM_ENGINE)
+TRANS: [#EV_EN_STOP#:(ST_EN_ON)->(ST_EN_OFF)]
+RESET: (SM_ENGINE)/(SM_CCONTROL)
+RESET: (SM_ENGINE)/(SM_CRUISE)
+EXEC: {[*]:[onExit(ST_CC_ENABLED)]}
+destroying cruise data
+EXEC: {[*]:[onReset(SM_CRUISE)]}
+EXEC: {}
+active cruise reset!
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(ST_CC_ON)]}
+EXEC: {[*]:[onReset(SM_CCONTROL)]}
+EXEC: {}
+cruise control reset!
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(ST_EN_ON)]}
+EXEC: {[*]:[#EV_EN_STOP#:(ST_EN_ON)->(ST_EN_OFF)]}
+EXEC: {[*]:[onEntr(ST_EN_OFF)]}
+EXEC: {}
+engine turned off
+STEP END: EV_EN_STOP result: 0
+>>>> Cruise control test finished
+RESET: (SM_ENGINE)/(SM_ENGINE)
+EXEC: {[*]:[onExit(ST_EN_OFF)]}
+EXEC: {[*]:[onReset(SM_ENGINE)]}
+EXEC: {}
+engine reset!
+EXEC: {[*]:[onEntr(__OFF__)]}
+======== Camera State Machine Test
+>>>> Initiating camera
+START: (SmCamera)
+INIT: (SmCamera)/(SmCamera)
+TRANS: [#__INIT__#:(__OFF__)->(NotShooting)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(NotShooting)]}
+entering NotShooting state
+EXEC: {[*]:[onEntr(NotShooting)]}
+INIT: (SmCamera)/(SmNotShooting)
+TRANS: [#__INIT__#:(__OFF__)->(Idle)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Idle)]}
+entering Idle state
+EXEC: {[*]:[onEntr(Idle)]}
+>>>> Pressed shutter half
+BCST: #EvShutterHalf#
+---> Popped: EvShutterHalf
+STEP BEGIN: EvShutterHalf on (SmCamera)
+TRANS: [#EvShutterHalf#:(NotShooting)->(Shooting)]
+RESET: (SmCamera)/(SmNotShooting)
+EXEC: {[*]:[onExit(Idle)]}
+leaving Idle state
+EXEC: {[*]:[onReset(SmNotShooting)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(NotShooting)]}
+leaving NotShooting state
+EXEC: {[*]:[#EvShutterHalf#:(NotShooting)->(Shooting)]}
+entering Shooting state
+EXEC: {[*]:[onEntr(Shooting)]}
+INIT: (SmCamera)/(SmShooting)
+TRANS: [#__INIT__#:(__OFF__)->(Focusing)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Focusing)]}
+entering Focusing state
+EXEC: {[*]:[onEntr(Focusing)]}
+EXEC: {}
+Focusing...
+BCST: #EvInFocus#
+STEP END: EvShutterHalf result: 0
+---> Popped: EvInFocus
+STEP BEGIN: EvInFocus on (SmCamera)
+TRANS: [#EvInFocus#:(Focusing)->(Focused)]
+EXEC: {[*]:[onExit(Focusing)]}
+leaving Focusing state
+EXEC: {[*]:[#EvInFocus#:(Focusing)->(Focused)]}
+EXEC: {}
+Displaying picture...
+entering Focused state
+EXEC: {[*]:[onEntr(Focused)]}
+STEP END: EvInFocus result: 0
+>>>> Released shutter
+BCST: #EvShutterReleased#
+---> Popped: EvShutterReleased
+STEP BEGIN: EvShutterReleased on (SmCamera)
+TRANS: [#EvShutterReleased#:(Shooting)->(NotShooting)]
+RESET: (SmCamera)/(SmShooting)
+EXEC: {[*]:[onExit(Focused)]}
+leaving Focused state
+EXEC: {[*]:[onReset(SmShooting)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(Shooting)]}
+leaving Shooting state
+EXEC: {[*]:[#EvShutterReleased#:(Shooting)->(NotShooting)]}
+entering NotShooting state
+EXEC: {[*]:[onEntr(NotShooting)]}
+INIT: (SmCamera)/(SmNotShooting)
+TRANS: [#__INIT__#:(__OFF__)->(Idle)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Idle)]}
+entering Idle state
+EXEC: {[*]:[onEntr(Idle)]}
+STEP END: EvShutterReleased result: 0
+>>>> Pressed configure button
+BCST: #EvConfig#
+---> Popped: EvConfig
+STEP BEGIN: EvConfig on (SmCamera)
+TRANS: [#EvConfig#:(Idle)->(Configuring)]
+EXEC: {[*]:[onExit(Idle)]}
+leaving Idle state
+EXEC: {[*]:[#EvConfig#:(Idle)->(Configuring)]}
+entering Configuring state
+EXEC: {[*]:[onEntr(Configuring)]}
+STEP END: EvConfig result: 0
+>>>> Pressed shutter half
+BCST: #EvShutterHalf#
+---> Popped: EvShutterHalf
+STEP BEGIN: EvShutterHalf on (SmCamera)
+TRANS: [#EvShutterHalf#:(NotShooting)->(Shooting)]
+RESET: (SmCamera)/(SmNotShooting)
+EXEC: {[*]:[onExit(Configuring)]}
+leaving Configuring state
+EXEC: {[*]:[onReset(SmNotShooting)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(NotShooting)]}
+leaving NotShooting state
+EXEC: {[*]:[#EvShutterHalf#:(NotShooting)->(Shooting)]}
+entering Shooting state
+EXEC: {[*]:[onEntr(Shooting)]}
+INIT: (SmCamera)/(SmShooting)
+TRANS: [#__INIT__#:(__OFF__)->(Focusing)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Focusing)]}
+entering Focusing state
+EXEC: {[*]:[onEntr(Focusing)]}
+EXEC: {}
+Focusing...
+BCST: #EvInFocus#
+STEP END: EvShutterHalf result: 0
+---> Popped: EvInFocus
+STEP BEGIN: EvInFocus on (SmCamera)
+TRANS: [#EvInFocus#:(Focusing)->(Focused)]
+EXEC: {[*]:[onExit(Focusing)]}
+leaving Focusing state
+EXEC: {[*]:[#EvInFocus#:(Focusing)->(Focused)]}
+EXEC: {}
+Displaying picture...
+entering Focused state
+EXEC: {[*]:[onEntr(Focused)]}
+STEP END: EvInFocus result: 0
+>>>> Pressed configure button
+BCST: #EvConfig#
+---> Popped: EvConfig
+STEP BEGIN: EvConfig on (SmCamera)
+STEP END: EvConfig result: 1
+>>>> Pressed shutter half
+BCST: #EvShutterHalf#
+---> Popped: EvShutterHalf
+STEP BEGIN: EvShutterHalf on (SmCamera)
+STEP END: EvShutterHalf result: 1
+>>>> Pressed shutter full
+BCST: #EvShutterFull#
+---> Popped: EvShutterFull
+STEP BEGIN: EvShutterFull on (SmCamera)
+TRANS: [#EvShutterFull#:(Focused)->(Storing)]
+EXEC: {[*]:[onExit(Focused)]}
+leaving Focused state
+EXEC: {[*]:[#EvShutterFull#:(Focused)->(Storing)]}
+entering Storing state
+EXEC: {[*]:[onEntr(Storing)]}
+STEP END: EvShutterFull result: 0
+>>>> Released shutter
+BCST: #EvShutterReleased#
+---> Popped: EvShutterReleased
+STEP BEGIN: EvShutterReleased on (SmCamera)
+TRANS: [#EvShutterReleased#:(Shooting)->(NotShooting)]
+RESET: (SmCamera)/(SmShooting)
+EXEC: {[*]:[onExit(Storing)]}
+leaving Storing state
+EXEC: {[*]:[onReset(SmShooting)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(Shooting)]}
+leaving Shooting state
+EXEC: {[*]:[#EvShutterReleased#:(Shooting)->(NotShooting)]}
+entering NotShooting state
+EXEC: {[*]:[onEntr(NotShooting)]}
+INIT: (SmCamera)/(SmNotShooting)
+TRANS: [#__INIT__#:(__OFF__)->(Idle)]
+EXEC: {[*]:[onExit(__OFF__)]}
+EXEC: {[*]:[#__INIT__#:(__OFF__)->(Idle)]}
+entering Idle state
+EXEC: {[*]:[onEntr(Idle)]}
+STEP END: EvShutterReleased result: 0
+>>>> Camera test finished
+RESET: (SmCamera)/(SmCamera)
+RESET: (SmCamera)/(SmNotShooting)
+EXEC: {[*]:[onExit(Idle)]}
+leaving Idle state
+EXEC: {[*]:[onReset(SmNotShooting)]}
+EXEC: {[*]:[onEntr(__OFF__)]}
+EXEC: {[*]:[onExit(NotShooting)]}
+leaving NotShooting state
+EXEC: {[*]:[onReset(SmCamera)]}
+EXEC: {[*]:[onEntr(__OFF__)]}

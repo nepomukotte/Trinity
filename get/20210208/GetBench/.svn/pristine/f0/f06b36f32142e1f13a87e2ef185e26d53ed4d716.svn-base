@@ -1,0 +1,39 @@
+if VXWORKS_KERNEL
+
+#########################################
+# getHwServer
+#########################################
+EXTRA_PROGRAMS = getHwServer_partialimage
+
+nodist_getHwServer_SOURCES = getHwServer_ctdt.c
+
+getHwServer_partialimage_SOURCES = $(getHwServer_SOURCES)
+getHwServer_partialimage_LDFLAGS = $(getHwServer_LDFLAGS)
+getHwServer_partialimage_LDADD = $(getHwServer_LDADD)
+
+getHwServer_ctdt.c: getHwServer_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+
+BUILT_SOURCES          += getHwServer_ctdt.c
+CLEANFILES             += getHwServer_ctdt.c getHwServer_partialimage$(EXEEXT)
+
+#########################################
+# frameSender
+#########################################
+if HAVE_MFM
+EXTRA_PROGRAMS         += frameSender_partialimage
+
+nodist_frameSender_SOURCES = frameSender_ctdt.c
+
+frameSender_partialimage_SOURCES = $(frameSender_SOURCES)
+frameSender_partialimage_LDFLAGS = $(frameSender_LDFLAGS)
+frameSender_partialimage_LDADD   = $(frameSender_LDADD)
+
+frameSender_ctdt.c: frameSender_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+
+BUILT_SOURCES          += frameSender_ctdt.c
+CLEANFILES             += frameSender_ctdt.c frameSender_partialimage$(EXEEXT)
+endif
+
+endif

@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+slicedir=@datarootdir@/slice
+
+Name: mdaq-interfaces
+Description: Mordicus DAQ: a C++ class library providing building blocks to build DAQ systems.
+Requires: Utilities@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -lmdaq-interfaces@DEBUG_SUFFIX@
+Cflags: -I${includedir}

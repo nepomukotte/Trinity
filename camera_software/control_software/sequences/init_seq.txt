@@ -1,0 +1,21 @@
+# Initializing the ADC on the SIABs and Sleeping for 4 seconds
+20FFFFFFFF17000000
+4
+# Turning on Music Chips on SIABs and Sleeping for 4 seconds
+20FFFFFFFF08000000
+4
+# Initializing the Music SPI communication and Sleeping for 4 seconds
+20FFFFFFFF10000000
+4
+# Initializing the Trigger Board and Sleeping for 3 seconds
+300200000000000000
+3
+# Preparing the Trigger Board and Sleeping for 3 seconds
+300400640000000000
+3
+# Running the getEccServer and Sleeping for 5 seconds
+400100000000000000
+5
+# Running the DataRouter and Sleeping for 5 seconds
+400200000000000000
+5

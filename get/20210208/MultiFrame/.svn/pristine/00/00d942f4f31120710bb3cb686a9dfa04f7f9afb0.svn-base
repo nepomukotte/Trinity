@@ -1,0 +1,107 @@
+/*
+ * $Id$
+ * @file Field.h
+ * @created 20 févr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#ifndef mfm_Field_h_INCLUDED
+#define mfm_Field_h_INCLUDED
+
+#include "mfm/Common.h"
+#include "mfm/Serializer.h"
+#include "mfm/Header.h"
+#include <string>
+
+namespace mfm {
+//______________________________________________________________________
+class AbstractFieldContainer;
+class BitField;
+/**
+ * Class describing a significant entity within a frame made of an integer number of Bytes.
+ */
+class Field
+{
+public:
+	Field(AbstractFieldContainer const * container=0, Serializer const & s = Serializer());
+	Field(AbstractFieldContainer const * c, Serializer const & s, const size_t & pos, const size_t & size);
+	Field(Field const & r);
+	virtual ~Field();
+	Field& operator=(const Field & r);
+	size_t size_B() const { return serializer_.size_B(); }
+	size_t offset_B() const { return serializer_.offset_B(); }
+	size_t relativeOffset_B() const { return relativeOffset_B_; }
+	std::string name() const;
+	const AbstractFieldContainer & container() const { return *container_; }
+
+	/** @name Getters and setters for the value of the field */
+	///@{
+	template <typename T>
+	void setValue(const T & value);
+	template <typename T>
+	T value() const;
+	void value(DynamicBitset & value) const;
+	///@fn template <> void setValue< DynamicBitset >(const DynamicBitset & value)
+	///@fn template <> DynamicBitset value() const
+	///@}
+
+	/** @name Accessors for subsets of bits within the field */
+	///@{
+	BitField bitField(size_t const & pos, size_t const & width);
+	BitField bitField(std::string const &);
+	BitField bitField(const BitField & bf);
+	///@}
+
+	/** @name Getters and setters for the value of a single bit within the field */
+	///@{
+	void setBit(size_t const & pos, const bool flag);
+	bool bit(size_t const & pos) const;
+	///@}
+private:
+	Serializer serializer_; ///< Access to buffer.
+	AbstractFieldContainer const * container_;  ///< MFM header information.
+	size_t relativeOffset_B_; ///< Offset of the field w.r.t. to the beginning of its container [Bytes].
+	static const size_t BITS_PER_BYTE = 8; ///< Used to convert field size units [Byte] into bit field size units [bits]
+};
+
+template <>
+void Field::setValue< DynamicBitset >(const DynamicBitset & value);
+
+template <>
+DynamicBitset Field::value() const;
+
+//______________________________________________________________________
+} /* namespace mfm */
+
+#include <mfm/Field.hpp>
+
+#endif /* mfm_Field_h_INCLUDED */

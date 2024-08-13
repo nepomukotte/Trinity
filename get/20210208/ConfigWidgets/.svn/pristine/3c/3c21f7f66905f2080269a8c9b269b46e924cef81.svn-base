@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: ConfigWidgets
+Description: A collection of reusable widgets to edit ccfg-style configurations.
+Requires: @CCFG_LIB_NAME@ >= 2.0.0 Utilities@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -l@CONFIG_WIDGETS_LIB_NAME@
+Cflags: -I${includedir}

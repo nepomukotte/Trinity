@@ -1,0 +1,19 @@
+digraph setup_ml507 {
+  rankdir="LR";
+  compound=true;
+  
+  edge [fontsize=8, weight="0.5", color="gray", arrowhead="none"];
+
+  node [shape="ellipse", fontsize=8, fixedsize=true, width=0.9, fontcolor="blue"];
+  ExternalSwitch [label="Switch"];
+  LocalSwitch [label="3Com\nGigabit\nSwitch"];
+  node [shape="none", fontsize=8, fixedsize=true, width=0.9, fontcolor="blue"];
+  WWW;
+  node [shape="box", style="filled", fontsize=8, fixedsize=true, width=0.9, fontcolor="blue"];
+  ML507;
+  PC1 [label="Boot\nWorkstation\n(DHCP,NFS)"];
+  PC2 [label="DAQ\nWorkstation"];
+
+  ML507 -> LocalSwitch -> PC1 -> ExternalSwitch -> WWW;
+  { rank="same"; LocalSwitch -> PC2; }
+}

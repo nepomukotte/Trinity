@@ -1,0 +1,8 @@
+connect device asad
+# ADC2: 0x2A0 = straight binary format, CUSTOM test pattern
+reg-write ADC2 0x2A0
+# ADC3/4: 11 least significant bits (ADC3) and 1 most significant bit (ADC4) of the CUSTOM test pattern 
+reg-write ADC3 0x3E8
+reg-write ADC4 0x0
+
+

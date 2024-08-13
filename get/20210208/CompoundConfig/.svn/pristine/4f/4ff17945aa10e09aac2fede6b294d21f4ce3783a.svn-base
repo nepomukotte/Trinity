@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Daq>
+	<!--The data acquistion duration for a frame-->
+	<frameDuration unit="ms">100
+		<!--10 per second-->
+	</frameDuration>
+	<readOutFreq unit="Mb/s" range="[10, 80]">25</readOutFreq>
+	<Channel id="*" include="channels/default_channel.xml" />
+	<Channel id="0" />
+	<Channel id="1">
+		<isActive>false</isActive>
+	</Channel>
+	<Channel id="2" />
+	<Channel id="3">
+		<Flow id="WFA">
+			<eventRate unit="kHz" range="{2, 100}">2.4</eventRate>
+		</Flow>
+	</Channel>
+</Daq>

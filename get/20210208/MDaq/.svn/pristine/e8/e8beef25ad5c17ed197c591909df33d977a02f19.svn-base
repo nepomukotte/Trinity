@@ -1,0 +1,145 @@
+/*
+ * $Id$
+ * @file EccBackEnd.h
+ * @created 20 juin 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors: patrick.sizun@cea.fr
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#ifndef mdaq_EccBackEnd_h_INCLUDED
+#define mdaq_EccBackEnd_h_INCLUDED
+
+#include "mdaq/Ecc.h"
+#include "mdaq/hw/Control.h"
+#include "mdaq/DaqControl.h"
+#include "mdaq/DefaultPortNums.h"
+#include "mdaq/rc/HardwareNode.h"
+#include "utl/net/SocketAddress.h"
+#include ICE_HEADER(Communicator.h)
+#include <utility>
+
+// Forward declarations
+namespace CCfg
+{
+	class CConfig;
+}
+
+namespace mdaq {
+//__________________________________________________________________________________________________
+class EccBackEnd
+{
+public:
+	EccBackEnd();
+	virtual ~EccBackEnd() {};
+	/// @name Management
+	/// @{
+	virtual void testConnectionToEcc();
+	virtual void testConnectionToHardware();
+	virtual void shutdownHardwareServer();
+	virtual void rebootHardware();
+	///@}
+
+	/// @name General
+	///@{
+	virtual void loadHwDescription(const std::string& cfgFileName);
+	virtual void setAlwaysFlushData(bool enable);
+	virtual void setCircularBuffersEnabled(int mask);
+	virtual void daqStart();
+	virtual void daqStop();
+	virtual void connect(const std::string& objectType, const std::string& objectName, bool isBatched=false);
+	virtual void eccSleep(const size_t seconds);
+	///@}
+
+	/// @name Node
+	///@{
+	virtual void addHwNode(const ::utl::net::SocketAddress & endpoint);
+	virtual void renameHwNode(const std::string& newName);
+	virtual void removeHwNode(const std::string& nodeName);
+	virtual void removeAllHwNodes();
+	virtual void selectHwNodeByName(const std::string& nodeName);
+	virtual void selectHwNodeByEndpoint(const ::utl::net::SocketAddress & endpoint);
+	virtual void selectHwNodeById(const std::string& hwNodeId);
+	virtual void getListOfHwNodes(hw::NodeList& nodes);
+	virtual void getNameOfCurrentHwNode(std::string & nodeName);
+	virtual void getEndpointOfCurrentHwNode(std::string & nodeEndpoint);
+	/// @}
+
+	/// @name Device
+	///@{
+	virtual void addDevice(const mdaq::hw::DeviceDescription & deviceDescription);
+	virtual void removeDevice(const std::string& deviceName);
+	virtual void removeAllDevices();
+	virtual void selectCurrentDevice(const std::string& deviceName);
+	virtual void getListOfDevices(hw::DeviceList& devices);
+	virtual void getNameOfCurrentDevice(std::string & deviceName);
+	virtual void getDeviceDescription(hw::DeviceDescription & deviceDescription);
+	virtual std::string checkDevice(const ::mdaq::hw::DeviceDescription & descr, Ice::Long regValue, Ice::Long firstRegOffset, Ice::Long regCount);
+	/// @}
+
+	/// @name Register
+	///@{
+	virtual void addRegister(const ::mdaq::hw::RegisterConfig & cfg);
+	virtual void addRegisters(const ::mdaq::hw::RegisterConfigList & cfg);
+	virtual Ice::Long readRegister(const std::string& registerName);
+	virtual void writeRegister(const std::string& registerName, Ice::Long fieldValue);
+	virtual void getListOfRegisters(hw::RegisterList& registers);
+	virtual void getRegisterDescription(const std::string & registerName, hw::RegisterDescription & descr);
+	/// @}
+
+	/// @name Field
+	///@{
+	virtual void writeField(const std::string& registerName, const std::string& fieldName, Ice::Long fieldValue);
+	virtual Ice::Long readField(const std::string& registerName, const std::string& fieldName);
+	virtual void getListOfFields(const std::string& registerName, hw::FieldList& fields);
+	virtual void getFieldDescription(const std::string& registerName, const std::string & fieldName, hw::FieldDescription & descr);
+	/// @}
+
+	typedef boost::ptr_map< std::string, mdaq::rc::HardwareNode > HardwareNodeMap;  ///< A list of hardware nodes which can be retrieved by their ID.
+
+protected:
+	void loadHwDescription(const CCfg::CConfig & nodeConfig);
+	virtual void addHwNode(HardwareNodePtr hwNodePtr);
+	virtual HardwareNodePtr connectHwNode(const std::string & nodeCtrlAddress, bool isBatched=false);
+	virtual void connectDaqCtrl();
+	virtual void connectRunProcessor(const std::string & daqAddress, const std::string & dataRouterType = "Ice");
+	virtual void disconnectRunProcessor();
+	      rc::HardwareNode& currentHwNode();
+	const rc::HardwareNode& currentHwNode() const;
+	hw::NodePrx& currentHwNodePrx();
+	hw::DevicePrx& currentHwDevicePrx();
+	std::string currentHwDeviceName();
+	mdaq::DaqCtrlNodePrx& currentDaqCtrl();
+	const std::string& currentHwNodeId() const { return currentHwNodeId_; }
+
+protected:
+	std::string currentHwNodeId_; ///< Proxy to current HW node.
+	HardwareNodeMap hwNodes_;         ///< Map of hardware nodes known to ECC.
+	std::string proxyOptions;   ///< Proxy options for hardware node
+};
+//__________________________________________________________________________________________________
+} /* namespace mdaq */
+#endif /* mdaq_EccBackEnd_h_INCLUDED */

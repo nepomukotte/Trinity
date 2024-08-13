@@ -1,0 +1,12 @@
+Source: libutilities
+Section: devel
+Priority: optional
+Maintainer: Frederic Chateau <frederic.chateau@cea.fr>
+Build-Depends: debhelper, cdbs, automake (>= 1.11), libtool (>= 2.2), libboost-dev (>= 1.33.1)
+Standards-Version: 3.8.0
+Homepage: <https://dsm-trac.cea.fr/mordicus>
+
+Package: libutilities
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Mordicus Utilities library defines general-purpose utility classes.

@@ -1,0 +1,86 @@
+/*
+ * $Id: BitField.h 1039 2013-02-13 08:34:27Z psizun $
+ * @file BitField.h
+ * @created 28 mars 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#ifndef mfm_BitField_h_INCLUDED
+#define mfm_BitField_h_INCLUDED
+
+#include "mfm/Common.h"
+#include "mfm/Field.h"
+
+namespace mfm {
+//______________________________________________________________________
+/** Class for accessing a meaningful entity made of a number of successive bits within a Field.
+ */
+class BitField
+{
+public:
+	BitField();
+	BitField(Field const & parentField, const size_t & pos_b, const size_t & size_b);
+	BitField(BitField const & r);
+	BitField& operator=(const BitField & r);
+	virtual ~BitField();
+
+	size_t pos_b() const { return pos_b_; }
+	size_t width_b() const { return width_b_; }
+
+	/** @name Getters and setters for the value of the bit field */
+	///@{
+	template <typename T>
+	void setValue(const T & value);
+	template <typename T>
+	T value() const;
+	void value(DynamicBitset & value) const;
+	///@fn template <> void setValue< DynamicBitset >(const DynamicBitset & value)
+	///@fn template <> DynamicBitset value() const
+	///@}
+private:
+	Field field_;    ///< A copy of the field to which the bit field belongs to.
+	size_t pos_b_;    ///< Offset, in bits.
+	size_t width_b_;  ///< Size, in bits.
+};
+
+template <>
+void BitField::setValue< DynamicBitset >(const DynamicBitset & value);
+
+template <>
+DynamicBitset BitField::value() const;
+
+//______________________________________________________________________
+} /* namespace mfm */
+
+#include <mfm/BitField.hpp>
+
+#endif /* mfm_BitField_h_INCLUDED */

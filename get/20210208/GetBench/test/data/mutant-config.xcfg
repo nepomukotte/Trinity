@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mutant>
+	<!-- Whether the Mutant module is a master or a slave module.-->
+	<isSlave>false</isSlave>
+	<!-- Whether to enable Mutant data readout. -->
+	<readoutModeEnabled>true</readoutModeEnabled>
+	<!-- Whether to enable the Mutant test mode. -->
+	<testModeEnabled>false</testModeEnabled>
+	<!-- Whether to enable coupling with CENTRUM, or disable the CS interface, or enable scaler channels. -->
+	<centrumScalerInterface range="{CENTRUM, Disabled, Scalers}">Disabled</centrumScalerInterface>
+	<sourceId range="[0, 255]">0</sourceId>
+	<!-- Type of Mutant data frame (only one type so far).-->
+	<frameType range="[0, 0]">0</frameType>
+	<!-- Value of the 48-bit timestamp to preload, in units of 10 ns -->
+	<preLoadedTimestamp>
+		<!-- Most signficant 16 bits -->
+		<high range="[0x0, 0xFFFF]">0x0</high>
+		<!-- Bits 16 to 31 -->
+		<mid range="[0x0, 0xFFFF]">0x0</mid>
+		<!-- Least signficant 16 bits -->
+		<low range="[0x0, 0xFFFF]">0x0</low>
+	</preLoadedTimestamp>
+	<!-- Value of the event number to preload. -->
+	<preLoadedEventNumber range="[0x0, 0xFFFFFFFF]">0x0</preLoadedEventNumber>
+	<Master>
+		<enablePortA>true</enablePortA>
+		<enablePortB>true</enablePortB>
+	</Master>
+	<Slave>
+		<!-- Port from which this slave module is connected to master module (A means that connection is between slave port A and master port B). -->
+		<slavePort range="{A, B}">A</slavePort>
+		<!-- Slave number (for now, should be 0 if slave is connected from its port A to master port B, 1 otherwise).-->
+		<slaveId range="{0, 1}">0</slaveId>
+	</Slave>
+	<Scalers>
+		<!-- Whether to reset all scalers at the start of the run. -->
+		<clearCounters>true</clearCounters>
+		<!-- Whether to enable counting for scaler 1 or not. -->
+		<enableScaler id="1">true</enableScaler>
+		<!-- Whether to enable counting for scaler 2 or not. -->
+		<enableScaler id="2">true</enableScaler>
+		<!-- Whether to enable counting for scaler 3 or not. -->
+		<enableScaler id="3">true</enableScaler>
+		<!-- Whether to enable counting for scaler 4 or not. -->
+		<enableScaler id="4">true</enableScaler>
+		<!-- Whether to enable counting for scaler 5 or not. -->
+		<enableScaler id="5">true</enableScaler>
+	</Scalers>
+	<!-- L0L1: external trigger (L0) starts a coincidence window waiting for a valid L1 event;
+ L1L0: when Level 1 trigger occurs, a coincidence window is opened waiting for a L0 trigger validation. -->
+	<levelPriority range="{L0L1, L1L0}">L0L1</levelPriority>
+	<!-- External trigger parameters -->
+	<Level id="0">
+		<!-- Enables L0 (external) trigger -->
+		<isEnabled>true</isEnabled>
+		<!-- Delay of the Level 0 gate, in microseconds. -->
+		<gateDelay unit="us" range="[0.0, 655.35]">1.0</gateDelay>
+		<!-- Duration of the Level 0 gate, in microseconds. -->
+		<gateDuration unit="us" range="[0.01, 655.35]">655.35</gateDuration>
+	</Level>
+	<!-- Multiplicity trigger parameters -->
+	<Level id="1">
+		<!-- Enables L1 (multiplicity) trigger -->
+		<isEnabled>true</isEnabled>
+		<!-- Condition for a valid L1 trigger: only low threshold, only high threshold, either, or both.-->
+		<selection range="{AND, HIGH, LOW, OR}">OR</selection>
+		<!-- Time added to a valid L1 trigger in order to delay the STOP sampling, in microseconds. -->
+		<postTriggerDelay unit="us" range="[0.0, 655.35]">0.01</postTriggerDelay>
+		<L1A>
+			<lowMultThreshold range="[1, 65535]">1</lowMultThreshold>
+			<highMultThreshold range="[1, 65535]">65535</highMultThreshold>
+			<!-- Number of buckets for Level 1A low trigger. -->
+			<lowNumBuckets unit="buckets" range="[1, 511]">511</lowNumBuckets>
+			<!-- Number of buckets for Level 1A high trigger. -->
+			<highNumBuckets unit="buckets" range="[1, 511]">511</highNumBuckets>
+		</L1A>
+		<L1B>
+			<lowMultThreshold range="[1, 65535]">1</lowMultThreshold>
+			<highMultThreshold range="[1, 65535]">65535</highMultThreshold>
+			<!-- Number of buckets for Level 1B low trigger. -->
+			<lowNumBuckets unit="buckets" range="[1, 511]">511</lowNumBuckets>
+			<!-- Number of buckets for Level 1B high trigger. -->
+			<highNumBuckets unit="buckets" range="[1, 511]">511</highNumBuckets>
+			<!-- Timeout value in case of no L1B trigger, in microseconds. -->
+			<timeout unit="us" range="[0.0, 1677000.0]">2.56</timeout>
+		</L1B>
+	</Level>
+	<!-- Level 2 trigger parameters -->
+	<Level id="2">
+		<!-- Enables L2 trigger -->
+		<isEnabled>true</isEnabled>
+		<!-- Tells the trigger/timestamper state machine that a mask pattern will be provided to CoBos in case of L2 OK. -->
+		<hitPatternModified>true</hitPatternModified>
+	</Level>
+	<TwoProtonDecayMode>
+		<!-- Enables 2p mode. -->
+		<isEnabled>false</isEnabled>
+		<!-- Whether to send half-event after a timeout. -->
+		<halfEventReadout>false</halfEventReadout>
+	</TwoProtonDecayMode>
+	<GlobalMasterClock>
+		<!-- Whether GMC is distributed to the enabled AMCs (false) or START Pulse is sent to the DSTART input of the TDC and to the enabled AMC (true). -->
+		<externalClockEnabled>false</externalClockEnabled>
+		<!-- Whether CLOCK 100 MHz comes from the optical transceiver input or from the VHDCI or FIREWIRE connectors. -->
+		<externalClockSelection range="{OpticalTransceiverInput, VHDCI_FIREWIRE}">OpticalTransceiverInput</externalClockSelection>
+	</GlobalMasterClock>
+	<!-- Selects the internal signals sent to the front panel and rear panel LEMO connectors. -->
+	<Inspection>
+		<!-- Signal sent to front panel LEMO connector LOG INSP1. -->
+		<frontPanelInsp1 range="[0, 255]">0</frontPanelInsp1>
+		<!-- Signal sent to front panel LEMO connector LOG INSP2. -->
+		<frontPanelInsp2 range="[0, 255]">0</frontPanelInsp2>
+		<!-- Signal sent to rear panel LEMO connector TEST1. -->
+		<rearPanelInsp1 range="[0, 255]">0</rearPanelInsp1>
+		<!-- Signal sent to rear panel LEMO connector TEST2. -->
+		<rearPanelInsp2 range="[0, 255]">0</rearPanelInsp2>
+	</Inspection>
+</Mutant>

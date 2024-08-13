@@ -1,0 +1,6 @@
+Turned off
+Turned on
+Idling
+Activated
+Throwing a critical error.
+Shutting down

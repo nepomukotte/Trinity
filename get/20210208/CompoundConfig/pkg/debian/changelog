@@ -1,0 +1,5 @@
+libcompoundconfig (2.1.1-1) oneiric; urgency=low
+
+  * Initial release : First deb package
+
+ -- Frederic Chateau <frederic.chateau@cea.fr>  Fri, 2 Mar 2012 10:31:21 +0100

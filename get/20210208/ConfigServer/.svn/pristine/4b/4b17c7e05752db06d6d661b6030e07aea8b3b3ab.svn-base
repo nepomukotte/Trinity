@@ -1,0 +1,12 @@
+Source: configserver
+Section: unknown
+Priority: extra
+Maintainer: Hervé Loïc <lherve@cea.fr>
+Build-Depends: debhelper (>= 7), autotools-dev, libc6-dev, libstdc++6-4.3-dev, linux-libc-dev, compoundconfig(>= 2.1.0), swig(>= 1.3.36), sun-java5-jdk(>= 1.5.0) | sun-java6-jdk(>= 1.6.0), libzeroc-ice33-dev(>= 3.3.0), slice2cpp
+Standards-Version: 3.8.0
+Homepage: <insert the upstream URL, if relevant>
+
+Package: configserver
+Architecture: any
+Depends: compoundconfig(>= 2.1.0), swig(>= 1.3.36), sun-java5-jre(>= 1.5.0) | sun-java6-jre(>= 1.6.0), libzeroc-ice33-dev(>= 3.3.0)
+Description: This is the Configuration Server of the CompoundConfig Library.

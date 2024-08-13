@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/MAX_JOBS/delimiter=\:
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/MAX_JOBS/operation=append
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/MAX_JOBS/value=1
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/MORDICUS_INSTALL/delimiter=\:
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/MORDICUS_INSTALL/operation=append
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/MORDICUS_INSTALL/value=${MORDICUS_INSTALL_ROOT}/${ConfigName}
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/append=true
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653.893285282/appendContributed=true
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/MAX_JOBS/delimiter=\:
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/MAX_JOBS/operation=append
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/MAX_JOBS/value=1
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/MORDICUS_INSTALL/delimiter=\:
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/MORDICUS_INSTALL/operation=append
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/MORDICUS_INSTALL/value=${MORDICUS_INSTALL_ROOT}/${ConfigName}
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/append=true
+environment/project/org.eclipse.linuxtools.cdt.autotools.core.configuration.build.297570653/appendContributed=true

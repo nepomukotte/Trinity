@@ -1,0 +1,107 @@
+/*
+ * $Id$
+ * @file IpAddress.h
+ * @created 11 mai 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors: Shebli Anvar, Patrick Sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of the Utilities package of the Mordicus Real-Time
+ * Software Development Framework.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#ifndef utl_net_IpAddress_h_INCLUDED
+#define utl_net_IpAddress_h_INCLUDED
+
+#if defined(VXWORKS)
+#include <vxWorks.h>
+#include <inetLib.h>
+#include <taskLib.h>
+#elif defined(_WIN32)
+#include <winsock2.h>
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#endif // VXWORKS
+
+#include <boost/cstdint.hpp>
+#include <string>
+#include <ostream>
+
+#if defined(_WIN32)
+/**
+ * compatibility wrapper for in_addr, because in_addr_t does not exist and in_addr
+ * is not directly convertible to an integer.
+ */
+struct in_addr_t : in_addr
+{
+	in_addr_t& operator=(const in_addr_t& v) { s_addr = v.s_addr; return *this; }
+	in_addr_t& operator=(u_long a) { s_addr = a; return *this; }
+	operator u_long() const { return s_addr; }
+};
+#endif
+
+namespace utl {
+namespace net {
+//__________________________________________________________________________________________________
+/** An IPv4 Internet address. */
+class IpAddress
+{
+public:
+	/// Default constructor. Constructs an invalid IP address.
+	IpAddress() { address_ = INADDR_NONE; }
+	IpAddress(uint8_t field0, uint8_t field1, uint8_t field2, uint8_t field3) { fromOctets(field0, field1, field2, field3); }
+	IpAddress(in_addr_t address) { address_ = address; }
+	IpAddress(const std::string& dotDecimalString, const bool allowPort=true) { fromString(dotDecimalString, allowPort); }
+	~IpAddress() {}
+
+	const in_addr_t& in_addr() const { return address_; }
+	      in_addr_t& in_addr()       { return address_; }
+
+	const in_addr_t& address() const { return in_addr(); } ///< @deprecated Use in_addr() instead
+	      in_addr_t& address()       { return in_addr(); } ///< @deprecated Use in_addr() instead
+	const uint8_t& at(uint8_t idx) const { return reinterpret_cast<const uint8_t*>(&address_)[idx]; }
+	      uint8_t& at(uint8_t idx)       { return reinterpret_cast<      uint8_t*>(&address_)[idx]; }
+
+	const uint8_t& operator [] (uint8_t idx) const { return at(idx); }
+	      uint8_t& operator [] (uint8_t idx)       { return at(idx); }
+	bool isValid() const { return address_ != INADDR_NONE; }
+	bool isAny() const { return address_ == INADDR_ANY; }
+
+	IpAddress& fromOctets(uint8_t field0, uint8_t field1, uint8_t field2, uint8_t field3);
+	IpAddress& fromString(const std::string& dotDecimalString, const bool allowPort = true);
+	std::string toString() const;
+	friend std::ostream& operator<<(std::ostream& stream, const IpAddress& url);
+
+	bool operator==(const IpAddress& ip) const { return address_ == ip.address_; }
+	bool operator!=(const IpAddress& ip) const { return address_ != ip.address_; }
+
+private:
+	in_addr_t address_;
+};
+//__________________________________________________________________________________________________
+} /* namespace net */
+} /* namespace utl */
+#endif /* utl_net_IpAddress_h_INCLUDED */

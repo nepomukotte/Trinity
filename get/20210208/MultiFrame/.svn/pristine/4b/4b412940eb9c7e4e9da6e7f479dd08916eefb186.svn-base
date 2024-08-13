@@ -1,0 +1,221 @@
+/*
+ * $Id$
+ * @file Field.cpp
+ * @created 20 févr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#include "mfm/Field.h"
+#include "mfm/BitField.h"
+#include "mfm/Exception.h"
+#include <sstream>
+
+namespace mfm {
+//______________________________________________________________________
+/**
+ * Default constructor.
+ * @param s Buffer of the field.
+ */
+Field::Field(AbstractFieldContainer const * c, Serializer const & s)
+	: serializer_(s), container_(c)
+{
+	if (container_ != 0)
+		relativeOffset_B_ = offset_B() - container().offset_B();
+}
+//______________________________________________________________________
+/**
+ * Constructor.
+ * @param s A buffer including the field.
+ * @param pos Where the field starts in the buffer [Bytes]
+ * @param size Size [Bytes] of the field.
+ */
+Field::Field(AbstractFieldContainer const * c, Serializer const & s, const size_t & pos, const size_t & size)
+	: serializer_(s, size, pos), container_(c)
+{
+	if (container_ != 0)
+		relativeOffset_B_ = offset_B() - container().offset_B();
+}
+//______________________________________________________________________
+/**
+ * Copy constructor.
+ */
+Field::Field(Field const & r)
+	: serializer_(r.serializer_), container_(r.container_), relativeOffset_B_(r.relativeOffset_B_)
+{
+	;
+}
+//______________________________________________________________________
+Field::~Field()
+{
+	;
+}
+//______________________________________________________________________
+/**
+ * Assignment operator.
+ */
+Field& Field::operator=(const Field & r)
+{
+	serializer_ = r.serializer_;
+	container_ = r.container_;
+	relativeOffset_B_ = r.relativeOffset_B_;
+	return *this;
+}
+//______________________________________________________________________
+/**
+ * @fn size_t Field::size_B() const
+ * Returns the size of the field, in Bytes.
+ * @return Size of the field, in Bytes.
+ */
+//______________________________________________________________________
+/**
+ * @fn size_t Field::offset_B() const
+ * Returns the offset of the field, in Bytes, within the entire frame.
+ * @return Offset, in Bytes.
+ */
+//______________________________________________________________________
+/**
+ * @fn size_t Field::relativeOffset_B() const
+ * Returns the offset of the field, in Bytes, within its container (header or item).
+ * @return Offset, in Bytes.
+ */
+//______________________________________________________________________
+/**
+ * Searches the name of the field with its frame format description and returns it.
+ * @return The name of this field.
+ */
+std::string Field::name() const
+{
+	return container_->fieldName(serializer_.offset_B(), serializer_.size_B());
+}
+//______________________________________________________________________
+/**
+ * Sets the entire value of this field, using a bitset.
+ * @param value The bitset from which to get the new value of this field.
+ */
+template <>
+void Field::setValue< DynamicBitset >(const DynamicBitset & value)
+{
+	// Read bitset one Byte at a time, starting from least significant byte
+	size_t const num_blocks = serializer_.size_B();
+
+	if (container_->header().isBigEndian())
+	{
+		std::vector< unsigned char > data(num_blocks);
+		boost::to_block_range(value, data.rbegin());
+		for (size_t i=0; i < num_blocks; ++i)
+		{
+			BinIO::encode<Byte>(data[i], serializer_.outputStream(i));
+		}
+	}
+	else
+	{
+		std::ostream_iterator<char> osit(serializer_.outputStream());
+		boost::to_block_range(value, osit);
+	}
+}
+//______________________________________________________________________
+void Field::value(DynamicBitset & value) const
+{
+	// Clear bitset
+	value.clear();
+
+	// Fill bitset one Byte at a time, starting from least significant byte
+	size_t const num_blocks = serializer_.size_B();
+	Byte block;
+	for (size_t i=0; i < num_blocks; ++i)
+	{
+		if (container_->header().isBigEndian())
+			BinIO::decode<Byte>(block, serializer_.inputStream(num_blocks - 1 - i));
+		else
+			BinIO::decode<Byte>(block, serializer_.inputStream(i));
+		value.append(block); // appends to the most-significant end
+	}
+}
+//______________________________________________________________________
+template <>
+DynamicBitset Field::value() const
+{
+	DynamicBitset bitset;
+	value(bitset);
+	return bitset;
+}
+//______________________________________________________________________
+/** Returns a BitField instance to manipulate a bit field within this field, given its position and width.
+ * @param pos Offset, in bits.
+ * @param width Size, in bits
+ * @return Returns the BitField required.
+ * @throws OutOfRangeError
+ */
+BitField Field::bitField(size_t const & pos, size_t const & width)
+{
+	if (pos + width > size_B()*BITS_PER_BYTE)
+	{
+		std::ostringstream oss;
+		oss << "accessing bitfield of (pos=" << pos << " b, width=" << width << " b) in field of " << size_B() << " B";
+		throw mfm::OutOfRangeError(oss.str());
+	}
+	return BitField(*this, pos, width);
+}
+//______________________________________________________________________
+/** Returns a BitField instance to manipulate a bit field within this field, given its name.
+ * @param bitFieldName Name of the bit field.
+ * @return Returns the BitField required.
+ * @throws OutOfRangeError
+ */
+BitField Field::bitField(std::string const & bitFieldName)
+{
+	// Find bit field position and width within field
+	size_t bfPos_b, bfWidth_b;
+	container_->findBitField(name(), bitFieldName, bfPos_b, bfWidth_b);
+	// Use bit field getter with position and width
+	return bitField(bfPos_b, bfWidth_b);
+}
+//______________________________________________________________________
+BitField Field::bitField(const BitField & bf)
+{
+	return bitField(bf.pos_b(), bf.width_b());
+}
+//______________________________________________________________________
+void Field::setBit(size_t const & pos, const bool flag)
+{
+	DynamicBitset fieldValue = value<DynamicBitset>();
+	fieldValue.set(pos, flag);
+	setValue(fieldValue);
+}
+//______________________________________________________________________
+bool Field::bit(size_t const & pos) const
+{
+	DynamicBitset fieldValue = value<DynamicBitset>();
+	return fieldValue.test(pos);
+}
+//______________________________________________________________________
+} /* namespace mfm */

@@ -1,0 +1,23 @@
+describe hardwareConfigID
+prepare hardwareConfigID
+configure hardwareConfigID
+start
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+exec asadInjectCharge.ecc
+sleep 1
+stop

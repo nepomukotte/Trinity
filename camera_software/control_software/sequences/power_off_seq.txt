@@ -1,0 +1,9 @@
+# Resetting All the SIABs and Sleeping for 5 seconds
+20FFFFFFFF01000000
+5
+# Turning off Pump at ch8 and Sleeping for 5 seconds
+600308000000000000
+5
+# Turning off LVPS at ch9 and Sleeping for 10 seconds
+600309000000000000
+5

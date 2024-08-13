@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node id="MuTanT">
+	<Device id="*">
+		<registerAccess>MemBus32</registerAccess>
+		<registerWidth>4</registerWidth>
+		<baseAddress>0x0</baseAddress>
+		<Register id="*">
+			<offset>0x0</offset>
+			<BitField id="*">
+				<offset unit="bits">0</offset>
+				<width unit="bits" range="[1, 32]">1</width>
+				<writeOnly type="string">false</writeOnly>
+			</BitField>
+		</Register>
+	</Device>
+	<Device id="GPIO_SW_LEDS">
+		<baseAddress>0x81420000</baseAddress>
+		<registerAccess>MemBus32</registerAccess>
+		<Register id="TDC_STAT_CARD_B_FLGS">
+			<offset>0x0</offset>
+			<BitField id="led">
+				<offset>0</offset>
+				<width>2</width>
+			</BitField>
+			<BitField id="sw">
+				<width>2</width>
+				<offset>2</offset>
+			</BitField>
+			<BitField id="flgb">
+				<width>4</width>
+				<offset>4</offset>
+			</BitField>
+			<BitField id="fifo_empty">
+				<offset>4</offset>
+			</BitField>
+			<BitField id="fifo_full">
+				<offset>5</offset>
+			</BitField>
+			<BitField id="fifo_almost_full">
+				<offset>6</offset>
+			</BitField>
+			<BitField id="gmc">
+				<width>2</width>
+				<offset>8</offset>
+			</BitField>
+			<BitField id="tdc">
+				<width>4</width>
+				<offset>10</offset>
+			</BitField>
+		</Register>
+		<Register id="BOARD_ID_PWR_STAT">
+			<offset>0x8</offset>
+			<BitField id="rs">
+				<writeOnly type="string">true</writeOnly>
+				<offset>31</offset>
+			</BitField>
+			<BitField id="p3v3_p1v0">
+				<writeOnly type="string">true</writeOnly>
+				<offset>30</offset>
+			</BitField>
+			<BitField id="p2v5">
+				<writeOnly type="string">true</writeOnly>
+				<offset>29</offset>
+			</BitField>
+			<BitField id="p1v8">
+				<writeOnly type="string">true</writeOnly>
+				<offset>28</offset>
+			</BitField>
+			<BitField id="avtt_mgt">
+				<writeOnly type="string">true</writeOnly>
+				<offset>27</offset>
+			</BitField>
+			<BitField id="avcc_pll">
+				<writeOnly type="string">true</writeOnly>
+				<offset>26</offset>
+			</BitField>
+			<BitField id="avcc_mgt">
+				<writeOnly type="string">true</writeOnly>
+				<offset>25</offset>
+			</BitField>
+			<BitField id="ddr2">
+				<writeOnly type="string">true</writeOnly>
+				<offset>24</offset>
+			</BitField>
+			<BitField id="mutant_id">
+				<writeOnly type="string">true</writeOnly>
+				<width>24</width>
+			</BitField>
+		</Register>
+		<Register id="DIR2">
+			<offset>0xC</offset>
+			<BitField id="input_output">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="DIR1">
+			<offset>0x4</offset>
+			<BitField id="input_output">
+				<width>32</width>
+			</BitField>
+		</Register>
+	</Device>
+	<Device id="GPIO_CLK_TREE">
+		<baseAddress>0x81400000</baseAddress>
+		<registerAccess>MemBus32</registerAccess>
+		<Register id="CLOCK_TREE_CONFIG1">
+			<BitField id="amc_clk1_out_en">
+				<width>12</width>
+			</BitField>
+			<BitField id="amc_clk2_out_en">
+				<width>12</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="mux_clk1_sel">
+				<width>2</width>
+				<offset>24</offset>
+			</BitField>
+			<BitField id="mux_clk1_2_sel">
+				<width>4</width>
+				<offset>26</offset>
+			</BitField>
+			<BitField id="clk1_fb">
+				<width>1</width>
+				<offset>30</offset>
+			</BitField>
+			<BitField id="clk2_fb">
+				<width>1</width>
+				<offset>31</offset>
+			</BitField>
+		</Register>
+		<Register id="CLOCK_TREE_CONFIG2">
+			<offset>0x8</offset>
+			<BitField id="clk_path_sel">
+				<width>9</width>
+			</BitField>
+			<BitField id="start_pulse">
+				<offset>9</offset>
+			</BitField>
+		</Register>
+		<Register id="DIR1">
+			<BitField id="input_output">
+				<width>32</width>
+			</BitField>
+			<offset>0x4</offset>
+		</Register>
+		<Register id="DIR2">
+			<offset>0xC</offset>
+			<BitField id="input_output">
+				<width>32</width>
+			</BitField>
+		</Register>
+	</Device>
+	<!-- CLK200_SPI Never tested with MUTANT HwServer registerWidth should be 1!!!!! -->
+	<Device id="CLK200_SPI">
+		<registerAccess>SPI</registerAccess>
+		<registerWidth>4</registerWidth>
+		<Register id="VCXO_CONTROL">
+			<offset>0x68</offset>
+		</Register>
+	</Device>
+	<Device id="TDC_EMC">
+		<baseAddress>0x80A00000</baseAddress>
+		<registerAccess>MemBus32</registerAccess>
+		<Register id="TDC_REGISTER_0">
+			<BitField id="0">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_1">
+			<offset>0x4</offset>
+			<BitField id="1">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_2">
+			<offset>0x8</offset>
+			<BitField id="2">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_3">
+			<offset>0xC</offset>
+			<BitField id="3">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_4">
+			<offset>0x10</offset>
+			<BitField id="4">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_5">
+			<offset>0x14</offset>
+			<BitField id="5">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_6">
+			<offset>0x18</offset>
+			<BitField id="6">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_7">
+			<offset>0x1C</offset>
+			<BitField id="7">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_8">
+			<offset>0x20</offset>
+			<BitField id="8">
+				<writeOnly type="string">true</writeOnly>
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_9">
+			<offset>0x24</offset>
+			<BitField id="1">
+				<writeOnly type="string">true</writeOnly>
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_10">
+			<offset>0x28</offset>
+			<BitField id="10">
+				<writeOnly type="string">true</writeOnly>
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_11">
+			<offset>0x2C</offset>
+			<BitField id="11">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_12">
+			<offset>0x30</offset>
+			<BitField id="12">
+				<width>32</width>
+			</BitField>
+		</Register>
+		<Register id="TDC_REGISTER_14">
+			<offset>0x34</offset>
+			<BitField id="14">
+				<width>32</width>
+			</BitField>
+		</Register>
+	</Device>
+	<!-- MUTANT-B registers -->
+	<Device id="CARD_B_EMC">
+		<baseAddress>0x80F00000</baseAddress>
+		<registerAccess>MemBus16</registerAccess>
+		<registerWidth>2</registerWidth>
+		<Register id="GMC_WSCA_SEL">
+			<offset>0x0</offset>
+			<!-- GMC clock source: 2 = MUTANT_A VXCO, 0 = MUTANT_A Aligned, 1 = MUTANT_A optical link, 3 = MUTANT_B 100MHz (tests only)
+Previously (1.4.0): 0 = MUTANT_A VXCO, 1 = MUTANT_A Aligned, 2 = MUTANT_A optical link, 3= MUTANT_B 100MHz (tests only) -->
+			<BitField id="GMC">
+				<offset>0</offset>
+				<width>2</width>
+			</BitField>
+			<!-- WSCA clock source 0 = local (master MUTANT), 1 = remote VHDCI port A (slave), 2 = MUTANT_A remote VHDCI port A (slave), 3= not used) -->
+			<BitField id="WSCA">
+				<offset>2</offset>
+				<width>2</width>
+			</BitField>
+			<BitField id="PromptWSCA">
+				<offset>4</offset>
+			</BitField>
+		</Register>
+		<Register id="GLOBAL_CONF">
+			<offset>0x2</offset>
+			<!-- 1 = MUTANT is master, 0 = MUTANT is slave-->
+			<BitField id="M/S">
+				<offset>0</offset>
+				<width>1</width>
+			</BitField>
+			<!-- not used if master, slave number if slave -->
+			<BitField id="SNUM">
+				<offset>1</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 = VHDCI port A enabled -->
+			<BitField id="VPA_ON">
+				<offset>2</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 = VHDCI port B enabled   -->
+			<BitField id="VPB_ON">
+				<offset>3</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 = trigger level 0 enabled (master only) -->
+			<BitField id="L0EN">
+				<offset>4</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 = trigger level 1 enabled (master only) -->
+			<BitField id="L1EN">
+				<offset>5</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 = trigger level 2 enabled (master only) -->
+			<BitField id="L2EN">
+				<offset>6</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 = provide a mask pattern to Cobo in case of L2 trigger (master only) -->
+			<BitField id="L2W">
+				<offset>7</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 0 : L0 opens a coincidence window writing for L1, 1 : L0 opens a coincidence window waiting for L0  -->
+			<BitField id="L0/L1">
+				<offset>8</offset>
+				<width>1</width>
+			</BitField>
+			<!-- Multiplicity selection: 0=low, 1=high, 2=OR, 3=AND (since 1.5) -->
+			<BitField id="L1SEL">
+				<offset>9</offset>
+				<width>2</width>
+			</BitField>
+			<!-- 1 : select 2 proton decay mode -->
+			<BitField id="TPD">
+				<offset>11</offset>
+				<width>1</width>
+			</BitField>
+			<!-- Half event readout -->
+			<BitField id="HER">
+				<offset>12</offset>
+				<width>1</width>
+			</BitField>
+			<!-- J-PARC mode -->
+			<BitField id="JPM">
+				<offset>13</offset>
+				<width>1</width>
+			</BitField>
+			<!-- 1 : CENTRUM/SCALERS interface enabled -->
+			<BitField id="C/S">
+				<offset>14</offset>
+				<width>1</width>
+			</BitField>
+			<!-- if C/S=1, 0 : Scalers operationnal , 1 : CENTRUM coupling enabled -->
+			<BitField id="CENT">
+				<offset>15</offset>
+				<width>1</width>
+			</BitField>
+		</Register>
+		<Register id="TRIGGER_CTRL">
+			<offset>0x4</offset>
+			<BitField id="test" />
+			<BitField id="read_mode">
+				<offset>1</offset>
+			</BitField>
+			<BitField id="run">
+				<offset>15</offset>
+			</BitField>
+		</Register>
+		<Register id="TRIGGER_CMD">
+			<offset>0x6</offset>
+			<BitField id="luc" />
+			<BitField id="euc">
+				<offset>1</offset>
+			</BitField>
+			<BitField id="lec">
+				<offset>2</offset>
+			</BitField>
+			<BitField id="eec">
+				<offset>3</offset>
+			</BitField>
+			<BitField id="cl0c">
+				<offset>4</offset>
+			</BitField>
+			<BitField id="cl1ac">
+				<offset>5</offset>
+			</BitField>
+			<BitField id="cl1bc">
+				<offset>6</offset>
+			</BitField>
+			<BitField id="cl2c">
+				<offset>7</offset>
+			</BitField>
+			<!--  Load "2 proton" 32 bit time counter with SET_TIME_MID  SET_TIME_LOW register values -->
+			<BitField id="l2ptc">
+				<offset>8</offset>
+			</BitField>
+		</Register>
+		<Register id="SCALER_CTRL">
+			<offset>0x8</offset>
+			<BitField id="ens1" />
+			<BitField id="ens2">
+				<offset>1</offset>
+			</BitField>
+			<BitField id="ens3">
+				<offset>2</offset>
+			</BitField>
+			<BitField id="ens4">
+				<offset>3</offset>
+			</BitField>
+			<BitField id="ens5">
+				<offset>4</offset>
+			</BitField>
+			<BitField id="cs1">
+				<offset>5</offset>
+			</BitField>
+			<BitField id="cs2">
+				<offset>6</offset>
+			</BitField>
+			<BitField id="cs3">
+				<offset>7</offset>
+			</BitField>
+			<BitField id="cs4">
+				<offset>8</offset>
+			</BitField>
+			<BitField id="cs5">
+				<offset>9</offset>
+			</BitField>
+		</Register>
+		<Register id="SOURCE_SYSTEM">
+			<offset>0xA</offset>
+			<BitField id="source">
+				<width>8</width>
+			</BitField>
+		</Register>
+		<Register id="FIFO_FRAME_TYPE">
+			<offset>0xC</offset>
+			<BitField id="ft">
+				<width>2</width>
+			</BitField>
+		</Register>
+		<Register id="SHELF_MASK">
+			<offset>0x10</offset>
+		</Register>
+		<!-- ATO bit concerns any AMC (that is not a CoBo) plugged in the current shelf and designed to receive only synchronization information (event number and timestamp). -->
+		<Register id="AMC_TAG_ONLY">
+			<offset>0x12</offset>
+			<BitField id="ATO1" />
+			<BitField id="ATO2">
+				<offset>1</offset>
+			</BitField>
+			<BitField id="ATO3">
+				<offset>2</offset>
+			</BitField>
+			<BitField id="ATO4">
+				<offset>3</offset>
+			</BitField>
+			<BitField id="ATO5">
+				<offset>4</offset>
+			</BitField>
+			<BitField id="ATO6">
+				<offset>5</offset>
+			</BitField>
+			<BitField id="ATO7">
+				<offset>6</offset>
+			</BitField>
+			<BitField id="ATO8">
+				<offset>7</offset>
+			</BitField>
+			<BitField id="ATO9">
+				<offset>8</offset>
+			</BitField>
+			<BitField id="ATO10">
+				<offset>9</offset>
+			</BitField>
+			<BitField id="ATO11">
+				<offset>10</offset>
+			</BitField>
+			<BitField id="ATO12">
+				<offset>11</offset>
+			</BitField>
+		</Register>
+		<!-- Register where any information can be stored. No hardware is attached to these bits. -->
+		<Register id="USER_REG">
+			<offset>0x14</offset>
+		</Register>
+		<Register id="L0_GATE_DELAY">
+			<offset>0x18</offset>
+		</Register>
+		<Register id="L0_GATE_DURATION">
+			<offset>0x1A</offset>
+		</Register>
+		<Register id="L1_A_LOW_MULT_THRESHOLD">
+			<offset>0x20</offset>
+		</Register>
+		<Register id="L1_A_HIGH_MULT_THRESHOLD">
+			<offset>0x22</offset>
+		</Register>
+		<Register id="L1_B_LOW_MULT_THRESHOLD">
+			<offset>0x24</offset>
+		</Register>
+		<Register id="L1_B_HIGH_MULT_THRESHOLD">
+			<offset>0x26</offset>
+		</Register>
+		<Register id="L1_A_LOW_TH_N_BUCKETS">
+			<offset>0x28</offset>
+		</Register>
+		<Register id="L1_A_HIGH_TH_N_BUCKETS">
+			<offset>0x2A</offset>
+		</Register>
+		<Register id="L1_B_LOW_TH_N_BUCKETS">
+			<offset>0x2C</offset>
+		</Register>
+		<Register id="L1_B_HIGH_TH_N_BUCKETS">
+			<offset>0x2E</offset>
+		</Register>
+		<Register id="L1_B_TIMEOUT">
+			<offset>0x30</offset>
+		</Register>
+		<Register id="L1_POST_TRIG_DELAY">
+			<offset>0x32</offset>
+		</Register>
+		<Register id="SET_TIME_LOW">
+			<offset>0x40</offset>
+		</Register>
+		<Register id="SET_TIME_MID">
+			<offset>0x42</offset>
+		</Register>
+		<Register id="SET_TIME_HIGH">
+			<offset>0x44</offset>
+		</Register>
+		<Register id="SET_EVT_NUM_LOW">
+			<offset>0x46</offset>
+		</Register>
+		<Register id="SET_EVT_NUM_HIGH">
+			<offset>0x48</offset>
+		</Register>
+		<Register id="FP_LOG_IREG">
+			<!-- Internal signal sent on the front panel LEMO called "LOG INSP1" -->
+			<BitField id="fp_log_insp1">
+				<width>8</width>
+			</BitField>
+			<!-- Internal signal sent on the front panel LEMO called "LOG INSP2" -->
+			<BitField id="fp_log_insp2">
+				<width>8</width>
+				<offset>8</offset>
+			</BitField>
+			<offset>0x60</offset>
+		</Register>
+		<Register id="RP_LOG_IREG">
+			<offset>0x62</offset>
+		</Register>
+		<Register id="PWR_STAT_B">
+			<offset>0x80</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="MUTANT_STATUS">
+			<offset>0x82</offset>
+			<readOnly type="string">true</readOnly>
+			<BitField id="s0" />
+			<BitField id="s1a">
+				<offset>1</offset>
+			</BitField>
+			<BitField id="s1b">
+				<offset>2</offset>
+			</BitField>
+			<BitField id="s2">
+				<offset>3</offset>
+			</BitField>
+			<BitField id="s3">
+				<offset>4</offset>
+			</BitField>
+			<BitField id="mrdy">
+				<offset>8</offset>
+			</BitField>
+			<BitField id="s0rdy">
+				<offset>9</offset>
+			</BitField>
+			<BitField id="s1rdy">
+				<offset>10</offset>
+			</BitField>
+			<BitField id="cfs0">
+				<offset>12</offset>
+			</BitField>
+			<BitField id="cfs1">
+				<offset>13</offset>
+			</BitField>
+			<BitField id="test">
+				<offset>15</offset>
+			</BitField>
+		</Register>
+		<Register id="FIFO_WORD_COUNT">
+			<offset>0x84</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="AMC4_1_STATUS">
+			<offset>0x86</offset>
+			<readOnly type="string">true</readOnly>
+			<BitField id="amc4_status_code">
+				<width>4</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="amc3_status_code">
+				<width>4</width>
+				<offset>8</offset>
+			</BitField>
+			<BitField id="amc2_status_code">
+				<width>4</width>
+				<offset>4</offset>
+			</BitField>
+			<BitField id="amc1_status_code">
+				<width>4</width>
+				<offset>0</offset>
+			</BitField>
+		</Register>
+		<Register id="AMC8_5_STATUS">
+			<offset>0x88</offset>
+			<readOnly type="string">true</readOnly>
+			<BitField id="amc8_status_code">
+				<width>4</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="amc7_status_code">
+				<width>4</width>
+				<offset>8</offset>
+			</BitField>
+			<BitField id="amc6_status_code">
+				<width>4</width>
+				<offset>4</offset>
+			</BitField>
+			<BitField id="amc5_status_code">
+				<width>4</width>
+				<offset>0</offset>
+			</BitField>
+		</Register>
+		<Register id="AMC12_9_STATUS">
+			<offset>0x8A</offset>
+			<readOnly type="string">true</readOnly>
+			<BitField id="amc12_status_code">
+				<width>4</width>
+				<offset>12</offset>
+			</BitField>
+			<BitField id="amc11_status_code">
+				<width>4</width>
+				<offset>8</offset>
+			</BitField>
+			<BitField id="amc10_status_code">
+				<width>4</width>
+				<offset>4</offset>
+			</BitField>
+			<BitField id="amc9_status_code">
+				<width>4</width>
+				<offset>0</offset>
+			</BitField>
+		</Register>
+		<Register id="CENTRUM_EVT_NUM_LOW">
+			<offset>0xA0</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="CENTRUM_EVT_NUM_HIGH">
+			<offset>0xA2</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="CENTRUM_TS_LOW">
+			<offset>0xA4</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="CENTRUM_TS_MID">
+			<offset>0xA6</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="CENTRUM_TS_HIGH">
+			<offset>0xA8</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<!-- Lower half of the 32 bit timestamp internal counter used in 2 proton decay mode, started on L1A trigger and stopped on L1B trigger - LSB=10 ns -->
+		<Register id="CENTRUM_TP_TS_LOW">
+			<offset>0xAA</offset>
+		</Register>
+		<!-- Higher half of the 32 bit timestamp internal counter used in 2 proton decay mode, started on L1A trigger and stopped on L1B trigger - LSB=10 ns -->
+		<Register id="CENTRUM_TP_TS_HIGH">
+			<offset>0xAC</offset>
+		</Register>
+		<Register id="L0_EVT_CNT_LOW">
+			<offset>0xC0</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L0_EVT_CNT_HIGH">
+			<offset>0xC2</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L1A_EVT_CNT_LOW">
+			<offset>0xC4</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L1A_EVT_CNT_HIGH">
+			<offset>0xC6</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L1B_EVT_CNT_LOW">
+			<offset>0xC8</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L1B_EVT_CNT_HIGH">
+			<offset>0xCA</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L2_EVT_CNT_LOW">
+			<offset>0xCC</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="L2_EVT_CNT_HIGH">
+			<offset>0xCE</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER1_REG_LOW">
+			<offset>0xE0</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER1_REG_HIGH">
+			<offset>0xE2</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER2_REG_LOW">
+			<offset>0xE4</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER2_REG_HIGH">
+			<offset>0xE6</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER3_REG_LOW">
+			<offset>0xE8</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER3_REG_HIGH">
+			<offset>0xEA</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER4_REG_LOW">
+			<offset>0xEC</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER4_REG_HIGH">
+			<offset>0xEE</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER5_REG_LOW">
+			<offset>0xF0</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="SCALER5_REG_HIGH">
+			<offset>0xF2</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="PPC_MESSAGE_REG1">
+			<offset>0x100</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="PPC_MESSAGE_REG2">
+			<offset>0x102</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="MULT_A_MEM">
+			<offset>0x104</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+		<Register id="MULT_B_MEM">
+			<offset>0x106</offset>
+			<readOnly type="string">true</readOnly>
+		</Register>
+	</Device>
+</Node>

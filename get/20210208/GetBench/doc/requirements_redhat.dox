@@ -1,0 +1,182 @@
+// $Id: requirements_redhat.dox 1469 2015-06-26 12:12:59Z psizun $
+/**
+@page page_Redhat Linux Redhat Requirements
+@tableofcontents
+
+@section sec_yum yum or dnf (Fedora, Scientific Linux, CentOS)
+To install all the external tools and libraries required by the GET software in a RPM-based Linux environment such as Fedora, Scientific Linux or CentOS, proceed as indicated below.
+
+@subsection gcc C++ compiler
+\verbatim
+sudo yum install gcc-c++
+\endverbatim
+
+@subsection boost Boost
+\verbatim
+sudo yum install boost-devel
+\endverbatim
+
+@subsection readline readline
+\verbatim
+sudo yum install readline-devel
+\endverbatim
+
+@subsection ncurses ncurses
+\verbatim
+sudo yum install ncurses-devel
+\endverbatim
+
+@subsection subversion Subversion
+\verbatim
+sudo yum install subversion
+\endverbatim
+
+@subsection autotools Autotools
+\verbatim
+sudo yum install automake autoconf libtool
+\endverbatim
+
+@subsection pkg-config pkg-config
+\verbatim
+sudo yum install pkgconfig
+\endverbatim
+
+@subsection qt Qt 4
+\verbatim
+sudo yum install qt-devel
+\endverbatim
+
+@subsection qwt Qwt
+\verbatim
+sudo yum install qwt-devel
+\endverbatim
+@warning On Scientific Linux 6, the <i>qwt-devel</i> package provides version 5 of Qwt which may cause the GUI's using it to be very slow.
+You might need to install Qwt 6 from source.
+
+@subsection qwtplot3d QwtPlot3d
+@note The @em qwtplot3d-qt4-devel package is available in the <a href="http://fedoraproject.org/wiki/EPEL">EPEL</a> repository.
+
+\verbatim
+sudo yum install epel-release
+sudo yum install qwtplot3d-qt4-devel
+\endverbatim
+
+@subsection log4cxx log4cxx
+\verbatim
+sudo yum install log4cxx-devel
+\endverbatim
+
+@subsection ice ICE
+  @subsubsection ice_fedora15 Fedora 15
+\verbatim
+sudo yum --enablerepo=updates-testing install ice ice-devel
+\endverbatim
+
+  @subsubsection ice_fedora20 Fedora 20
+\verbatim
+sudo yum install ice ice-devel
+\endverbatim
+
+  @subsubsection ice_fedora22 Fedora 22
+\verbatim
+sudo rpm --import https://zeroc.com/download/GPG-KEY-zeroc-release
+sudo wget -P /etc/yum.repos.d https://zeroc.com/download/rpm/el7/zeroc-ice-el7.repo
+sudo sed -i 's;$releasever;7;g' /etc/yum.repos.d/zeroc-ice-el7.repo
+sudo dnf install ice-all-runtime ice-all-devel
+\endverbatim
+
+  @subsubsection ice_redhat6 Other RHEL6 based distributions
+    - Download the description <a href="http://download.zeroc.com/Ice/3.5/el6/zeroc-ice-el6.repo">zeroc-ice-el6.repo</a> of the <a href="http://www.zeroc.com/download.html#linux">ZeroC RPM repository</a> and install it in the <em>/etc/yum.repos.d</em> directory.
+    - Install all Ice-related RPMs:
+	\verbatim
+sudo wget -P /etc/yum.repos.d http://download.zeroc.com/Ice/3.5/el6/zeroc-ice-el6.repo
+# On Scientific Linux 6, you may have to edit the zeroc-ice-el6.repo file to replace $releasever with 6 like below:
+sudo sed -i 's/$releasever/6/g' /etc/yum.repos.d/zeroc-ice-el6.repo
+sudo yum install ice-c++-devel ice-servers mcpp-devel
+\endverbatim
+
+  @subsubsection ice_redhat7 Other RHEL7 based distributions
+  	\verbatim
+sudo rpm --import https://zeroc.com/download/GPG-KEY-zeroc-release
+sudo wget -P /etc/yum.repos.d https://zeroc.com/download/rpm/el7/zeroc-ice-el7.repo
+sudo yum install ice-all-runtime ice-all-devel
+\endverbatim
+
+@subsection root ROOT
+\verbatim
+sudo yum install root-gui-qt root-physics
+\endverbatim
+
+@subsection gsoap gSOAP
+\verbatim
+sudo yum install gsoap-devel
+\endverbatim
+
+@section sec_urpmi urpmi (Mageia)
+The instructions below have been tested on Mageia 4, as the <em>root</em> user.
+
+@subsection urpmi_gcc C++ compiler
+\verbatim
+urpmi gcc-c++
+\endverbatim
+
+@subsection urpmi_boost Boost
+\verbatim
+urpmi boost-devel
+\endverbatim
+
+@subsection urpmi_readline readline
+\verbatim
+urpmi readline-devel
+\endverbatim
+
+@subsection urpmi_ncurses ncurses
+\verbatim
+urpmi ncurses-devel
+\endverbatim
+
+@subsection urpmi_subversion Subversion
+\verbatim
+urpmi subversion
+\endverbatim
+
+@subsection urpmi_autotools Autotools
+\verbatim
+urpmi automake autoconf libtool
+\endverbatim
+
+@subsection urpmi_pkg-config pkg-config
+\verbatim
+urpmi pkgconfig
+\endverbatim
+
+@subsection urpmi_qt Qt 4
+\verbatim
+urpmi qt4-devel
+\endverbatim
+
+@subsection urpmi_qwt Qwt
+\verbatim
+urpmi libqwt-devel
+\endverbatim
+
+@subsection urpmi_qwtplot3d QwtPlot3d
+\verbatim
+urpmi libqwtplot3d-devel
+\endverbatim
+
+@subsection urpmi_ice ICE
+\verbatim
+urpmi ice-devel
+\endverbatim
+
+@subsection urpmi_root ROOT
+TBD
+
+@subsection urpmi_gsoap gSOAP
+\verbatim
+urpmi gsoap
+\endverbatim
+
+$LastChangedDate: 2016-03-16 05:15:26 -0400 (Wed, 16 Mar 2016) $
+*/

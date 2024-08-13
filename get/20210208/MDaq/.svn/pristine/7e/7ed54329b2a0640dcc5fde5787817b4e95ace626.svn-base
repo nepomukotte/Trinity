@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Node id="CoBo">
+	<Device id="*">
+		<registerAccess>MemBus</registerAccess>
+		<registerWidth unit="bytes">4</registerWidth>
+		<baseAddress>0x0</baseAddress>
+		<Register id="*">
+			<offset>0x0</offset>
+			<BitField id="*">
+				<offset unit="bit">0</offset>
+				<width unit="bits" range="[1, 32]">1</width>
+				<readOnly type="string">false</readOnly>
+			</BitField>
+		</Register>
+	</Device>
+	<Device id="CoBo">
+		<Register id="AGET_0">
+			<BitField id="channel_0">
+				<width>12</width>
+			</BitField>
+		</Register>
+		<baseAddress>0x8000000</baseAddress>
+	</Device>
+</Node>

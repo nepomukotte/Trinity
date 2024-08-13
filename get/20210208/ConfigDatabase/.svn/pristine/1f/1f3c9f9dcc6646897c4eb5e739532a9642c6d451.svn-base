@@ -1,0 +1,15 @@
+<cfg>
+	<Computer id="mypc">
+		<CPU id="0">
+			<Constructor>Intel</Constructor>
+			<Frequency unit="MHz">2800</Frequency>
+			<HyperThreading>true</HyperThreading>
+		</CPU>
+		<HardDisk id="0">
+			<Capacity unit="GB">200</Capacity>
+		</HardDisk>
+		<HardDisk id="1">
+			<Capacity unit="GB">400</Capacity>
+		</HardDisk>
+	</Computer>
+</cfg>

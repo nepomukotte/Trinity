@@ -1,0 +1,114 @@
+
+<!-- A full configuration ID -->
+<ConfigId>
+	<SubConfigId type="Describe">monoNode</SubConfigId>
+	<SubConfigId type="Prepare">pedestals</SubConfigId>
+	<SubConfigId type="Configure">pedestals</SubConfigId>
+</ConfigId>
+
+<!--  Example of an EXOGAM configuration ID -->
+<ConfigId>exogam2_16clovers</ConfigId>
+
+
+<!-- A list of 4 configuration IDs -->
+<ConfigIdSet>
+	<ConfigId>
+		<SubConfigId type="Describe">monoNode</SubConfigId>
+		<SubConfigId type="Prepare">pedestals</SubConfigId>
+		<SubConfigId type="Configure">pedestals</SubConfigId>
+	</ConfigId>
+	<ConfigId>
+		<SubConfigId type="Describe">monoNode</SubConfigId>
+		<SubConfigId type="Prepare">autogain</SubConfigId>
+		<SubConfigId type="Configure">autogain</SubConfigId>
+	</ConfigId>
+	<ConfigId>
+		<SubConfigId type="Describe">monoNode</SubConfigId>
+		<SubConfigId type="Prepare">selected_readout</SubConfigId>
+		<SubConfigId type="Configure">selected_readout</SubConfigId>
+	</ConfigId>
+	<ConfigId>
+		<SubConfigId type="Describe">biNode</SubConfigId>
+		<SubConfigId type="Prepare">pedestals</SubConfigId>
+		<SubConfigId type="Configure">pedestals</SubConfigId>
+	</ConfigId>
+</ConfigIdSet>
+
+<!-- An empty list of configuration IDs -->
+<ConfigIdSet>
+</ConfigIdSet>
+
+<!-- An EXOGAM list of configuration IDs -->
+<ConfigIdSet>
+	<ConfigId>exogam2_16clovers</ConfigId>
+	<ConfigId>exogam2_12clovers</ConfigId>
+</ConfigIdSet>
+
+<!-- A list of data senders -->
+<DataSenderSet>
+	<DataSender id="CoBo[Crate0Slot0].Asad[0]"/>
+	<DataSender id="CoBo[Crate0Slot0].Asad[1]"/>
+	<DataSender id="CoBo[Crate0Slot0].Asad[2]"/>
+	<DataSender id="CoBo[Crate0Slot0].Asad[3]"/>
+	<DataSender id="Mutant[Crate0Slot1]"/>
+</DataSenderSet>
+
+<!-- A list of (DataSender,DataRouter) couples -->
+<DataLinkSet>
+	<DataLink>
+		<DataSender id="CoBo[Crate0Slot0].Asad[0]"/>
+		<DataRouter name="Actor0" ipAddress="132.166.9.000" port="46005" type="FDT"/>
+	</DataLink>
+	<DataLink>
+		<DataSender id="CoBo[Crate0Slot0].Asad[1]"/>
+		<DataRouter name="Actor1" ipAddress="132.166.9.001" port="46005" type="FDT"/>
+	</DataLink>
+	<DataLink>
+		<DataSender id="CoBo[Crate0Slot0].Asad[2]"/>
+		<DataRouter name="Actor2" ipAddress="132.166.9.002" port="46005" type="FDT"/>
+	</DataLink>
+	<DataLink>
+		<DataSender id="CoBo[Crate0Slot0].Asad[3]"/>
+		<DataRouter name="Actor3" ipAddress="132.166.9.003" port="46005" type="FDT"/>
+	</DataLink>
+	<DataLink>
+		<DataSender id="Mutant[Crate0Slot1]"/>
+		<DataRouter name="Actor4" ipAddress="132.166.9.000" port="46006" type="FDT"/>
+	</DataLink>
+</DataLinkSet>
+
+<!-- A set of configurations with their ID (extract) -->
+<ConfigSet>
+	<File filename="describe_monoNode.xcfg" format="xcfg" subConfigType="describe" subConfigId="monoNode">
+		<Setup id="Hardware">
+			<etc/>
+		</Setup>
+	</File>
+	<File filename="prepare_pedestals.xcfg" format="xcfg" subConfigType="prepare" subConfigId="pedestals">
+		<Setup id="Conditions">
+			<etc/>
+		</Setup>
+	</File>
+	<File filename="configure_pedestals.xcfg" format="xcfg" subConfigType="configure" subConfigId="pedestals">
+		<Setup id="Conditions">
+			<etc/>
+		</Setup>
+	</File>
+	<File filename="hardware_reducedCoBo.xcfg" format="xcfg" subConfigType="hardware" subConfigId="reducedCoBo">
+		<Setup id="Hardware">
+			<etc/>
+		</Setup>
+	</File>
+	<File filename="hardware_Mutant.xcfg" format="xcfg" subConfigType="hardware" subConfigId="Mutant">
+		<Setup id="Hardware">
+			<etc/>
+		</Setup>
+	</File>
+</ConfigSet>
+
+<!--  An EXOGAM configuration set -->
+<ConfigSet>
+	<SvnUrl url="https://exogam.ganil.fr/svn/config/exogam2_16clovers" revision=103 />
+</ConfigSet>
+
+

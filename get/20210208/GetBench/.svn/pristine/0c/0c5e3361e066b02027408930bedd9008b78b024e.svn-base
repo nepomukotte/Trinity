@@ -1,0 +1,138 @@
+// $Id: interfaces.dox 1499 2015-09-18 08:06:36Z psizun $
+/**
+@page page_Concepts Concepts
+
+@page page_Formats Formats
+@section sec_CompoundConfigFormat Format of configurations
+All configurations are stored either in <a href="https://dsm-trac.cea.fr/cconfig/doxygen/CompoundConfig/html/main.html?path=%2Fvar%2Fdoxygen%2Fcconfig%2FCompoundConfig%2Fhtml%2Fmain.html">CompoundConfig</a> XML files or in a <a href="https://dsm-trac.cea.fr/cconfig/doxygen/CompoundConfig/html/main.html?path=%2Fvar%2Fdoxygen%2Fcconfig%2FCompoundConfig%2Fhtml%2Fmain.html">CompoundConfig</a> database.
+
+Example files can be found in the <em>${PREFIX}/share/get-bench/config</em> directory created after installing the <i>GetBench</i> software package.
+
+@par Hardware description files
+Each entity hosting a register server (R-Cobo, CoBo or Mutant board) needs a hardware description file describing its devices, registers and bit fields.
+
+@par Run configuration files
+The values to give to the AGET, AsAd and (R-)CoBo registers are also stored using CompoundConfig.
+
+@section sec_DataFormats Format of data
+
+@par Format of (R-)CoBo data frames
+The data sent by (R-)CoBo boards follow the document @ref ref_cobo_data_format "GET CoBo Data Format 3.3"
+ describing the revision <b>4</b> of <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/DataFormats/MultiFrame-2.2.pdf">Multiframe Metaformat 2.2</a> basic frames of type <b>1</b>.
+ 
+In full readout mode and when zero suppression is disabled, a more compact data format is used, where the channel index and bucket index of each sample are not explicitly given.
+
+@par
+The <a href="https://dsm-trac.cea.fr/cconfig/doxygen/CompoundConfig/html/main.html?path=%2Fvar%2Fdoxygen%2Fcconfig%2FCompoundConfig%2Fhtml%2Fmain.html">CompoundConfig</a> description files of this format are available 
+in the <em>${PREFIX}/share/get-bench/format</em> directory created after installing the <i>GetBench</i> software package.
+
+@par Format of (R-)CoBo topology frames
+In addition to the data frames prepared by its firmware, CoBo can send small <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/DataFormats/CoBoTopoFormat-rev0v2.pdf">topology frames</a> prepared by its software. The purpose of these frames is to help the Narval actors figure out how many frames it can expect from each AsAd board connected to the CoBo board.
+They are sent only once, when opening a FDT connection between the CoBo board and a data receiver.
+
+@par Format of merged data frames
+The Narval event builder can gather raw (CoBo) data frames that share the same event identifier or the same event timestamp into layered frames.
+The two formats for merged data (frames of types 65281 and 65282) are described <a href="http://wiki.ganil.fr/gap/browser/Documents/SPIRAL2_DAQ/DataFormat/MultiFrame-MergeDataFormat-1.0.pdf">here</a>.
+
+<table>
+<caption>Reserved MFM frame type identifiers</caption>
+<tr><th>Frame Type</th><th>Project</th><th>Data Format Description</th></tr>
+<tr><td>1 (0x1)</td><td>GET</td><td>CoBo data frame</td></tr>
+<tr><td>2 (0x2)</td><td>GET</td><td>CoBo data compact frame (no channel index, no bucket index)</td></tr>
+<tr><td>7 (0x7)</td><td>GET</td><td>CoBo topology frame</td></tr>
+<tr><td>8 (0x8)</td><td>GET</td><td>Mutant data frame</td></tr>
+<tr><td>9 (0x9)</td><td>GET</td><td>Mutant data frame</td></tr>
+<tr><td>10 (0xA)</td><td>GET</td><td>Mutant data frame</td></tr>
+<tr><td>11 (0xB)</td><td>GET</td><td>Mutant RESERVED</td></tr>
+<tr><td>16 (0x10)</td><td>Ganil EXOGAM2</td><td>Numexo2 EXOGAM EC data frame</td></tr>
+<tr><td>17 (0x11)</td><td>Ganil EXOGAM2</td><td>Numexo2 EXOGAM O oscilloscope frame</td></tr>
+<tr><td>18 (0x12)</td><td>Ganil EXOGAM2</td><td>Numexo2 NEDA NR data frame</td></tr>
+<tr><td>19 (0x13)</td><td>Ganil EXOGAM2</td><td>Numexo2 NEDA NC compressed data frame</td></tr>
+<tr><td>32 (0x20)</td><td>Ganil VME/VXI</td><td>VME/VXIevent number data frame</td></tr>
+<tr><td>33 (0x21)</td><td>Ganil VME/VXI</td><td>VME/VXItimestamp data frame</td></tr>
+<tr><td>34 (0x22)</td><td>Ganil VME/VXI</td><td>VME/VXIevent number + timestamp</td></tr>
+<tr><td>35 (0x23)</td><td>Ganil VME/VXI</td><td>MATACQ data frame</td></tr>
+<tr><td>48 (0x30)</td><td>RIKEN/RIBF</td><td>RIBF event data frame</td></tr>
+<tr><td>65281 (0xFF01)</td><td>Ganil</td><td>Layered frame of data frames merged by event ID</td></tr>
+<tr><td>65282 (0xFF02)</td><td>Ganil</td><td>Layered frame of data frames merged by event timestamp</td></tr>
+</table>
+@see <a href="http://wiki.ganil.fr/gap/browser/Documents/SPIRAL2_DAQ/DataFormat/MFM_types_allocation.pdf">GANIL MFM types allocation</a>
+@see <a href="http://wiki.ganil.fr/gap/wiki/SPIRAL2-Multiframe-Meta-Format">GANIL-SPIRAL2 MFM data formats</a>
+
+@page page_Interfaces Interfaces
+@tableofcontents
+
+@section sec_DataFlowInterface Data flow interface between (R-)CoBo and data router(s)
+@subsection sec_flowTypes Data flow types
+The data frames generated by the R-CoBo/CoBo firmware are sent using one of the following data flow types:
+ICE, TCP, ZBUF or FDT.
+  - <b>ICE</b>\n
+    Frames are sent using the ZeroC Internet Communications Engine middleware.
+
+  - <b>TCP</b>\n
+    Frames are sent using a vanilla TCP/IP connection.
+
+  - <b>ZBUF</b>\n
+    A TCP connection optimized for a high data throughput, with zero-copy buffer and checksum offloading.
+    The performances of this data flow type are highly dependent on:
+      - the network interface card
+      - the driver of this card
+      - the value set for the network interface Maximum Transfer Unit (MTU).
+      .
+  - <b>FDT</b>\n
+    A version of the ZBUF data flow type customized for the interface with GANIL Narval actors.
+    - Whenever the embedded data sender has been idle for more than 3 seconds, a 4-Byte heart beat is sent.
+    - After opening the connection and sending the first heart beat, a CoBo topology frame is sent indicating which AsAd boards are active and whether the 2p mode is enabled.
+    - Before closing the connection, the data sender emits a specific 4-Byte word.
+
+Two additional flow types that do not actually send the data are also available for debugging purposes.
+
+@subsection sec_processorTypes Data processor types
+The <em>dataRouter</em> software provides a choice between several data processor types.
+	- <b>ByteStorage</b>\n
+	The raw data received are directly written into a file.\n
+	A new file is created if the size of the previous one exceeds 1 GiB.
+
+	- <b>ByteCounter</b>\n
+	The data reception rate is printed every 5 seconds and the data received are discarded.
+	
+	- <b>FrameStorage</b>\n
+	The data received are stored in memory until a full frame has been reconstructed.\n
+	A new file is created if the size of the previous one exceeds 1 GiB or if the event ID of the frame is smaller than the ID of the previous frame.
+
+	- <b>FrameCounter</b>\n
+	  The data received are stored in memory until a full frame has been reconstructed.\n
+	  The frame reception rate is printed every 5 seconds and the frames received are discarded.
+
+@section sec_EccRccInterface Interface between ECC (state machine) and RCC
+To control a (series of) CoBo/Mutant board(s), the GANIL Global Run Control Core interacts with the GET Electronics Control Core server, which hosts a state machine.
+The states of the system, and the transitions between these states, are illustrated below.
+
+@htmlonly
+<div align="center">
+<embed src="get_ecc_state_machine_diagram.svg" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" />
+</div>
+<div align="center" class="caption">Diagram of the GET ECC state machine.</div>
+@endhtmlonly
+
+To trigger a transition of the state machine, check its status or get a list of the available configurations, the RCC interacts with the ECC server using a SOAP interface.
+
+@section sec_CoBoFirmwareSoftwareInterfaces Interfaces between CoBo firmware and software
+@subsection Data
+
+For each event, the CoBo firmware creates one data frame per AsAd board.
+Each AsAd board is associated with a circular buffer, a range of memory where the frames are written (with a start pointer, an end pointer, a read pointer and a write pointer). 
+After writing frames to the circular buffers, the firmware updates the write pointers and sends an interrupt.
+After each interrupt, the software reads the write pointers, sends the contents of each of the circular buffers on the network and updates the read pointers.
+
+<table>
+<caption>Memory range available for AsAd circular buffers</caption>
+<tr><th>Board</th><th>Memory range</th></tr>
+<tr><td>R-CoBo</td><td>128 MiB from 0x8000000 to 0x10000000</td></tr>
+<tr><td>CoBo</td><td>192 MiB from 0x4000000 to 0x10000000 (48 MiB per AsAd)</td></tr>
+</table>
+
+The total amount of memory available (see table above) must be split between the AsAd boards (see @ref page_RunConfigParameters).
+
+$LastChangedDate$
+*/

@@ -1,0 +1,146 @@
+// $Id: requirements_debian.dox 1518 2015-11-17 09:48:53Z psizun $
+/**
+@page page_Debian Linux Debian Requirements
+
+\tableofcontents
+To install all the external tools and libraries required by the GET software in a Linux Debian-based environment such as Ubuntu, proceed as indicated below.
+
+\section sec_ubuntu_req Ubuntu
+
+\subsection oneliner One-liner
+\verbatim
+sudo apt-get install subversion g++ automake autoconf libtool pkg-config  libboost-all-dev libreadline-dev libncurses-dev libqt4-dev libqwt-dev libqwtplot3d-qt4-dev libzeroc-ice-dev gsoap liblog4cxx10-dev libmysqlclient-dev
+\endverbatim
+(This one-liner does not install the following optional requirements: ROOT, PostgreSQL, Oracle, SQLite3.)
+
+
+\subsection gcc C++ compiler
+\verbatim
+sudo apt-get install g++
+\endverbatim
+
+
+\subsection autotools Autotools
+\verbatim
+sudo apt-get install automake autoconf libtool
+\endverbatim
+
+
+\subsection pkg-config pkg-config
+\verbatim
+sudo apt-get install pkg-config
+\endverbatim
+
+
+\subsection boost Boost
+\verbatim
+sudo apt-get install libboost-all-dev
+\endverbatim
+
+
+\subsection readline readline
+\verbatim
+sudo apt-get install libreadline-dev
+\endverbatim
+
+
+\subsection ncurses ncurses
+\verbatim
+sudo apt-get install libncurses-dev
+\endverbatim
+
+
+\subsection subversion Subversion
+\verbatim
+sudo apt-get install subversion
+\endverbatim
+
+
+\subsection qt Qt
+\verbatim
+sudo apt-get install qtbase5-dev libqt5opengl5
+\endverbatim
+
+
+\subsection qwt Qwt
+\verbatim
+sudo apt-get install libqwt-qt5-dev
+\endverbatim
+
+
+\subsection qwtplot3d QwtPlot3d
+\verbatim
+sudo apt-get install libqwtplot3d-qt5-dev
+\endverbatim
+
+
+\subsection log4cxx log4cxx
+\verbatim
+sudo apt-get install liblog4cxx-dev
+\endverbatim
+
+
+\subsection ice ICE
+\verbatim
+sudo apt-get install zeroc-ice-all-dev
+\endverbatim
+
+
+\subsection gsoap gSOAP
+\verbatim
+sudo apt-get install gsoap
+\endverbatim
+
+
+\subsection root ROOT 5
+No Debian package is currently available. It needs to be installed <a href="http://root.cern.ch">from source</a>.
+To enable the Qt graphics backend, install Qt and invoke the ROOT configure script with the <em>--enable-qt</em> option.
+
+
+\subsection MySql MySql client library
+\verbatim
+sudo apt-get install libmysqlclient-dev
+\endverbatim
+
+
+\subsection PostgreSql PostgreSql client library
+\verbatim
+sudo apt-get install libpq-dev
+\endverbatim
+
+\subsection SQLite3 SQLite3 client library
+\verbatim
+sudo apt-get install libsqlite3-dev
+\endverbatim
+
+\subsection Oracle Oracle client library
+	- Go to  http://www.oracle.com and to the  download area (click on view all downloads, on right), in the section <em>Database</em>, select <em>Instant client</em> (<a href="http://www.oracle.com/technology/software/tech/oci/instantclient/index.html">direct link</a>), and then <em>Instant Client for Linux x86</em> (or x86-64).
+	You will need an Oracle account.
+    - Click <em>Accept the licence agreement</em>.
+    - Download <em>oracle-instantclient11.2-basic-11.2.0.3.0-1.x86_64.rpm</em>,  <em>oracle-instantclient11.2-sqlplus-11.2.0.3.0-1.x86_64.rpm</em>,  <em>oracle-instantclient11.2-devel-11.2.0.3.0-1.x86_64.rpm</em>.
+    - We will have to convert these RPMs to DEB files using <em>alien</em>. Alternatively, you can also use the pre-converted packages attached to <a href="https://dsm-trac.cea.fr/cconfig/wiki/LinuxSetup">this page</a>.
+        - first, let's install alien
+        \verbatim
+sudo apt-get install alien
+\endverbatim
+		- then, let's convert the packages
+        \verbatim
+sudo alien -d oracle-instantclient11.2-basic-11.2.0.3.0-1.x86_64.rpm oracle-instantclient11.2-sqlplus-11.2.0.3.0-1.x86_64.rpm oracle-instantclient11.2-devel-11.2.0.3.0-1.x86_64.rpm
+\endverbatim
+	- Now we can install the generated .deb files
+    	- first, we have to install a dependency: libaio1
+        \verbatim
+sudo apt-get install libaio1
+\endverbatim
+    	- then we install the Oracle client:
+        \verbatim
+sudo dpkg -i oracle-instantclient11.2-basic_11.2.0.3.0-2_amd64.deb oracle-instantclient11.2-sqlplus_11.2.0.3.0-2_amd64.deb oracle-instantclient11.2-devel_11.2.0.3.0-2_amd64.deb
+\endverbatim
+	- Finally, you need to add the Oracle library path to the @em LD_LIBRARY_PATH environment variable in your shell profile; for Bash, append the following line to your system or user profile:
+        \verbatim
+export LD_LIBRARY_PATH=/usr/lib/oracle/11.2/client64/lib:$LD_LIBRARY_PATH
+\endverbatim
+
+$LastChangedDate$
+*/
+

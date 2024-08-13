@@ -1,0 +1,6 @@
+[YYYY/MM/DD HH:MM],[Observer lat, +N],[Observer long, +E],[Elevation in m]
+[object1 name],[object1 type designation],[object1 right ascension in deg],[object1 declination in deg],[object1 magnitude]
+[object2 name],[object2 type designation],[object2 right ascension in deg],[object2 declination in deg],[object2 magnitude]
+...
+
+use (https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId800642) for type designation

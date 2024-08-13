@@ -1,0 +1,299 @@
+/*
+ * $Id: FrameFormatTest.cpp 740 2012-06-05 14:59:08Z psizun $
+ * @file FrameFormatTest.cpp
+ * @created 21 févr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+#include "mfm/FrameFormat.h"
+#include "mfm/Frame.h"
+using namespace mfm;
+#include "tut.h"
+#include <string>
+#include <fstream>
+using namespace std;
+
+#ifndef VXWORKS
+#define TEMP_DIR "/tmp/"
+#else
+#define TEMP_DIR "tmp/"
+#endif
+
+namespace tut
+{
+///////////////////////////////////////////////////////////////////////////////
+// test fixture definition
+///////////////////////////////////////////////////////////////////////////////
+struct frame_format_test_data
+{
+};
+
+typedef test_group<frame_format_test_data> testgroup;
+typedef testgroup::object testobject;
+testgroup frame_format_testgroup("FrameFormat");
+
+///////////////////////////////////////////////////////////////////////////////
+// test methods body
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Checks constructor with file path.
+ */
+template<> template<>
+void testobject::test<1>()
+{
+    set_test_name("Checks constructor with file path");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+}
+
+/**
+ * Checks isValid().
+ */
+template<> template<>
+void testobject::test<2>()
+{
+    set_test_name("Checks isValid()");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+    ensure_equals("isValid", format.isValid(), true);
+}
+
+/**
+ * Checks formatName().
+ */
+template<> template<>
+void testobject::test<3>()
+{
+    set_test_name("Checks formatName()");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+    ensure_equals("formatName", format.formatName(), "CoBo");
+}
+
+/**
+ * Checks findItemField() by name.
+ */
+template<> template<>
+void testobject::test<4>()
+{
+    set_test_name("Checks findItemField() by name");
+
+	size_t pos, size;
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		format.findItemField("", pos, size);
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("Unnamed field not found.");
+	}
+
+	try
+	{
+		format.findItemField("none", pos, size);
+		fail("Non-existing field found!");
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		;
+	}
+}
+
+/**
+ * Checks findHeaderField() by name.
+ */
+template<> template<>
+void testobject::test<5>()
+{
+    set_test_name("Checks findHeaderField() by name");
+
+	size_t offset, size;
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		format.findHeaderField("asadIdx", offset, size);
+		ensure_equals("asadIdx.size", size, 1u);
+		ensure_equals("asadIdx.offset", offset, 27u);
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("Field 'asadIdx' not found.");
+	}
+}
+
+/**
+ * Checks findItemBitField() by name.
+ */
+template<> template<>
+void testobject::test<6>()
+{
+    set_test_name("Checks findItemBitField() by name");
+
+	size_t pos, width;
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		format.findItemBitField("", "buckIdx", pos, width);
+		ensure_equals("buckIdx.width", width, 9u);
+		ensure_equals("buckIdx.pos", pos, 14u);
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("BitField ''.buckIdx found.");
+	}
+}
+
+/**
+ * Checks findHeaderBitField().
+ */
+template<> template<>
+void testobject::test<7>()
+{
+    set_test_name("Checks findHeaderBitField()");
+
+	size_t pos, width;
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		format.findHeaderBitField("metaType", "P2BLCK", pos, width);
+		ensure_equals("metaType.P2BLCK.width", width, 4u);
+		ensure_equals("metaType.P2BLCK.pos", pos, 0u);
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("BitField 'metaType.P2BLCK' found.");
+	}
+}
+
+/**
+ * Checks findItemField() by offset and size.
+ */
+template<> template<>
+void testobject::test<8>()
+{
+    set_test_name("Checks findItemField() by offset and size");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		ensure_equals("Field name", format.findItemField(0, 4), "");
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("Expected field not found.");
+	}
+
+	try
+	{
+		format.findItemField(0, 5);
+		fail("Non-existing field found!");
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		;
+	}
+}
+
+/**
+ * Checks findHeaderField() by offset and size.
+ */
+template<> template<>
+void testobject::test<9>()
+{
+    set_test_name("Checks findHeaderField() by offset and size");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		ensure_equals("Field name", format.findHeaderField(31, 9), "hitPat_0");
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("Expected field not found.");
+	}
+
+	try
+	{
+		format.findHeaderField(23, 2);
+		fail("Non-existing field found!");
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		;
+	}
+}
+
+/**
+ * Checks endianness().
+ */
+template<> template<>
+void testobject::test<10>()
+{
+    set_test_name("Checks endianness()");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		ensure_equals("endianness", format.endianness(), utl::BigEndian);
+	}
+	catch (mfm::FieldNotFound & e)
+	{
+		fail("Failed to read ISLEND attribute.");
+	}
+}
+
+/**
+ * Checks creation of an empty frame from its CompoundConfig format.
+ */
+template<> template<>
+void testobject::test<11>()
+{
+    set_test_name("Checks creation of an empty frame from its CompoundConfig format");
+
+    FrameFormat format("mfm/sample_formats.xml", "CoBo", 0);
+	try
+	{
+		std::auto_ptr<Frame> frame = format.createFrame();
+		ensure_equals("metaType", frame->headerField("metaType").value<uint8_t>(), 0x06);
+		ensure_equals("frameSize_B", frame->header().frameSize_B(), 128u);
+	}
+	catch (mfm::Exception & e)
+	{
+		fail("Frame::create(format) failed: ");
+	}
+}
+
+//
+} // namespace tut
+
+

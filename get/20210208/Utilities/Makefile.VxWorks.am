@@ -1,0 +1,15 @@
+if VXWORKS_KERNEL
+BUILT_SOURCES += UtilitiesTest_ctdt.c
+CLEANFILES += UtilitiesTest_ctdt.c
+
+EXTRA_PROGRAMS = UtilitiesTest_partialimage
+
+nodist_UtilitiesTest_SOURCES = UtilitiesTest_ctdt.c
+
+UtilitiesTest_partialimage_SOURCES = $(UtilitiesTest_SOURCES)
+UtilitiesTest_partialimage_LDADD = $(UtilitiesTest_LDADD)
+
+UtilitiesTest_ctdt.c: UtilitiesTest_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+
+endif

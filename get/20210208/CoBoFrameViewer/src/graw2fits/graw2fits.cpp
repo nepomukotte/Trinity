@@ -1,0 +1,285 @@
+/**
+ * @file graw2fits.cpp
+ * @date Nov 13, 2013
+ * @author sizun
+ * 
+ * @note SVN tag: $Id: graw2fits.cpp 1014 2013-11-18 09:33:36Z psizun $
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the CoBoFrameViewer software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "graw2fits.h"
+#include <mfm/Frame.h>
+using mfm::Frame;
+#include "get/CoBoEvent.h"
+#include "utl/Logging.h"
+
+#include <CCfits/CCfits>
+using namespace CCfits;
+
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
+
+#include <cerrno>
+#include <cstring>
+#include <fstream>
+#include <valarray>
+using namespace std;
+
+namespace get
+{
+//_________________________________________________________________________________________________
+std::auto_ptr< CCfits::FITS > createEventIndex(const std::string & baseName)
+{
+	// Create output index FITS file
+    std::auto_ptr< CCfits::FITS > pFits(0);
+	// Overwrite any existing file with same name
+	std::ostringstream fileNameStr;
+	fileNameStr << '!' << baseName << "_index.fits.gz";
+	LOG_INFO() << "Creating file '" << fileNameStr.str() << "'...";
+	pFits.reset(new CCfits::FITS(fileNameStr.str(), CCfits::Write) );
+
+    const size_t numIndexCol = 11;
+    std::vector<string> colName(numIndexCol, "");
+   	std::vector<string> colForm(numIndexCol, "");
+   	std::vector<string> colUnit(numIndexCol, "");
+   	colName[0] = "EVENT";
+   	colForm[0] = "1V"; // V = unsigned 32-bit integer
+
+   	colName[1] = "COBO";
+   	colForm[1] = "1U"; // U = unsigned 16-bit integer
+
+   	colName[2] = "ASAD";
+   	colForm[2] = "1U"; // U = unsigned 16-bit integer
+
+   	colName[3] = "AGET";
+   	colForm[3] = "1U"; // U = unsigned 16-bit integer
+
+   	colName[4] = "CHAN";
+   	colForm[4] = "1U"; // U = unsigned 16-bit integer
+
+   	colName[5] = "MEMBER_XTENSION"; // XTENSION keyword value of member: ’PRIMARY ’, ’TABLE’, ’BINTABLE’, ’IMAGE’ or any other IAU FITS Working Group registered XTENSION value
+   	colForm[5] = "8A";
+
+   	colName[6] = "MEMBER_NAME"; // EXTNAME keyword value of member
+   	colForm[6] = "32A";
+
+   	colName[7] = "MEMBER_VERSION"; // EXTVER keyword value of member
+   	colForm[7] = "1J";
+
+   	colName[8] = "MEMBER_POSITION"; // member’s position within its FITS file
+   	colForm[8] = "1J";
+
+   	colName[9] = "MEMBER_URI_TYPE"; // 'URL' or 'URN'
+   	colForm[9] = "3A";
+
+   	colName[10] = "MEMBER_LOCATION";
+   	colForm[10] = "256A";
+
+    Table* indexTable = pFits->addTable("GROUPING", 0, colName, colForm, colUnit);
+    indexTable->addKey("GRPNAME", "GET-EVTS-CHAN-IDX", "Name of the group table");
+    indexTable->writeChecksum();
+
+    return pFits;
+}
+//_________________________________________________________________________________________________
+std::auto_ptr< CCfits::FITS > createEventFile(const std::string & baseName, const uint32_t eventIdx,
+		const uint16_t coboIdx, const uint16_t asadIdx)
+{
+	std::auto_ptr< CCfits::FITS > pFits;
+
+	// Build event file name
+	std::ostringstream fileNameStr;
+	fileNameStr << '!' << baseName << "_CoBo" << coboIdx << "_AsAd" << asadIdx << "_EVT" << eventIdx << ".fits.gz";
+
+	// Create file
+	LOG_DEBUG() << "Creating file '" << fileNameStr.str() << '\'';
+	pFits.reset(new CCfits::FITS(fileNameStr.str(), CCfits::Write) );
+	return pFits;
+}
+//_________________________________________________________________________________________________
+CCfits::Table* createChannelTable(std::auto_ptr< CCfits::FITS > & pFits, const uint32_t eventIdx,
+		const uint16_t coboIdx, const uint16_t asadIdx, const uint16_t agetIdx, const uint16_t chanIdx,
+		const size_t numSamples=0)
+{
+	unsigned long rows(numSamples);
+	string hduName = "GET-EVTS-CHAN";
+	std::vector<string> colName(2,"");
+	std::vector<string> colForm(2,"");
+	std::vector<string> colUnit(2,"");
+
+	colName[0] = "BUCKET";
+	colForm[0] = "1U"; // U = unsigned 16-bit integer
+	colUnit[0] = "";
+
+	colName[1] = "SAMPLE";
+	colForm[1] = "1U"; // U = unsigned 16-bit integer
+	colUnit[1] = "count"; // See VOUnits 1.0 Table 2
+
+	// Create table
+	const int version = pFits->extension().count(hduName) + 1;
+	//LOG_WARN() << "Version: " << version;
+	Table* newTable = pFits->addTable(hduName,rows,colName,colForm,colUnit, BinaryTbl, version);
+	newTable->addKey("EXTVER", version, "");
+	newTable->addKey("EVENT", eventIdx, "Event identifier");
+	newTable->addKey("COBO", coboIdx, "CoBo board identifier");
+	newTable->addKey("ASAD", asadIdx, "AsAd board index");
+	newTable->addKey("AGET", agetIdx, "AGET chip index");
+	newTable->addKey("CHAN", chanIdx, "AGET channel index");
+	newTable->writeChecksum();
+	pFits->flush();
+	return newTable;
+}
+//_________________________________________________________________________________________________
+void writeChannelSamples(CCfits::Table & table, const get::Channel & channel)
+{
+	const size_t numSamples = channel.sampleCount();
+	uint16_t *data = const_cast<uint16_t*>(channel.buckIndexes().data());
+	table.column("BUCKET").write(data, numSamples, 1);
+	data = const_cast<uint16_t*>(channel.sampleValues().data());
+	table.column("SAMPLE").write(data, numSamples, 1);
+}
+//_________________________________________________________________________________________________
+bool graw2fits(const std::string & input_filename, const std::string & baseName,
+		const size_t maxFrames, const size_t frameOffset)
+{
+	LOG_INFO() << "Converting raw MFM frame contents into FITS file...";
+	LOG_DEBUG() << "Opening file '" << input_filename << "'...";
+	std::ifstream in;
+	in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	try
+	{
+		in.open(input_filename.c_str(), std::ios::in | std::ios::binary);
+	}
+	catch (const std::ifstream::failure & e)
+	{
+		LOG_ERROR() << "Could not open file '" << input_filename << "': " << std::strerror(errno);
+		return false;
+	}
+
+    // Create index table
+	std::auto_ptr< CCfits::FITS > pFitsIndex = createEventIndex(baseName);
+	CCfits::Table & indexTable = dynamic_cast< CCfits::Table & >(pFitsIndex->extension("GROUPING"));
+
+    // Loop over frames in input file
+	std::auto_ptr<Frame> frame;
+	Frame::seekFrame(in, frameOffset);
+	size_t frameCount = 0;
+	get::CoBoEvent event;
+	try
+	{
+		do
+		{
+			if (maxFrames > 0 and frameCount >= maxFrames) break;
+			//boost::timer timer;
+			// Read frame
+			try
+			{
+				frame = Frame::read(in);
+			}
+			catch (const std::ifstream::failure & e)
+			{
+				if (in.rdstate() & std::ifstream::eofbit)
+				{
+					LOG_WARN() << "EOF reached.";
+					break;
+				}
+				else
+				{
+					LOG_ERROR() << "Error reading frame: " << e.what();
+				}
+				return false;
+			}
+
+			// Decode frame
+			event.fromFrame(*frame.get());
+
+			// Create FITS file for event
+			const uint32_t eventIdx = event.eventIdx();
+			const uint16_t coboIdx = event.coboIdx();
+			const uint16_t asadIdx = event.asadIdx();
+			std::auto_ptr< CCfits::FITS > pEventFits = createEventFile(baseName, eventIdx, coboIdx, asadIdx);
+
+			// Update index
+			const size_t numIndexRows = indexTable.rows();
+			const size_t numChannels = event.channels().size();
+			indexTable.insertRows(numIndexRows, numChannels);
+			std::valarray< uint32_t > evenIdxs(eventIdx, numChannels);
+			indexTable.column("EVENT").write(evenIdxs, numIndexRows+1);
+			std::valarray< uint32_t > coboIdxs(coboIdx, numChannels);
+			indexTable.column("COBO").write(coboIdxs, numIndexRows+1);
+			std::valarray< uint32_t > asadIdxs(asadIdx, numChannels);
+			indexTable.column("ASAD").write(asadIdxs, numIndexRows+1);
+			indexTable.column("MEMBER_XTENSION").write(std::vector< std::string >(numChannels, "BINTABLE"), numIndexRows+1);
+			indexTable.column("MEMBER_NAME").write(std::vector< std::string >(numChannels, "GET-EVTS-CHAN"), numIndexRows+1);
+			indexTable.column("MEMBER_URI_TYPE").write(std::vector< std::string >(numChannels, "URL"), numIndexRows+1);
+			std::string location;
+#if BOOST_FILESYSTEM_VERSION >= 3
+			location = fs::path(pEventFits->name()).leaf().string();
+#else
+			location = fs::path(pEventFits->name()).leaf();
+#endif
+			indexTable.column("MEMBER_LOCATION").write(std::vector< std::string >(numChannels, location), numIndexRows+1);
+
+			// Loop over channels
+			ChannelMap::const_iterator it;
+			size_t memberVersion = 0;
+			for (it = event.channels().begin(); it != event.channels().end(); ++it)
+			{
+				++memberVersion;
+
+				uint16_t chanIdx = it->first.first;
+				uint16_t agetIdx = it->first.second;
+
+				// Add HDU for channel
+				unsigned rows = it->second.sampleCount();
+				Table* table = createChannelTable(pEventFits, eventIdx, coboIdx, asadIdx, agetIdx, chanIdx, rows);
+				writeChannelSamples(*table, it->second);
+				table->addKey("GRPID1", -1, "EXTVER of the grouping table");
+				table->addKey("GRPLC1", pFitsIndex->name(), "URI of the grouping table");
+				table->writeChecksum();
+
+				// Update index
+				indexTable.column("AGET").write(&agetIdx, 1, numIndexRows + memberVersion);
+				indexTable.column("CHAN").write(&chanIdx, 1, numIndexRows + memberVersion);
+				indexTable.column("MEMBER_VERSION").write(&memberVersion, 1, numIndexRows + memberVersion);
+				size_t memberPosition = memberVersion;
+				indexTable.column("MEMBER_POSITION").write(&memberPosition, 1, numIndexRows + memberVersion);
+			}
+		}
+		while (in.good());
+	}
+	catch (const std::exception & e)
+	{
+		LOG_ERROR() << e.what();
+		return false;
+	}
+
+	indexTable.writeChecksum();
+	return true;
+}
+//_________________________________________________________________________________________________
+}; // namespace get
+

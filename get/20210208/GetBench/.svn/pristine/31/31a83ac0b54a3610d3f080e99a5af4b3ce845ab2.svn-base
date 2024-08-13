@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+slicedir=@datarootdir@/slice
+
+Name: getbench-daq
+Description: Data Acquisition : a C++ class library to access data acquired from a node.
+Requires: mdaq-hwserver@DEBUG_SUFFIX@ MultiFrame@DEBUG_SUFFIX@
+Version: @VERSION@
+Libs: -L${libdir} -lgetbench-daq@DEBUG_SUFFIX@
+Cflags: -I${includedir} @PTHREAD_CFLAGS@ @UTILS_CFLAGS@

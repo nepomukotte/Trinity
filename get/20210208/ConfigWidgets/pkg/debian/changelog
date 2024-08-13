@@ -1,0 +1,5 @@
+libconfigwidgets (1.1.0-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Hervé Loïc <lherve@cea.fr>  Mon, 28 Sep 2009 16:39:28 +0200

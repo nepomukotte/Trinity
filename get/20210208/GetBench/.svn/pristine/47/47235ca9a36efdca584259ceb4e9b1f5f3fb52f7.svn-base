@@ -1,0 +1,385 @@
+// $Id: tools.dox 1439 2015-04-16 13:00:38Z psizun $
+/**
+@page page_Tools Software tools
+@tableofcontents
+
+@section sec_tools_intro Introduction
+
+This section describes the role of each of the software actors involved in the configuration and the data acquisition of a GET system.
+
+@htmlonly
+<div align="center">
+<embed src="get_client_server_links.svg" type="image/svg+xml" pluginspage="http://www.adobe.com/svg/viewer/install/" />
+</div>
+<div align="center" class="caption">Client-server relationships between GET software components.</div>
+@endhtmlonly
+@image latex get_client_server_links.eps "Client-server relationships between GET software components." width=0.8\textwidth
+
+@section sec_tools_getHwServer Embedded server(s)
+	
+@par getHwServer.out
+The software running under VxWorks on the Reduced-CoBo ML507 board or on the CoBo board is named <em>getHwServer.out</em>.
+ - It acts as a server with respect to the Electronics Control Core server which, after loading the (R-)CoBo hardware description, configures the registers.
+ - It acts as a client with respect to a data router (Narval, or GetController or the <em>dataRouter</em> executable).
+
+@section sec_tools_cconfiged Configuration editor
+	@par cconfiged
+	<em>cconfiged</em>  provides a stand-alone GUI for editing CompoundConfig XML configuration files (see @ref page_Formats).
+	@image html cconfiged.png "CompoundConfig cconfiged configuration editor."
+	@par dbconfiged
+	<em>dbconfiged</em>  provides a stand-alone GUI for editing CompoundConfig database configurations (see @ref page_Formats). 
+
+@section sec_tools_getEccServer ECC server
+	The Electronics Control Core (ECC) server is a central node acting as a relay between:
+	  - a configuration client (GRCC, <em>getEccClient</em>, <em>getEccSoapClient</em>, <em>GetController</em>)
+	  - and one or several embedded targets (R-CoBo, CoBo or Mutant boards).
+	
+	It contains a state machine (see @ref sec_EccRccInterface) whose transitions are triggered by the light clients (GRCC, <em>getEccSoapClient</em>).
+	
+	It can also be used as a simple intermediate for more intelligent clients like the <em>GetController</em> test bench.
+
+@subsection subsec_tools_getEccServer getEccServer
+This is the flavor of the ECC server offering a ZeroC/ICE interface to its clients.\n
+When started with no arguments, it is available to its clients on all network interfaces through port 46002.
+@verbatim
+$ getEccServer
+-- Adding servant with id: Ecc
+== Creating object adapter @ default -p 46002
+== STARTED server on 0.0.0.0:46002
+@endverbatim
+You can also specify the IP address (and, if you need several instances, the port) the ECC server should be reachable at.
+@verbatim
+getEccServer 132.166.11.159:46002
+@endverbatim
+When the ECC server state machine is being used, the <em>--config-repo-url</em> option allows users to use a configuration repository different from the working directory.
+@verbatim
+$getEccServer -h
+Usage: getEccServer [--config-repo-url=URL] [--config-repo-user=USER] [--config-repo-pwd=PWD] [[ipAddr][:ipPort]] [Ice arguments]
+@endverbatim
+
+@subsection subsec_tools_getEccSoapServer getEccSoapServer
+This is the flavor of the ECC server offering a SOAP interface to its clients.\n
+When started with no arguments, the server is available to its clients through port 8083.
+@verbatim
+$getEccSoapServer
+(15:41:45 - 06/09/2013) INFO - Starting Electronics Control Core SOAP server on port 8083
+@endverbatim
+	The <em>--port=PORT</em> option allow to change the port and, like the ICE server, the <em>--config-repo-url</em> option allows to set the configuration repository URL.
+	@verbatim
+$ getEccSoapServer -h
+Creating manager for configuration files in '/tmp'
+Usage: getEccSoapServer [--port=PORT] [--config-repo-url=URL] [--config-repo-user=USER] [--config-repo-pwd=PWD]
+@endverbatim
+
+@par Logger
+The server uses the <a url="http://logging.apache.org/log4cxx/">Apache log4cxx</a> library to log messages.
+By default, it uses a console appender.
+Alternate loggers can be defined (with the prefix GET) in a file named log4j.properties located in the run directory of <em>getEccSoapServer</em>.
+Such a file is provided with the <em>GetBench</em> package.
+
+@warning You need to have installed the gSOAP development library for <em>getEccSoapServer</em> to be generated when building the <em>GetBench</em> package.
+
+@subsection subsec_ConfigRepository State machine configuration files
+Three of the transitions of the GET ECC state machine take configuration identifiers as arguments.
+The ECC server will search for the configurations corresponding to these identifiers in its repository, which can be a directory of XML files or a database.
+
+  - <em>describe</em>
+  The <em>describe</em> transition expects a list of all the hardware nodes to configure, including their nature (CoBo, Mutant, ...), their network parameters and the identifier of their hardware description file.
+  Below is an example (see file <i>describe-mono-node.xcfg</em> provided with the <em>GetBench</em> software package) defining a single hardware node, of type (Reduced-)CoBo: 
+\verbatim
+<?xml version="1.0" encoding="UTF-8"?>
+<Setup id="Hardware">
+	<Node id="*">
+		<Instance id="*">
+			<HardwareConfigId>fullCoBoStandAlone</HardwareConfigId>
+			<Endpoint>
+				<addressField id="*" range="[0, 255]">255</addressField>
+				<addressField id="0">192</addressField>
+				<addressField id="1">168</addressField>
+				<addressField id="2">200</addressField>
+				<addressField id="3">1</addressField>
+				<port range="[0, 65535]">46001</port>
+			</Endpoint>
+		</Instance>
+	</Node>
+	<Node id="CoBo">
+		<Instance id="Crate00_Slot00">
+		</Instance>
+	</Node>
+	<Node id="Mutant">
+		<Instance id="*">
+			<HardwareConfigId>Mutant</HardwareConfigId>
+			<Endpoint>
+				<addressField id="3">200</addressField>
+				<addressField id="2">2</addressField>
+				<port>46007</port>
+			</Endpoint>
+		</Instance>
+	</Node>
+	<Node id="BEM">
+		<Instance id="*">
+			<HardwareConfigId>BEM</HardwareConfigId>
+		</Instance>
+	</Node>
+</Setup>
+@endverbatim
+  - <em>prepare</em>
+  - <em>configure</em>
+Currently, for GET, the transitions <em>prepare</em> and <em>configure</em> use the same configuration file, whose structure is shown below (this is the same file as the one used by the <em>GetController</em> test bench tool).
+See file <i>configure-pedestals.xcfg</em> provided with the <em>GetBench</em> software package.
+  @verbatim
+<?xml version="1.0" encoding="UTF-8"?>
+<Setup id="Conditions">
+	<ECC>
+		<!-- Enables the event display (might slow down the acquisition rate). -->
+		<DataMonitor>true</DataMonitor>
+		<!-- Verbosity. -->
+		<Verbose>true</Verbose>
+	</ECC>
+	<Node id="*">
+		<Instance id="*" />
+	</Node>
+	<Node id="CoBo">
+		<Instance id="*">
+			<!-- Whether the CoBo board is active and should be configured. -->
+			<isActive>false</isActive>
+			<Module>
+		 	...
+			</Module>
+		</Instance>
+		<Instance id="Crate00_Slot00">
+		</Instance>
+	</Node>
+	<Node id="Mutant">
+		<Instance id="*">
+		</Instance>
+	</Node>
+</Setup>
+@endverbatim
+
+@note
+When the ECC server has been started with a directory as its configuration repository, it will build a list of configuration sets by searching in this directory for files whose name starts with <em>describe-</em> and <em>configure-</em>. 
+
+@section sec_tools_getEccClient ECC client
+@subsection subsec_tools_getEccClient getEccClient
+	This is a command line client capable of interacting via ICE with <em>getEccServer</em>.\n
+	When invoked without arguments, it will try and connect to the ECC server using all loopback interfaces.
+	Otherwise, it can be provided with the network address (and port) of the ECC server (see @ref sec_tools_getEccServer).
+	@verbatim
+$getEccClient
+---- List of all commands ----
+asad-alarm-monitor - Starts or stops the periodic check of the AsAd alarm bits.
+asad-pulser-start - Starts periodic pulses of the AsAd voltage generator
+asad-pulser-stop - Stops periodic pulses of the AsAd voltage generator
+asad-pulser-trigger - Injects the given charge in mV
+cobo-led-blink-all - Blinks LEDs.
+cobo-led-flip   - Flips state of LED.
+cobo-led-pulse  - Flips LED periodically.
+cobo-led-set    - Switches LED on or off.
+cobo-mutant-link-set - Sets up mode of link between current CoBo node and Mutant (0=Normal, 1=Disconnected, 2=GMC, 3=WSCA)
+cobo-readout-channel-select - Selects a single channel per chip to always read.
+cobo-sc-fast    - Switches current CoBo node to hit register mode.
+cobo-sc-slow    - Switches current CoBo node to slow control mode.
+cobo-test-channel-select - Selects a single channel per chip for test modes.
+config-add      - Adds a configuration to the run control configuration manager.
+config-get      - Retrieves configuration of given identifier.
+config-list     - Returns list of all configuration IDs that are available to the ECC
+connect         - Connects to a node, device or DAQ (of type 'ICE', 'TCP', 'ZBUF' or 'FDT') target
+daq-start       - Launches data acquisition
+daq-stop        - Stops data acquisition
+device-list     - Lists the devices in the current node
+device-name     - Prints name of current device of current node
+device-read     - Reads everything from a device of the current node
+exec            - Executes a command file
+field-list      - Lists the bit fields in a given register of the current device
+field-read      - Reads from a bitfield of the current node
+field-write     - Writes to a bitfield of the current node
+help            - Help on a specific command
+ispm-set        - Sets ISPM register
+load            - Loads a register description configuration file into the current node
+loop            - Loops count times over the execution of specified command every half-second
+loopkey         - Loops the execution of specified command every half-second until any <RETURN> key is pressed
+mutant-align    - Triggers alignment procedure of current Mutant node.
+node-alarm-subscribe - Subscribes ECC to alarms from current node.
+node-endpoint   - Get endpoint (IP address and port) used for connecting to the current node
+node-list       - Prints the names of known hardware nodes
+node-name       - Get name of current node
+node-read       - Reads everything from current node
+node-reboot     - Reboots the current hardware node
+node-rename     - Renames the current node
+node-select     - Selects a node by its name
+nop             - Executes nothing
+pll-configure   - Configures PLL for chosen CKW frequency
+pll-reset       - Sends RESET to PLL
+pll-write       - Writes single PLL register
+q               - Exits the program
+reg-list        - Lists the registers in the current device of the current node
+reg-read        - Reads all fields of a register of the current node
+reg-write       - Writes to a register of the current node
+sleep           - Sleeps specified number of seconds
+sm-breakup      - Invalidates physics parameters setup in the boards
+sm-configure    - Loads physics parameters into the registers of the boards
+sm-describe     - Sets up hardware topology
+sm-links        - Returns links between data senders and data routers
+sm-pause        - Pauses the run, i.e. forbids hardware to deliver data
+sm-prepare      - Prepares inter-board communications, clock synchronizations, calibrations
+sm-reset        - Resets ECC state machine, allowing to start configuration from scratch
+sm-resume       - Resumes the run, i.e. allows again hardware to deliver data
+sm-start        - Starts the run, i.e. allows hardware to deliver data
+sm-status       - Returns status (state, transition, error) of ECC state machine
+sm-stop         - Ends the run, preventing hardware from delivering data
+------------------------------
+Get-Ecc >
+@endverbatim
+	The list of available commands is displayed at startup or when entering the <em>help</em> command with no arguments.\n
+	Commands corresponding to state machine transitions have names starting with <em>sm</em>.\n
+	You can either enter commands one by one at the prompt:
+	@verbatim
+Get-Ecc > sm-status
+-- Connecting to servant Ecc:default -h 132.166.9.203 -p 46002...
+-- Servant Ecc:default -h 132.166.9.203 -p 46002 successfully connected.
+State: IDLE Error: NO_ERR
+Get-Ecc > 
+@endverbatim
+	or execute command scripts with the <em>exec</em> command.
+
+@subsection subsec_tools_getEccSoapClient getEccSoapClient
+	The SOAP flavor of the ECC server was designed to be driven by the GANIL Global Run Control Core. <em>getEccSoapClient</em> is a debugging tool simulating the GRCC.
+	@verbatim
+$ getEccSoapClient 
+Usage: getEccSoapClient [--port=PORT] [--host=HOST] CMD [PARAMETERS...]
+Available commands: exit config-list describe prepare undo configure start stop pause resume breakup status
+@endverbatim
+	The host and port of the server can be specified in addition to the command and its parameters.
+	A run could look like this:
+	@verbatim
+getEccSoapClient config-list
+getEccSoapClient breakup
+getEccSoapClient reset
+getEccSoapClient reset
+getEccSoapClient status
+getEccSoapClient describe '<ConfigId><SubConfigId type="describe">mono-node</SubConfigId><SubConfigId type="prepare">pedestals</SubConfigId><SubConfigId type="configure">pedestals</SubConfigId></ConfigId>'
+getEccSoapClient status
+getEccSoapClient prepare '<ConfigId><SubConfigId type="describe">mono-node</SubConfigId><SubConfigId type="prepare">pedestals</SubConfigId><SubConfigId type="configure">pedestals</SubConfigId></ConfigId>'
+getEccSoapClient status
+getEccSoapClient configure '<ConfigId><SubConfigId type="describe">mono-node</SubConfigId><SubConfigId type="prepare">pedestals</SubConfigId><SubConfigId type="configure">pedestals</SubConfigId></ConfigId>' '<DataLinkSet><DataLink><DataSender id="CoBo[Crate00_Slot00]" /><DataRouter name="NarvalActor" ipAddress="132.166.9.203" port="46005" type="FDT" /></DataLink></DataLinkSet>'
+getEccSoapClient status
+getEccSoapClient start
+sleep 60
+getEccSoapClient stop
+@endverbatim
+	The arguments (configuration identifiers, data router list) of the configuration transitions (<em>describe</em>, <em>prepare</em>, <em>configure</em>) will be described in more details elsewhere.
+
+@section sec_tools_dataRouter Data router
+	For each (R-)CoBo board, the data frames from all AsAd boards are sent using a unique connection to a data router using one of several protocols (see @ref sec_flowTypes).
+	@par Narval 
+	The protocol used for data transfer between (R-)CoBo and the Narval actors is FDT.
+	
+	@par dataRouter
+	The <em>dataRouter</em> tool can be used instead of Narval to receive and process the data frames.
+	@verbatim
+$dataRouter -h
+Usage: dataRouter <[ctrl-ipAddr]:[port]>  <[data-ipAddr]:[port]> [ICE|TCP|FDT] [ByteCounter|ByteStorage|FrameCounter|FrameStorage] [Ice arguments]
+@endverbatim
+	It usually takes 4 arguments:
+	  - the IP address (and port) for the remote control of the router;
+	  - the IP address (and port) for the data flow;
+	  - the type of connection used for transmitting the data (see @ref sec_flowTypes).
+	  - the type of data processor (see @ref sec_processorTypes), e.g. what should be done with the data (save them, dump them, ...).
+	  .
+	
+	Example:
+	@verbatim
+dataRouter 132.166.9.203:46003 132.166.9.203:46005 TCP FrameStorage
+@endverbatim
+	If the second address is omitted, the first address is used. The default behavior is to use a vanilla TCP connection and to save the data frames to disk. Hence, the above example is equivalent to:
+	@verbatim
+dataRouter 132.166.9.203
+@endverbatim
+
+@section sec_tools_GetController GetController
+	@par GetController
+	<em>GetController</em> is a graphical user interface which can be used as a client to the ICE ECC server to configure and control a unique (R-) CoBo board.\n
+	It bypasses the ECC server state machine.\n
+	It can  be used:
+	  - either with its internal data router in which case the data frames can be displayed and/or saved to disk;
+	  - or with an instance of <em>dataRouter</em> (see @ref sec_tools_dataRouter).
+	  .
+	At startup:
+	  -# You are first prompted to select a workspace file, which is a list of configuration sets.
+    	@image html GetController_WorkspaceWizard.png "Workspace wizard."
+		If no workspace exists yet, one will be created.
+	  -# You are then prompted to enter the type of data router (internal or external), its network parameters and data flow type.
+	    @image html GetController_DataRouterWizard.png "Data router selection wizard."
+		Instead of having the data received and displayed by GetController, you can choose to use an <i>external</i> data router (which you will need to start from a terminal using the <i>dataRouter</i> command, as explained below).
+	  -# Once the main window of <em>GetController</em> is ready, you can create and run tests by specifying the hardware description and run configuration files, and edit them using the integrated <em>CompoundConfig</em> editor.
+	    @image html screenshot_GetController_w600.png "Screenshot of the GetController user interface."
+	    - The reference <a href="https://dsm-trac.cea.fr/get/browser/GetBench/trunk/software/data/config/hardwareDescription_fullCoBoStandAlone.xcfg">(R-)CoBo hardware description file</a> is available in the <i>${PREFIX}/share/get-bench/config</i> directory.
+	    - A documented example of a <a href="https://dsm-trac.cea.fr/get/browser/GetBench/trunk/software/data/config/configure-pedestals.xcfg">configuration file</a> is available in the <i>${PREFIX}/share/get-bench/config</i> directory.
+	    - The configuration parameters are also briefly described here: @ref page_RunConfigParameters.
+	    .
+	  @warning Regarding the <em>type</em> of tests, most users should choose <b>Default</b> (a.k.a. <b>BaseLine</b>, physics mode where <em>GetController</em> is passive during the run).
+	
+@section sec_tools_CoBoFrameViewer Raw data display
+	@par cobo-frame-viewer
+	<em>dataRouter</em>, <em>GetController</em> and the Narval MFM Storage actor can all save the raw binary MFM frames (see @ref page_Formats) coming from the CoBo board into files.\n
+	The contents of these frames stored on disk can be displayed using the <em>cobo-frame-viewer</em> utility.
+	@verbatim
+$cobo-frame-viewer -h
+Usage: cobo-frame-viewer -i frame.graw [OPTIONS...]
+Options:
+  -h [ --help ]                 help message
+  -i [ --input-file ] arg       filename
+  -n [ --frame ] arg            index of the frame within the file
+  -a [ --aget ] arg (=0)        AGET index
+  -c [ --channels ] arg (=0-67) channels (ex: 1-5,7-63)
+  -f [ --format ] arg           overrides format description file
+$cobo-frame-viewer CoBo_2012-09-18_17-39-33_RawFrame.graw
+@endverbatim
+	@image html screenshot_cobo-frame-viewer_w600.png "Display of the contents of a data frame using cobo-frame-viewer."
+	@image html screenshot_cobo-frame-viewer_3d_w600.png "3D display of the contents of a data frame using cobo-frame-viewer."
+
+@section sec_tools_CoBoFrameMerge Data merger
+	@par cobo-frame-merge
+	With <em>cobo-frame-merge</em>, the raw binary frames contained in one or several files (for example from multiple AsAd boards) can be copied into a file of layered frames gathering frames sharing the same event identifier following the merged data format (see @ref sec_DataFormats).
+	@verbatim
+$cobo-frame-merge -h
+Usage: cobo-frame-merge input.graw [input2.graw ...] [OPTIONS...]
+Allowed options:
+  -h [ --help ]            produce help message
+  -f [ --format ] arg      overrides format description file
+  -i [ --input-file ] arg  input raw MFM files
+  -o [ --output-file ] arg name of output merged data file
+$cobo-frame-merge CoBo_AsAd1_2013-08-23T15:33:49.836_0000.graw CoBo_AsAd2_2013-08-23T15:33:49.847_0000.graw -o CoBo_2013-08-23T15:33:49.gmer
+Gathered 354 frame(s) into 177 layered frame(s) in file 'CoBo_2013-08-23T15:33:49.gmer'
+@endverbatim
+
+@section sec_tools_CoBoFrameGraw2Root Raw to ROOT data converter
+	@par cobo-frame-graw2root
+	The raw binary frames can also be converted, with <em>cobo-frame-graw2root</em> into a ROOT file with a TTree (with instances of a custom made GET event class).
+	@verbatim
+$cobo-frame-graw2root -h
+Usage: cobo-frame-graw2root [--t2k] input.graw [output.root] [OPTIONS...]
+Allowed options:
+  -h [ --help ]            produce help message
+  --t2k                    produce ROOT tree of T2K (uncompressed) events
+  -i [ --input-file ] arg  input raw frame filename
+  -o [ --output-file ] arg output ROOT filename
+  -f [ --format ] arg      overrides format description file
+  -s [ --start ] arg (=0)  index of first frame
+  -n [ --count ] arg (=0)  number of frames to convert (0 for all)
+@endverbatim
+   @par ROOT dictionary
+   To avoid warnings about missing dictionaries when opening the resulting ROOT files inside ROOT, you can load the dictionaries contained in the <em>libget-root.so</em> library:
+   @verbatim
+root [0] gSystem->Load("libget-root.so");
+@endverbatim
+This command can be added to your <em>rootlogon.C</em> script.
+
+@section sec_tools_CoBoFrameRoot2Disp ROOT data display
+	@par cobo-frame-root2disp
+	The ROOT files produced by <em>cobo-frame-graw2root</em> can be displayed with <em>cobo-frame-root2disp</em>.
+	@image html cobo_frame_root2disp_w600.png "Display of the contents of a data frame within a ROOT file using cobo-frame-root2disp.
+
+$LastChangedDate$
+*/

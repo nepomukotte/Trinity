@@ -1,0 +1,344 @@
+/**
+ * @file CoBoPLLManager.cpp
+ * @date Sep 26, 2013
+ * @author sizun
+ * 
+ * @note SVN tag: $Id: CoBoPLLManager.cpp 1726 2017-11-14 11:50:40Z psizun $
+ * @note Contributor(s): Patrick Sizun
+ * @note 
+ * @note This file is part of the GetBench software project.
+ *
+ * @copyright © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ *
+ * @par FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ *
+ * @par COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ *
+ */
+
+#include "CoBoPLLManager.h"
+#include "utl/Logging.h"
+#include "utl/BitFieldHelper.hpp"
+#include "mdaq/utl/CmdException.h"
+#include <boost/assign/list_of.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/format.hpp>
+#include <algorithm>
+#include <set>
+#include <sstream>
+#include <iomanip>
+
+#define PLL_DEBUG() LOG_DEBUG() << nodeId_.toString() << ": "
+#define PLL_INFO()  LOG_INFO()  << nodeId_.toString() << ": "
+#define PLL_WARN()  LOG_WARN() << nodeId_.toString() << ": "
+#define PLL_ERROR() LOG_ERROR() << nodeId_.toString() << ": "
+
+namespace get
+{
+namespace rc
+{
+//__________________________________________________________________________________________________
+const uint32_t CoBoPLLManager::RDFIFO_RESET;
+const uint32_t CoBoPLLManager::WRFIFO_RESET;
+const uint32_t CoBoPLLManager::PLL_RESET_MASK;
+const size_t CoBoPLLManager::LMK04800_REG_NUM;
+//__________________________________________________________________________________________________
+// Each register consists of a 5-bit address field and 27-bit data field.
+//  The address field is formed by bits 0 through 4 (LSBs)
+// and the data field is formed by bits 5 through 31 (MSBs).
+const uint32_t CoBoPLLManager::PLL_DEFAULT_CONFIG[LMK04800_REG_NUM] =
+{
+	PLL_RESET_MASK, // R0: bit 17 is the RESET bit
+	// MASK[0] is the address
+	// MASK[2] & MASK[1] are our divider values
+	// Divide by 80 is A0 i.e. 25MHz
+	// Divide by 40 is 50 i.e. 50MHz
+	// Divide by 20 is 28 i.e. 100MHz
+	// Firmware only supports CKR = 25MHz
+	// CKW has been tested with 25, 50, and 100MHz
+	0x00000A00, // R0: CLK2 & CLK3 		-- CKR -> AS1 & AS0 = 25MHz i.e. 2GHz/80
+	0x00000A01, // R1: CLK2 & CLK3 		-- CKR -> AS3 & AS2 = 25MHz i.e. 2GHz/80
+	0x00000A02, // R2: CLK4 & CLK5 		-- FPGA CKR & FPGA PLL = 25MHz
+	0x00000A03, // R3: CLK6 & CLK7 		-- CKW -> AS1 & AS0
+	0x00000A04, // R4: CLK8 & CLK9 		-- CKW -> AS3 & AS2
+	0x00000A05, // R5: CLK10 & CLK11 	-- FPGA CKW = 25MHz i.e. 2GHz/80
+	0x11110006,
+	0x11110007,
+	0x01110008,
+	0x55555549,
+	0x9140410A, // R10: VCO_DIV [10:8]
+	0x0400000B, // R11: MODE [31:27], EN_SYNC [26], NO_SYNC_CLKout0_1 [20], SYNC_POL_INV [16], SYNC_EN_AUTO [15], SYNC_TYPE [14:12]
+	0x0B0C006C, // R12: LD_MUX [31:27], LD_TYPE [26:24]
+	0x1B12902D, // R13: HOLDOVER_MUX [31:27], HOLDOVER_TYPE [26:24], Status_CLKin1_MUX [22:20], Status_CLKin0_TYPE [18:16], Status_CLKin0_MUX [14:12], CLKin_Select_MODE [11:9]
+	0x1200000E, // R14: Status_CLKin1_TYPE [26:24]
+	0x8000800F,
+	0x01550410,
+	0x000000D8,
+	0x01010019,
+	0xAFA8001A, // R26: EN_PLL2_REF_2X [29]
+	0x1C0000DB,
+	0x002000DC, // R28: PPL2_R [31:20]
+	0x0180015D,
+	0x0200015E,
+	0x001F001F
+};
+//__________________________________________________________________________________________________
+/**
+ * Constructs a manager for CoBo local clocks configuration.
+ * @param pll Proxy to PLL device.
+ * @param ctrl Proxy to CoBo ctrl device.
+ */
+CoBoPLLManager::CoBoPLLManager(mdaq::hw::DevicePrx pll, mdaq::hw::DevicePrx ctrl) : pll_(pll), ctrl_(ctrl)
+{
+}
+//__________________________________________________________________________________________________
+/**
+ * Constructs a manager for CoBo local clocks configuration.
+ * @param hwNode CoBo hardware node.
+ */
+CoBoPLLManager::CoBoPLLManager(get::rc::Node & node) :
+		nodeId_(node.id()), pll_(node.hwNode().findDevice("pll")), ctrl_(node.hwNode().findDevice("ctrl"))
+{}
+//__________________________________________________________________________________________________
+/**
+ * Prepares PLL configuration for a specific CKW frequency.
+ *
+ * The VCO inside the PLL is running at 2000 MHz. This is dividend.
+ * - See emails from F A-N on Dec 5th, 2013. Swapped CLK5 with CLK10 i.e. FPGA_CKW is no longer on CLK5. It moved to CLK10.
+ * - See Table 8-2 (Register Map) on page 54 of Texas Instruments LMK04806 Data Sheet: http://www.ti.com/lit/ds/symlink/lmk04806.pdf
+ * The divider is an 11-bit value starting at bit 5.
+ *
+ * Extended to frequencies other than 1OO MHz/2**n in September 2014 on J-PARC's request.
+ *
+ * @param ckwFreq_MHz CKW frequency in MHz (3.125, 6.25, 12.5, 25, 50 or 100 MHz or ...).
+ * @param r Map of non default PLL register values.
+ */
+void CoBoPLLManager::setCKWFrequency(const float & ckwFreq_MHz, const RegisterMap & r)
+{
+	const uint16_t dividend = 2000; // VCO frequency, MHz
+
+	// Check frequency is allowed
+	static std::set<float> allowedFrequencies_MHz = boost::assign::list_of(3.125)(6.25)(12.5)(25)(50)(100);
+	// To comply with the AGET requirements, WCKn frequency must be within the range 1MHz-100MHz.
+	// AsAd is configured so that WCKn = CKW.
+	// This also ensures divider is only 11 bit long.
+	if (ckwFreq_MHz < 1 or ckwFreq_MHz > 200)
+	{
+		throw ::mdaq::utl::CmdException(boost::lexical_cast< std::string >(ckwFreq_MHz) + " MHz is not a valid CKW frequency");
+	}
+
+	// Compute divider
+	uint16_t divider = static_cast< uint16_t >(dividend/ckwFreq_MHz);
+	// Ensure divider is only 11 bits
+	divider = (divider & UINT16_C(0x7FF));
+	PLL_DEBUG() << "Using divider " << std::hex << std::showbase << divider << std::dec << std::noshowbase << " for frequency " << dividend*1.0/divider << " MHz";
+	if (not allowedFrequencies_MHz.count(ckwFreq_MHz))
+	{
+		PLL_WARN() << "CoBo PLL will be configured with a non-standard CKW frequency of " << dividend*1.0/divider << " MHz!";
+	}
+
+	// Update configuration
+	for (size_t i=0; i < 3; ++i)
+	{
+		utl::BitFieldHelper< uint32_t >::setField(pllConfig_[4+i], 5, 11, divider);
+	}
+
+	// No longer adjusting PLL configuration to firmware version
+	// or to whether CoBo is used in stand alone or with Mutant
+	// See email from F. A.-N. on May 15th, 2014 and March 17th, 2015
+	setRegisters(r);
+}
+//__________________________________________________________________________________________________
+/**
+ * Modifies PLL configuration given a map of register values.
+ * @param r Map of register values indexed by register indices.
+ */
+void CoBoPLLManager::setRegisters(const RegisterMap & r)
+{
+	RegisterMap::const_iterator iter;
+	for (iter = r.begin(); iter != r.end(); ++iter)
+	{
+		const size_t regIndex = iter->first;
+		// Available registers are 0 to 16 and 24 to 31
+		if (regIndex > 31 or (regIndex > 16 and regIndex < 24)) continue;
+		PLL_DEBUG() << "Received value "  << boost::format("0x%08X") % ((uint32_t) iter->second) << " for PLL register R" << regIndex;
+		// Get index in PLL configuration array
+		const size_t i = (regIndex <=16)?(1u + regIndex):(regIndex - 6u);
+		// Modify configuration
+		pllConfig_[i] = iter->second;
+	}
+}
+//__________________________________________________________________________________________________
+/**
+ * Sets PLL device mode.
+ * Register field R11[31:27].
+ * See TI data sheet pp. 55 and 71.
+ */
+void CoBoPLLManager::setMode(const uint8_t & mode)
+{
+	utl::BitFieldHelper< uint32_t >::setField(pllConfig_[12], 27, 5, mode);
+}
+//__________________________________________________________________________________________________
+/**
+ * Sets the polarity of the SYNC pin when input.
+ * Register bit R11[16]: SYNC_POL_INV.
+ * See TI data sheet pp. 55 and 73.
+ */
+void CoBoPLLManager::setSyncPolInv(const bool isActiveHigh)
+{
+	utl::BitFieldHelper< uint32_t >::setBit(pllConfig_[12], 16, isActiveHigh);
+}
+//__________________________________________________________________________________________________
+/**
+ * Sets the output value of the Status_CLKin0 pin.
+ * Register field R13[14:12]: Status_CLKin0_MUX
+ * See TI data sheet pp. 55 and 79.
+ */
+void CoBoPLLManager::setStatus_CLKin0_MUX(const uint8_t & value)
+{
+	utl::BitFieldHelper< uint32_t >::setField(pllConfig_[14], 12, 3, value);
+}
+//__________________________________________________________________________________________________
+/**
+ * Reads date of CoBo firmware.
+ * @return Firmware build date in the format 0xYYYYMMDD
+ */
+uint32_t CoBoPLLManager::firmwareDate()
+{
+	uint32_t date = 0x20130910; // Last firmware without register 'firmwareDate' (added in firmware of 20131107)
+	try
+	{
+		date = ctrl_->readRegister("firmwareDate");
+	}
+	catch (mdaq::utl::CmdException & e)
+	{
+		PLL_WARN() << e.reason;
+	}
+	return date;
+}
+//__________________________________________________________________________________________________
+/**
+ * Loads CoBo PLL configuration.
+ * @param ckwFreq_MHz CKW frequency, in MHz
+ * @param registers Map of PLL register values to used instead of the defaults.
+ */
+void CoBoPLLManager::loadPLLConfig(const float ckwFreq_MHz, const RegisterMap & registers)
+{
+	PLL_INFO() << "Loading PLL configuration...";
+	// Copy default PLL configuration
+	std::copy(PLL_DEFAULT_CONFIG, PLL_DEFAULT_CONFIG + LMK04800_REG_NUM, pllConfig_);
+	// Prepare PLL configuration for frequency
+	setCKWFrequency(ckwFreq_MHz, registers);
+	// Reset write packet FIFO to initial state
+	resetWriteFIFO();
+	// Reset read packet FIFO to its initial state
+	resetReadFIFO();
+	// Push data to write packet FIFO
+	PLL_DEBUG() << "   - push data to write packet FIFO";
+	for (size_t pllIndex = 0; pllIndex < LMK04800_REG_NUM; pllIndex++)
+	{
+		PLL_DEBUG() << boost::format("     0x%08X") % pllConfig_[pllIndex];
+		writeToFIFO(pllConfig_[pllIndex]);
+		// Write register R11 twice to generate the sync pulse (F. A.-N., March 16-18, 2015)
+		// You only need to write R11 twice when the user uses CoBo without a Mutant module.
+		if (12 == pllIndex)
+		{
+			PLL_DEBUG() << "Checking whether to write R11 twice";
+			// Check in register R13 whether CLKin1 is enabled
+			const bool EN_CLKin1 = utl::BitFieldHelper< uint32_t >::getBit(pllConfig_[14], 6u);
+			// Do not write twice unless CLKin1 is enabled (case of CoBo 0.2v stand-alone configuration?)
+			if (not EN_CLKin1) continue;
+			// Set SYNC_POL_INV (bit 16) to 0
+			uint32_t R11 = pllConfig_[pllIndex];
+			utl::BitFieldHelper< uint32_t >::setBit(R11, 16u, false);
+			PLL_DEBUG() << boost::format("     0x%08X") % R11;
+			writeToFIFO(R11);
+		}
+	}
+	bool isFull = isWriteFIFOFull();
+	PLL_DEBUG() << "   - write packet FIFO is " << (isFull?"full":"not full");
+}
+//__________________________________________________________________________________________________
+/**
+ * Writes value to PLL register
+ * @param value Value to write to PLL register.
+ */
+void CoBoPLLManager::writePLLRegister(const uint32_t & value)
+{
+	// Reset write packet FIFO to initial state
+	resetWriteFIFO();
+	// Write value
+	PLL_DEBUG() << "\t Writing     [" << boost::format("0x%08X") % value << ']';
+	writeToFIFO(value);
+}
+//__________________________________________________________________________________________________
+/**
+ * Sends RESET to PLL.
+ */
+void CoBoPLLManager::resetPLL()
+{
+	PLL_DEBUG() << "Sending RESET to PLL...";
+	writePLLRegister(PLL_RESET_MASK);
+}
+//__________________________________________________________________________________________________
+/**
+ * Resets write packet FIFO of PLL to its initial state.
+ */
+void CoBoPLLManager::resetWriteFIFO()
+{
+	PLL_DEBUG() << "   - reset write packet FIFO to initial state";
+	pll_->writeRegister("WRFIFO_RST", WRFIFO_RESET);
+}
+//__________________________________________________________________________________________________
+/**
+ * Resets read packet FIFO of PLL to its initial state.
+ */
+void CoBoPLLManager::resetReadFIFO()
+{
+	PLL_DEBUG() << "   - reset read packet FIFO to initial state";
+	pll_->writeRegister("RDFIFO_RST", RDFIFO_RESET);
+}
+//__________________________________________________________________________________________________
+/**
+ * Writes 32 bit data to PLL write packet FIFO module.
+ * @param   data is the value to be written to write packet FIFO.
+ */
+void CoBoPLLManager::writeToFIFO(const uint32_t & data)
+{
+	pll_->writeRegister("WRFIFO_DATA", data);
+}
+//__________________________________________________________________________________________________
+/**
+ * Checks whether the PLL write packet FIFO is full.
+ * @return Whether the PLL write packet FIFO is full
+ */
+bool CoBoPLLManager::isWriteFIFOFull()
+{
+	return pll_->readField("WRFIFO_SR", "Full");
+}
+//__________________________________________________________________________________________________
+/**
+ * Checks the PLL write packet FIFO vacancy.
+ * @return PLL write packet FIFO vacancy.
+ */
+uint32_t CoBoPLLManager::writeFIFOVacancy()
+{
+	return pll_->readField("WRFIFO_SR", "Vacancy");
+}
+//__________________________________________________________________________________________________
+} /* namespace rc */
+} /* namespace get */

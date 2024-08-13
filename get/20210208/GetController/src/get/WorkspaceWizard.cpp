@@ -1,0 +1,158 @@
+/**
+ * $Id: WorkspaceWizard.cpp 1740 2017-11-23 16:40:23Z psizun $
+ * @file WorkspaceWizard.cpp
+ * @date 19 avr. 2012
+ * @author sizun
+ * -----------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * -----------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software. You can use, modify and/or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL: "http://www.cecill.info".
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability. In this
+ * respect, the user's attention is drawn to the risks associated with loading,
+ * using, modifying and/or developing or reproducing the software by the user in
+ * light of its specific status of free software, that may mean that it is
+ * complicated to manipulate, and that also therefore means that it is reserved
+ * for developers and experienced professionals having in-depth computer
+ * knowledge. Users are therefore encouraged to load and test the software's
+ * suitability as regards their requirements in conditions enabling the security
+ * of their systems and/or data to be ensured and, more generally, to use and
+ * operate it in the same conditions as regards security.
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ * -----------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for
+ * commercial purposes. For this you will need to negotiate a specific contract
+ * with a legal representative of CEA.
+ * -----------------------------------------------------------------------------
+ */
+
+#include "get/WorkspaceWizard.h"
+#include "get/WorkspaceManager.h"
+
+#include <QFileDialog>
+#include <QVariant>
+#include <QSettings>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QGridLayout>
+#include <QRegExpValidator>
+#include <QMessageBox>
+#include <QFileInfo>
+#include <QDir>
+
+namespace get {
+//_____________________________________________________________________________
+WorkspaceWizard::WorkspaceWizard(QWidget* parentWidget)
+		: QWizard(parentWidget)
+{
+	addPage(new SelectWorkspacePage(this));
+	QPixmap pixmap = QPixmap(":/get/logo.png");
+	// setPixmap(QWizard::BannerPixmap, pixmap);
+	setWindowTitle(tr("Workspace Wizard"));
+	setWindowIcon(pixmap);
+	setOptions(QWizard::NoBackButtonOnStartPage);
+	resize( QSize(300, 200).expandedTo(minimumSizeHint()) );
+}
+//_____________________________________________________________________________
+QString WorkspaceWizard::selectWorkspace(QWidget* parentWidget, bool useLastWorkspace)
+{
+	QString lastWorkspace = QSettings().value("lastWorkspace").toString();
+	if (not lastWorkspace.isEmpty() and useLastWorkspace)
+	{
+		return lastWorkspace;
+	}
+
+	WorkspaceWizard dialog(parentWidget);
+	dialog.raise();
+	if (dialog.exec() == QDialog::Accepted)
+		return dialog.field("selectedWorkspace").toString();
+	return QString();
+}
+//_____________________________________________________________________________
+void WorkspaceWizard::accept()
+{
+	QString workspacePath = field("selectedWorkspace").toString();
+	if (not QFileInfo(workspacePath).exists())
+	{
+		QMessageBox::StandardButton answer = QMessageBox::question(this, tr("Create a new workspace?"),
+				tr("Workspace \"%1\" does not exist. Do you want to create a new workspace?").arg(workspacePath),
+				QMessageBox::Yes|QMessageBox::No);
+		if (QMessageBox::Yes == answer)
+		{
+			QDir workspaceDir = QFileInfo(workspacePath).absoluteDir();
+			if (not workspaceDir.exists())
+			{
+				QDir().mkpath(workspaceDir.absolutePath());
+			}
+			WorkspaceManager::instance().createWorkspace(workspacePath.toStdString());
+		}
+		else
+		{
+			return;
+		}
+	}
+	QSettings().setValue("lastWorkspace", QFileInfo(workspacePath).absoluteFilePath());
+	QWizard::accept();
+}
+//_____________________________________________________________________________
+SelectWorkspacePage::SelectWorkspacePage(QWidget* parentWidget) : QWizardPage(parentWidget)
+{
+    setTitle(tr("Select a workspace"));
+    setSubTitle(QString("%1<br>%2").arg(tr("GetController stores test definitions in an XML CompoundConfig file called a workspace."))
+    		.arg("Select an existing file or a file to create."));
+    setPixmap(QWizard::LogoPixmap, QPixmap(":/get/logo.png"));
+
+    QLabel* workspaceLabel = new QLabel(tr("Workspace:"));
+    QLineEdit* workspaceLineEdit = new QLineEdit;
+    QRegExpValidator* validator = new QRegExpValidator(QRegExp(".*[Ww]orkspace.*\\.(xcfg|xml)$"), this);
+    workspaceLineEdit->setValidator(validator);
+    workspaceLabel->setBuddy(workspaceLineEdit);
+
+    registerField("selectedWorkspace*", workspaceLineEdit);
+
+    QPushButton* workspacePushButton = new QPushButton(tr("Browse..."));
+    workspacePushButton->setCheckable(false);
+    connect(workspacePushButton, SIGNAL(released()), this, SLOT(selectWorkspace()));
+
+    QGridLayout *layout = new QGridLayout;
+    layout->addWidget(workspaceLabel, 0, 0);
+    layout->addWidget(workspaceLineEdit, 0, 1);
+    layout->addWidget(workspacePushButton, 0, 2);
+
+    setLayout(layout);
+}
+//_____________________________________________________________________________
+void SelectWorkspacePage::initializePage()
+{
+	// Check if a default map is defined
+	QString lastWorkspace = QSettings().value("lastWorkspace").toString();
+	if (not lastWorkspace.isEmpty())
+	{
+		setField("selectedWorkspace", lastWorkspace);
+	}
+	else
+	{
+		setField("selectedWorkspace", "workspace.xcfg");
+	}
+}
+//_____________________________________________________________________________
+void SelectWorkspacePage::selectWorkspace()
+{
+	QString path = QFileDialog::getOpenFileName(this, tr("Select a workspace"), field("selectedWorkspace").toString(),
+			QString("%1 (*workspace*.xml *Workspace*.xml *workspace*.xcfg *Workspace*.xcfg);; %2 (*)").arg(tr("Workspace files")).arg(tr("All files")));
+	if (not path.isEmpty())
+	{
+		setField("selectedWorkspace", path);
+	}
+}
+//_____________________________________________________________________________
+} /* namespace get */

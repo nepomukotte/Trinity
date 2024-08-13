@@ -1,0 +1,19 @@
+connect device ctrl
+write triggerMask slowControl 0
+connect device asad
+writeReg TCM1 0x3E
+connect device ctrl
+writeReg triggerDelay 650
+write triggerMask slowControl 1
+connect device asad
+writeReg TCM2 0x38
+connect device ctrl
+write triggerMask slowControl 0
+connect device asad
+writeReg TCM1 0
+connect device ctrl
+write triggerMask slowControl 0
+connect device asad
+writeReg TCM2 0
+connect device ctrl
+write triggerMask slowControl 0

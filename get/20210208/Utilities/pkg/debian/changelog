@@ -1,0 +1,7 @@
+libutilities (1.2.1-1) oneiric; urgency=low
+
+  * Initial release : First deb package
+
+  * Improved logging utilities
+
+ -- Frederic Chateau <frederic.chateau@cea.fr>  Thursday, 30 Aug 2012 10:27:00 +0200

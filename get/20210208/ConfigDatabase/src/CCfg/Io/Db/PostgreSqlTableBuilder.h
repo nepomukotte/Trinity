@@ -1,0 +1,56 @@
+/**
+ * @file PostgreSqlTableBuilder.h
+ * @author sizun
+ * $Id: PostgreSqlTableBuilder.h 806 2010-09-23 14:47:44Z psizun $
+ */
+#ifndef CCFG_IO_DB_PGSQLTABLEBUILDER_H_INCLUDED
+#define CCFG_IO_DB_PGSQLTABLEBUILDER_H_INCLUDED
+
+#include "TableBuilder.h"
+#include <string>
+#include <vector>
+
+namespace CCfg
+{
+namespace Io
+{
+namespace Db
+{
+////////////////////////////////////////////////////////////////////////////////
+// classes declarations
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This subclass defines constants and methods needed to generate PostgreSQL compliant
+ * "CREATE TABLE" queries.
+ *
+ * @author fchateau
+ */
+class PostgreSqlTableBuilder : public TableBuilder
+{
+	static const char* const TYPE_NAMES[COLUMN_TYPES_COUNT];
+	static const char* const REFERENCE_OPTION_NAMES[REFERENCE_OPTIONS_COUNT];
+	std::vector<std::string> autoIncrementColumns;
+	std::vector<std::string> sideQueries;
+public:
+	PostgreSqlTableBuilder();
+	virtual ~PostgreSqlTableBuilder();
+	std::vector<std::string> getSideQueries();
+
+protected:
+	const char* getTypeName(ColumnType type) const;
+	const char* getReferenceOptionName(ReferenceOption option) const;
+	const char* getCurrentDateTimeSymbol() const;
+	void beforeBuild(std::ostringstream& query);
+	void afterBuild(std::ostringstream& query);
+
+private:
+	PostgreSqlTableBuilder(const PostgreSqlTableBuilder& rvalue);
+	PostgreSqlTableBuilder& operator=(const PostgreSqlTableBuilder& rvalue);
+};
+
+}
+}
+}
+
+#endif // CCFG_IO_DB_PGSQLTABLEBUILDER_H_INCLUDED

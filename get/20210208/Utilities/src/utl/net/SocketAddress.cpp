@@ -1,0 +1,160 @@
+/*
+ * $Id: SocketAddress.cpp 1426 2013-11-21 14:07:23Z fchateau $
+ * @file SocketAddress.cpp
+ * @created 11 mai 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors:
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#include "SocketAddress.h"
+#include <sstream>
+#include <cstddef>
+
+namespace utl {
+namespace net {
+//__________________________________________________________________________________________________
+/**
+ * Constructs a socket address with an invalid IP address and given port number.
+ */
+SocketAddress::SocketAddress(uint16_t port)
+	: ipAddress_(), port_(port)
+{
+}
+//__________________________________________________________________________________________________
+SocketAddress::SocketAddress(const utl::net::IpAddress & address, uint16_t port)
+	: ipAddress_(address), port_(port)
+{
+
+}
+//__________________________________________________________________________________________________
+SocketAddress::SocketAddress(in_addr_t address, uint16_t port)
+	: ipAddress_(address), port_(port)
+{
+}
+//__________________________________________________________________________________________________
+SocketAddress::SocketAddress(const std::string& dotDecimalIpString, uint16_t port)
+	: ipAddress_(dotDecimalIpString, false), port_(port)
+{}
+//__________________________________________________________________________________________________
+SocketAddress::SocketAddress(const std::string& dotDecimalIpAndPortString)
+	: ipAddress_(), port_(0)
+{
+	fromString(dotDecimalIpAndPortString);
+}
+//__________________________________________________________________________________________________
+void SocketAddress::setPort(const std::string & port)
+{
+		port_ = 0;
+		std::istringstream iss(port);
+		iss >> port_;
+}
+//__________________________________________________________________________________________________
+/**
+ * Builds the address from a string made of the dotted decimal IP address and the port number separated by a colon.
+ */
+SocketAddress& SocketAddress::fromString(const std::string & decimalString)
+{
+	// Set IP address
+	ipAddress_.fromString(decimalString, true);
+	// Set port number
+	size_t colonPos = decimalString.find(':');
+	if (colonPos != std::string::npos)
+	{
+		setPort(decimalString.substr(colonPos+1));
+	}
+	return *this;
+}
+//__________________________________________________________________________________________________
+SocketAddress& SocketAddress::from_sockaddr_in(const struct sockaddr_in& bsd_sockaddr)
+{
+	ipAddress().in_addr() = bsd_sockaddr.sin_addr.s_addr;
+	port() = bsd_sockaddr.sin_port;
+	return *this;
+}
+//__________________________________________________________________________________________________
+std::string SocketAddress::toString() const
+{
+	std::ostringstream oss;
+	oss << *this;
+	return oss.str();
+}
+//__________________________________________________________________________________________________
+/**
+ * Outputs the socket address on a stream.
+ * @param stream the stream where the address will be appended.
+ * @param address the address to write.
+ * @return Returns the altered stream.
+ */
+std::ostream& operator<<(std::ostream& stream, const ::utl::net::SocketAddress& address)
+{
+	stream << std::dec << address.ipAddress() << ':' << address.port();
+	return stream;
+}
+//__________________________________________________________________________________________________
+std::string SocketAddress::iceEndPointString(const std::string & protocol) const
+{
+	std::ostringstream oss;
+	oss << protocol;
+	if (ipAddress().isValid())
+	{
+		// If host is not specified in an object adapter endpoint, Ice uses the value of the Ice.Default.Host property.
+		// If that property is not defined, the adapter behaves as if the wildcard symbol * was specified:
+		// The adapter listens on all network interfaces.
+
+		// If host is not specified in a proxy, Ice uses the value of the Ice.Default.Host property.
+		// If that property is not defined, outgoing connections are only attempted over loopback interfaces.
+		if (not ipAddress().isAny())
+			oss << " -h " << ipAddress();
+	}
+	if (port() != 0)
+	{
+		oss << " -p " << port();
+	}
+	return oss.str();
+}
+//__________________________________________________________________________________________________
+/**
+ * Returns a stringified ICE proxy.
+ * @param identity Object identity
+ * @param protocol Ice protocol version to use when sending a request with this proxy
+ * @param options Proxy options (example: "-e 1.0")
+ * @see http://doc.zeroc.com/display/Ice/Proxy+and+Endpoint+Syntax
+ */
+std::string SocketAddress::iceProxyString(const std::string & identity, const std::string & protocol, const std::string options) const
+{
+	std::ostringstream oss;
+	oss << identity;
+	if (not options.empty())
+	{
+		oss << ' ' << options << ' ';
+	}
+	oss << ':' << iceEndPointString(protocol);
+	return oss.str();
+}
+//__________________________________________________________________________________________________
+} /* namespace net */
+} /* namespace utl */

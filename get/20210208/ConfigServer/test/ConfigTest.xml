@@ -1,0 +1,12 @@
+<Test>
+	<Numbers>
+		<i>3</i>
+		<pos id="x" unit="m">5.2</pos>
+		<pos id="y">-2.1</pos>
+		<pos id="z">1.4</pos>
+		<memSize unit="bytes">0x10000</memSize>
+	</Numbers>
+	<ind id="0"></ind>
+	<!--Hello-->
+	<test range="[0,101]">42</test>
+</Test>

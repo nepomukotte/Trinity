@@ -1,0 +1,16 @@
+<cfg>
+	<Computer id="mypc">
+		<CPU id="0">
+			<Constructor>Intel</Constructor>
+			<Frequency unit="GHz">2.8</Frequency>
+		</CPU>
+		<HardDisk id="0">
+			<Capacity unit="GB" range="[1,2000]">200</Capacity>
+			<RotationSpeed unit="rpm" range="{4200,5400,7200,10000,15000}">7200</RotationSpeed>
+		</HardDisk>
+		<HardDisk id="1">
+			<Capacity>400</Capacity>
+			<RotationSpeed>7200</RotationSpeed>
+		</HardDisk>
+	</Computer>
+</cfg>

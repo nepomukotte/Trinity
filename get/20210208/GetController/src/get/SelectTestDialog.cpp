@@ -1,0 +1,99 @@
+/**
+ * $Id: SelectTestDialog.cpp 1780 2018-11-29 08:11:30Z psizun $
+ * @file SelectTestDialog.cpp
+ * @date 16 mai 2012
+ * @author sizun
+ * ---------------------------------------------------------------------------------------------------------------------
+ * © Commissariat a l'Energie Atomique et aux Energies Alternatives (CEA)
+ * ---------------------------------------------------------------------------------------------------------------------
+ * Contributors:
+ * ---------------------------------------------------------------------------------------------------------------------
+ * This software is part of
+ * ---------------------------------------------------------------------------------------------------------------------
+ * FREE SOFTWARE LICENCING
+ * This software is governed by the CeCILL license under French law and abiding  * by the rules of distribution of free
+ * software. You can use, modify and/or redistribute the software under the terms of the CeCILL license as circulated by
+ * CEA, CNRS and INRIA at the following URL: "http://www.cecill.info". As a counterpart to the access to the source code
+ * and rights to copy, modify and redistribute granted by the license, users are provided only with a limited warranty
+ * and the software's author, the holder of the economic rights, and the successive licensors have only limited
+ * liability. In this respect, the user's attention is drawn to the risks associated with loading, using, modifying
+ * and/or developing or reproducing the software by the user in light of its specific status of free software, that may
+ * mean that it is complicated to manipulate, and that also therefore means that it is reserved for developers and
+ * experienced professionals having in-depth computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling the security of their systems and/or data
+ * to be ensured and, more generally, to use and operate it in the same conditions as regards security. The fact that
+ * you are presently reading this means that you have had knowledge of the CeCILL license and that you accept its terms.
+ * ---------------------------------------------------------------------------------------------------------------------
+ * COMMERCIAL SOFTWARE LICENCING
+ * You can obtain this software from CEA under other licencing terms for commercial purposes. For this you will need to
+ * negotiate a specific contract with a legal representative of CEA.
+ * =====================================================================================================================
+ */
+
+#include "get/SelectTestDialog.h"
+#include "get/WorkspaceModel.h"
+#include <QDialogButtonBox>
+#include <QTableView>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QHeaderView>
+
+namespace get {
+//_____________________________________________________________________________
+SelectTestDialog::SelectTestDialog(QWidget* parentWidget)
+	: QDialog(parentWidget)
+{
+	QLayout* layout = new QVBoxLayout;
+
+	workspaceModel = new WorkspaceModel(this);
+	workspaceView = new QTableView(this);
+#if QT_VERSION_MAJOR >= 5
+	workspaceView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#elif QT_VERSION >= 0x040200
+	workspaceView->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
+	workspaceView->setModel(workspaceModel);
+	workspaceView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	workspaceView->setSelectionMode(QAbstractItemView::SingleSelection);
+	layout->addWidget(workspaceView);
+
+	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
+	layout->addWidget(buttonBox);
+	// Disable validation button until a test has been selected
+	buttonBox->button(QDialogButtonBox::Ok)->setDisabled(true);
+
+	setLayout(layout);
+	setWindowTitle(tr("Select a test"));
+	resize(800, 300);
+
+	QObject::connect(workspaceView->selectionModel(),
+			SIGNAL(selectionChanged(const QItemSelection & , const QItemSelection &)),
+			this, SLOT(onRowSelected()));
+	QObject::connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+	QObject::connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+}
+//_____________________________________________________________________________
+void SelectTestDialog::setSelectedTest(const std::string & name)
+{
+	// Find row with matching test name
+	if (workspaceModel->rowCount() <= 0) return;
+	QModelIndexList indexList = workspaceModel->match(workspaceModel->index(0, WorkspaceModel::Name), Qt::DisplayRole, QString::fromStdString(name), 1);
+	if (indexList.isEmpty()) return;
+	QModelIndex selectionIndex = indexList.first();
+
+	workspaceView->selectRow(selectionIndex.row());
+}
+//_____________________________________________________________________________
+std::string SelectTestDialog::selectedTest() const
+{
+	QModelIndexList selection = workspaceView->selectionModel()->selectedRows();
+	if (selection.isEmpty()) return std::string();
+	return workspaceModel->data(selection.first(), Qt::DisplayRole).toString().toStdString();
+}
+//_____________________________________________________________________________
+void SelectTestDialog::onRowSelected()
+{
+	buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+}
+//_____________________________________________________________________________
+} /* namespace get */

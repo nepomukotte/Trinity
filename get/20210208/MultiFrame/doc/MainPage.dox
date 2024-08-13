@@ -1,0 +1,116 @@
+/**
+@mainpage The MultiFrame library
+@section sec_Intro Introduction
+<p>
+The MultiFrame library provides an API to serialize and de-serialize binary data obeying to the Multi-Frame Metaformat (MFM) specification.
+
+Its current implementation follows version 2.2 of said specification.
+
+@warning While the purpose of this API is to be usable with all three kinds of MFM frames, until now, it has mainly been validated with basic frames in the CoBo format.
+
+@see https://project-actar-get.cea.fr
+@see https://dsm-trac.cea.fr/mordicus/raw-attachment/wiki/MultiFrame/MultiFrame-2.2.pdf
+
+@section sec_Tutorial Tutorial
+
+    - \ref subsec_Terminology
+    - \ref subsec1
+    - \ref subsec2
+    - \ref subsec3
+    - \ref subsec4
+    - \ref subsec5
+    - \ref subsec_TBC
+
+@subsection subsec_Terminology Terminology
+In addition to the concepts already introduced by the MFM specification document, this library defines a few terms.
+  - The <em>primary header</em> of a frame consists of the first 8 bytes of the header section,
+   which are common to all three kinds of frames (basic, layered and blob frames).
+  - A <em>field</em> is a signifying data block made of an integer number of consecutive bytes.
+  It can be part of the header section, the data reserve or a data item.
+  - A <em>bit field</em> is a signifying data block, <em>located inside a field</em>, made of an integer number of consecutive bits.
+  - A field or a bit field can be read or set using either an integer type (which can be signed or unsigned) or a bitset. The API does not handle floating point types.
+
+@subsection subsec1 How to de-serialize a frame from a binary file
+
+The following code assumes that an MFM frame is stored within a binary file "data.bin".<p>
+Provided with an input stream, the static function mfm::Frame::read can be used to create a Frame instance and access the contents of this frame. 
+@code
+#include <fstream>
+#include <mfm/Frame.h>
+
+std::ifstream ifs("data.bin", std::ios::binary);
+std::auto_ptr<mfm::Frame> myFrame = mfm::Frame::read(ifs);
+ifs.close();
+@endcode
+
+@subsection subsec2 Accessing fields by their position and size
+Once a frame's contents have been used to create a Frame instance, it can be used to access the value of its fields and bit fields, provided their properties are known.
+
+The following code excerpt shows how to print the value of a 2 Byte long unsigned integer field located inside the fourth item of the frame with an offset of 1 Byte:
+
+@code
+#include <iostream>
+
+std::cout << myFrame->itemAt(3).field(1, 2).value<uint16_t>() << std::endl;
+@endcode
+
+Alternately, the same field can be extracted as a 16-bit Boost mfm::DynamicBitset :
+@code
+#include <iostream>
+
+std::cout << myFrame->itemAt(3).field(1, 2).value<mfm::DynamicBitset>() << std::endl;
+@endcode
+
+Modifying the value of a field is similar:
+@code
+myFrame->itemAt(3).field(1, 2).setValue(1000u);
+@endcode
+
+@subsection subsec3 Accessing fields by name
+In order to free users of the task to provide a field's offset and size each time it must be accessed,
+ it is possible to describe once and for all the format of a frame using the CompoundConfig XML description format.
+@see @ref page_example_formats
+
+Once an XML file containing the mapping between a given revision of a frame format (identified by its 'frameType' and 'revision' header fields) and a list of named fields and bit fields has been created,
+ it must be added to the API's frame dictionary prior to using the field accessors which use the field's name as argument. 
+
+@code
+#include <mfm/FrameDictionary.h>
+mfm::FrameDictionary::instance().addFormats("/tmp/my_formats.xml");
+@endcode
+
+Then, the previous examples can be rewritten:
+
+@code
+#include <iostream>
+
+std::cout << myFrame->itemAt(3).field("aFieldName").value<uint16_t>() << std::endl;
+
+std::cout << myFrame->itemAt(3).field("aFieldName").value<mfm::DynamicBitset>() << std::endl;
+
+myFrame->itemAt(3).field("aFieldName").setValue(1000u);
+@endcode
+
+@subsection subsec4 Accessing bit fields
+
+Like fields, bit fields can be accessed by specifying either their name or their properties:
+
+@code
+myFrame->itemAt(2).field(0, 4).bitField(14, 9).setValue(511);
+
+mfm::DynamicBitset aBitFieldValue(9, 0xAA);
+myFrame->itemAt(2).field("aFieldName").bitField("aBitFieldName").setValue(aBitFieldValue);
+@endcode
+
+@subsection subsec5 How to dump a frame into a binary file
+@code
+#include <fstream>
+
+std::ofstream ofs("outfile.dat", ios::out | ios::binary);
+myFrame->write(ofs);
+ofs.close();
+@endcode
+
+@subsection subsec_TBC To be completed
+
+*/

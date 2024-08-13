@@ -1,0 +1,142 @@
+// $Id: getting_started.dox 1448 2015-05-20 13:20:43Z psizun $
+/**
+@page page_Usage Getting started
+@tableofcontents
+
+@section sec_Foreword Introduction
+@warning Some of the tools described below (<em>GetController</em>, <em>dataRouter</em>, <em>cobo-frame-graw2root</em>, etc...) require the CoBo data format description files (see @ref page_Formats) to be located in the working directory.
+
+@section sec_SetupRCoBo Setting up an R-CoBo system
+-# Prepare the ML507 board (see <b><a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/ML507setup.pdf">ML507 Setup</a> note</b>)
+	- Set the DIP switches on top and bottom of ML507 board as described in the note above and in the document <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/CoBoDocumentation/ReducedCoBoSetupGuide.pdf">Reduced CoBo Configuration</a>.
+    @warning Before programming the ML507 board, <em>ensure it has not already been done</em>.
+	- Using Xilinx Impact and a <a href="http://www.xilinx.com/support/documentation/data_sheets/ds300.pdf">JTAG-USB cable</a>, program the firmware (see <a href="https://dsm-trac.cea.fr/get/wiki/CoBoFirmware">wiki</a>) into the SPI flash.
+    @warning If the firmware is only available as a .bit file, you can first use Impact to <a href="https://dsm-trac.cea.fr/get/wiki/HowToGenerateAnMcsFirmwareFile">convert it into a .mcs file</a>.
+	- Using Xilinx XPS and a <a href="https://dsm-trac.cea.fr/get/wiki/CoBoDocumentation">Reduced CoBo XPS project</a>, program the <a href="https://dsm-trac.cea.fr/get/wiki/CoBoDocumentation">VxWorks image</a>) into the parallel flash.
+	- Using Xilinx XPS, program the board's MAC address into the parallel flash.
+	\n @warning Make sure to use the appropriate versions of the VxWorks image and firmware (see <a href="https://dsm-trac.cea.fr/get/wiki/Releases">Trac</a>).
+-# Prepare a workstation with DHCP and NFS servers
+	-# Setup a workstation with a <b>DHCP</b> server and add an entry with the MAC address of your ML507 board and its I.P. address.
+	-# On the same workstation, export the <i>/mnt/local/export/filesystem</i> directory via <b>NFS</b>.
+	-# Copy the <em>getHwServer.out</em> executable into the <i>/mnt/local/export/filesystem</i> NFS directory the target has access to.
+	\n It can be obtained :
+		- from the <a href="https://dsm-trac.cea.fr/get/wiki/CoBoEmbeddedSoftware">wiki</a> website ;
+		- or by cross-compiling the GetBench package (and all upstream packages, including <em>IceE</em>) for VxWorks (see the <a href="https://dsm-trac.cea.fr/mordicus">Mordicus</a> and <a href="https://dsm-trac.cea.fr/get">GET</a> wikis for help on setting up your cross-compilation environment).
+	\n Make sure to use the version corresponding to the rest of the software.
+	-# In the same <i>/mnt/local/export/filesystem</i> NFS directory, create a startup script named <i>startup.vxsh</i> containing the following line:
+	@verbatim
+ld < getHwServer.out
+	@endverbatim
+-# Connect the AsAd board to the ML507 board (see <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/AsAdDocumentation/AsAd_V2.0_QuickStartV0.0.pdf">AsAd v2.0 Quick Start Guide</a> and <a href="https://dsm-trac.cea.fr/get/wiki/HowToConnectAsAdToCoBo">How to connect AsAd to (R-)CoBo</a>).
+-# Setup a 3.6 V power supply for the AsAd board.
+-# Connect the power supply to the AsAd board.
+-# Switch on the ML507 board.\n You can use an RS232 cable and <i>minicom</i> to monitor the progress of the boot:
+	- The VxWorks image is loaded.
+	- The board obtains an I.P. address from the DHCP server.
+	- The board mounts the NFS directory and searches for the startup script.
+	- The <i>getHwServer.out</i> executable is started as instructed in the script.
+	@note If the NFS directory is not available or the startup script has not been found, an on-flash version of the GET hardware server is started, which may  not be up-to-date.
+
+@section sec_setup_uCoBo Getting started with a micro-TCA CoBo board
+-# The CoBo 1.0v production boards are delivered with their VxWorks image, firmware and MAC addresses already flashed.
+Each board has two MAC addresses:
+  - one for the control interface starting with 02;
+  - one for the data interface starting with 06.
+  \n The two MAC addresses are written on the board's box. Or, with a mini-USB cable, you can access the VxWorks console and see the CoBo board try to boot and note the two MAC addresses.
+-# To configure the MCH, see <a href="https://wikihost.nscl.msu.edu/attpc/doku.php?id=microtca_development">NSCL wiki</a>.
+-# DHCP and NFS servers
+	-# Setup a workstation with two network interfaces, a <b>DHCP</b> server and an NFS server.
+	-# Connect one interface to the MCH GbE electrical port, the other to the 10GbE optical port.
+	-# Provide the CoBo board with two IP addresses by adding its MAC addresses to the DHCP server configuration file.
+	-# After restarting the DHCP server and rebooting the CoBo board, you should be able to ping the board's addresses.
+	-# Export the <i>/mnt/local/export/filesystem</i> directory via <b>NFS</b>.
+	-# Copy the <em><a href="https://dsm-trac.cea.fr/get/wiki/Releases">getHwServer.out</a></em> executable into the <i>/mnt/local/export/filesystem</i> NFS directory the target has access to.
+	-# In the same <i>/mnt/local/export/filesystem</i> NFS directory, create a startup script named <i>startup.vxsh</i> containing the following line:
+	@verbatim
+ld < getHwServer.out
+	@endverbatim
+
+@note When using a single standalone CoBo board with GetController:
+- at the start of GetController, you should provide a data router address in the same subnet as CoBo's data interface;
+- in the configuration file, you should configure the @ref subsec_config_cobo_pll device appropriately.
+
+@section sec_GetController Getting started with GetController
+@image html getbench_usage_gui_h380.png "GetBench components when using the GetController GUI."
+@warning GetController can only be used with a single Reduced CoBo or micro-TCA CoBo board (in standalone mode). 
+  -# Setup the R-CoBo system (see @ref sec_SetupRCoBo).
+  -# Start the GET @ref sec_tools_getEccServer <em>getEccServer</em> from a terminal.
+  -# If you want to use a stand-alone data router, start an instance of <em>dataRouter</em> (see @ref sec_tools_dataRouter) in another terminal from a directory containing the CoBo data format description files (see @ref page_Formats).
+  -# In another terminal, start @ref sec_tools_GetController.
+
+@section sec_MUTanT Getting started with MUTanT
+
+See <a href="https://dsm-trac.cea.fr/get/raw-attachment/wiki/MuTanTDocumentation/Getting_Started_Guide_for_MUTANT_V1.1.pdf">Getting Started Guide for MUTanT v1.1</a>.
+
+When using a MUTanT module, do not forget to configure the PLL (see @ref subsec_config_cobo_pll) of CoBo boards appropriately.
+
+@section sec_cmdLineUsage Getting started with command line tools
+
+@image html getbench_usage_cmdline_h400.png "GetBench components in command line (script) mode."
+
+-# Setup the R-CoBo system (see @ref sec_SetupRCoBo).
+-# Start the GET @ref sec_tools_getEccServer <em>getEccServer</em> from a terminal.
+-# In another terminal, start an instance of <em>dataRouter</em>  (see @ref sec_tools_dataRouter) from a directory containing the CoBo data format description files (see @ref page_Formats).
+-# In yet another terminal, start the @ref sec_tools_getEccClient (providing the IP address the ECC server was setup to use).
+	You can then enter commands one by one after the prompt, or execute a script (examples are available in the <em>${PREFIX}/share/doc/get-bench/scripts/ice</em> directory):
+@verbatim
+Get-Ecc > exec initEverything.ecc
+@endverbatim
+
+@section sec_RCC Getting started with the GANIL Run Control
+
+@image html ganil_statemachine_usage_w600.png "Software components involved to control the GET electronics with the GANIL RCC."
+
+-# Setup the R-CoBo system (see @ref sec_SetupRCoBo) or your micoTCA CoBo / Mutant system.
+-# Install Narval and the GANIL Run Control software (Cf. <a href="http://wiki.ganil.fr/gap/wiki/GANIL-SPIRAL2-DAQ-Packages-Distribution">GANIL wiki</a>).
+-# Create a Narval topology
+  - Start a new experiment
+ 	@verbatim
+start_acq my_experiment
+ 	@endverbatim
+  - When the menu of the experiment is displayed, enter RC and wait for the Run Control GUI to appear.
+@image html rcc_experiment_menu.png "RCC Experiment Menu"
+  - Create a topology for your experiment:
+    -# Add an equipment of type <i>Electronics Control Core</i>
+@image html rccgui_addcatcher.png "Adding a Narval equipment to a topology."
+    -# Create Narval sub-systems
+    -# For each R-CoBo board in your setup, add an equipment of type <i>Narval actor defined by a template file</i> and select the <i>gnarval-mfm-catcher.template</i> template file.
+    The Narval actor <i>gnarval-cobo-catcher.template</i> is designed for a micro-TCA CoBo board and requires four output fluxes.
+      - Rename the actor so that its name is the one given to the CoBo board in the configuration files (example: <i>CoBo[Crate00_Slot00]</i>).
+      - Fill the <i>HostName</i> field with the IP address of the DAQ station.
+@image html rccgui_prepared.png "Example of a Narval topology for a single reduced CoBo board."
+    -# For each micro-TCA CoBo board in your setup, add an equipment of type <i>gnarval_cobo_catcher</i>. It needs 4 output links to the merger actor. It takes into account the topology frame sent by CoBo and generates empty frames for inactive AsAd cards.
+    -# For each MuTanT module, an actor <i>gnarval_mfm_catcher</i> must be used to readout data. 
+    -# Add a Narval actor of type <i>MFM Narval Watcher</i>
+    -# Add a Narval actor of type <i>MFM Narval Storage</i>
+    -# Create links between the equipments. Their buffer size shall be greater than 1 MB.
+    -# Edit the start and stop configurations to add the ECC:
+      - In the start configuration, NARVAL should appear <em>before</em> ECC.
+      - In the stop configuration, NARVAL should appear <em>after</em> ECC.
+    -# Save your topology
+-# Start the SOAP version of the GET @ref sec_tools_getEccServer, <em>getEccSoapServer</em>, from a terminal.
+  - The port used by the ECC server should be the port specified in the properties of the ECC equipment in the topology.
+  - The run directory of <em>getEccSoapServer</em> will serve as configuration repository unless the <em>--config-repo-url</em> is provided.
+  - For information on how to create a configuration set, see @ref subsec_ConfigRepository.
+-# Switch to the monitoring mode of the Run Control.
+@image html rccgui_ecc_command_panel.png "ECC specific command panel in the Run Control GUI."
+-# Select a configuration
+  - In the contextual menu of the <em>Electronics Control Core</em> equipment, select <em>Specific Command Panel</em> to open the ECC window.
+  - After pressing <em>Refresh list</em>, the list of configuration sets available to the ECC is displayed.
+  - Select a configuration set and press the <em>Change</em> button.
+-# Click on <i>Init</i>
+  - Once in the READY state, check the <em>Storage</em> box in the properties of the <em>MFM storage</em> equipment.
+-# Click on <i>Start</i>
+@image html rccgui_running.png
+@see @ref sec_ref_GANIL
+  
+
+@section sec_CoBoFrameViewer How to display the stored data
+	See @ref sec_tools_CoBoFrameViewer
+
+$LastChangedDate$
+*/

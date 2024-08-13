@@ -1,0 +1,13 @@
+if VXWORKS_KERNEL
+EXTRA_PROGRAMS = MultiFrameTest_partialimage
+
+nodist_MultiFrameTest_SOURCES = MultiFrameTest_ctdt.c
+MultiFrameTest_partialimage_SOURCES = $(MultiFrameTest_SOURCES)
+MultiFrameTest_partialimage_LDADD = $(MultiFrameTest_LDADD)
+
+BUILT_SOURCES = MultiFrameTest_ctdt.c
+CLEANFILES += MultiFrameTest_ctdt.c
+
+MultiFrameTest_ctdt.c: MultiFrameTest_partialimage$(EXEEXT)
+	$(host_alias)-nm $^ | tclsh $(WIND_BASE)/host/resource/hutils/tcl/munch.tcl -c `echo $(host_alias) | sed -r "s/(.*)-(.*)-(.*)/\1/"` > $@
+endif

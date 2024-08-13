@@ -1,0 +1,10 @@
+/**
+@mainpage Documentation of the CoBoFrameViewer package
+
+This package provides the following tools:
+  - cobo-frame-viewer, to display the contents of raw CoBo frames
+  - cobo-frame-raw2root, to convert CoBo frames from their raw, binary, MFM format to the ROOT format
+  - cobo-frame-root2disp, to display the contents of ROOT CoBo frames
+
+See GET software <a href="https://dsm-trac.cea.fr/get/doxygen/GetBench/html/main.html">user documentation</a>.
+*/

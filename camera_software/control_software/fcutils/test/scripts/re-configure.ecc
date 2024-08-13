@@ -1,0 +1,6 @@
+sm-breakup
+sm-reset
+sm-reset
+sm-describe mono-node
+sm-prepare pedestals
+sm-configure pedestals <DataLinkSet><DataLink><DataSender id="CoBo[0]" /><DataRouter name="dataRouter" ipAddress="192.168.41.20" port="46005" type="TCP" /></DataLink></DataLinkSet>

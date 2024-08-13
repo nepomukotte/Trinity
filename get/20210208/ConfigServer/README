@@ -1,0 +1,34 @@
+
+Launch .jar with a main (MyApplication) from the debug dir :
+------------------------------------------
+Usage : 
+java -cp [classpath] [lib dir] [MainClass]
+
+Example :
+java -classpath src/:jccfg.jar -Djava.library.path=.libs/ CCfg.MyApplication 
+
+
+
+
+Compile Java Test from the test dir: 
+------------------
+Usage:
+javac -cp [classpath] [javafiles]
+
+Example:
+#javac -cp .:/home/rvloic/.eclipse/org.eclipse.platform_3.4.0_1473617060/plugins/org.junit4_4.3.1/junit.jar:../build/debug/jccfg.jar *.java
+javac -cp .:/usr/share/java/junit4.jar:../build/pentium-linux-release/jccfg.jar *.java
+
+
+
+Launch Java Test (example with ConfigServerTest) :
+------------------------------------------------
+Usage:
+java  -cp [classpath] [lib dir] [JUnit] [TestClass]
+
+Example:
+#java  -cp .:/home/rvloic/.eclipse/org.eclipse.platform_3.4.0_1473617060/plugins/org.junit4_4.3.1/junit.jar:../build/debug/jccfg.jar -Djava.library.path=../build/debug/.libs/ org.junit.runner.JUnitCore ConfigServerTest
+java -cp .:/usr/share/java/junit4.jar:../build/pentium-linux-release/jccfg.jar -Djava.library.path=../build/pentium-linux-release/.libs/ org.junit.runner.JUnitCore ConfigServerTest
+java -cp .:/usr/share/java/junit4.jar:../build/pentium-linux-release/jccfg.jar -Djava.library.path=../build/pentium-linux-release/.libs/ org.junit.runner.JUnitCore JDocumentTest
+java -cp .:/usr/share/java/junit4.jar:../build/pentium-linux-release/jccfg.jar -Djava.library.path=../build/pentium-linux-release/.libs/ org.junit.runner.JUnitCore JCConfigTest
+java -cp .:/usr/share/java/junit4.jar:../build/pentium-linux-release/jccfg.jar -Djava.library.path=../build/pentium-linux-release/.libs/ GetConfigParser configure-pedestals.xcfg
